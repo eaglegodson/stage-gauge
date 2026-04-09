@@ -1,7 +1,7 @@
 import { supabase } from '../../../lib/supabase'
 
-export default async function ShowPage({ params }) {
-  const { id } = await params
+export default async function ShowPage({ params }: { params: Promise<{ id: string }> }) {
+      const { id } = await params
 
   const { data: production } = await supabase
     .from('production_listing')
