@@ -5,8 +5,15 @@ import { supabase } from '../lib/supabase'
 
 export default function Home() {
   const [productions, setProductions] = useState<any[]>([])
-    const [typeFilter, setTypeFilter] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+  }, [])
 
   useEffect(() => {
     async function fetchProductions() {
@@ -16,13 +23,8 @@ export default function Home() {
         .not('combined_score', 'is', null)
         .order('combined_score', { ascending: false })
 
-      if (typeFilter !== 'all') {
-        query = query.eq('type', typeFilter)
-      }
-
-      if (cityFilter !== 'all') {
-        query = query.eq('city', cityFilter)
-      }
+      if (typeFilter !== 'all') query = query.eq('type', typeFilter)
+      if (cityFilter !== 'all') query = query.eq('city', cityFilter)
 
       const { data, error } = await query
       if (!error) setProductions(data)
@@ -40,10 +42,23 @@ export default function Home() {
           <h1 className="font-serif text-2xl font-semibold text-gray-900">Stage Gauge</h1>
           <p className="text-xs text-gray-400 mt-0.5">The home for live performance reviews</p>
         </div>
-        <a href="/auth" className="text-sm text-white px-4 py-2 rounded-full" style={{backgroundColor: '#1D9E75'}}>
-          Sign in
-        </a>
+        {user ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600">{user.user_metadata?.display_name || user.email}</span>
+            <button
+              onClick={async () => { await supabase.auth.signOut(); setUser(null) }}
+              className="text-sm text-gray-500 underline"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <a href="/auth" className="text-sm text-white px-4 py-2 rounded-full" style={{backgroundColor: '#1D9E75'}}>
+            Sign in
+          </a>
+        )}
       </header>
+
       <div className="border-b border-gray-100 px-6 py-3 flex gap-2 overflow-x-auto">
         {typeFilters.map((f) => (
           <button
@@ -59,6 +74,7 @@ export default function Home() {
           </button>
         ))}
       </div>
+
       <div className="border-b border-gray-100 px-6 py-3 flex gap-2 overflow-x-auto">
         {cityFilters.map((c) => (
           <button
@@ -74,12 +90,13 @@ export default function Home() {
           </button>
         ))}
       </div>
+
       <div className="max-w-2xl mx-auto px-6 py-8">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">
           Now showing
         </h2>
         <div className="space-y-4">
-          {productions?.map((p) => (<a
+          {productions?.map((p) => (
             
               key={p.production_id}
               href={"/show/" + p.production_id}
@@ -99,17 +116,4 @@ export default function Home() {
                     <div className="text-2xl font-bold" style={{color: '#1D9E75'}}>{Math.round(p.combined_score)}</div>
                     <div className="flex gap-0.5 mt-1">
                       {[1,2,3,4,5].map((bar) => (
-                        <div key={bar} className="w-1.5 h-4 rounded-sm" style={{backgroundColor: Math.round(p.combined_score) >= bar * 20 ? '#1D9E75' : '#E5E7EB'}}></div>
-                      ))}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">{(p.critic_count || 0) + (p.audience_count || 0)} reviews</div>
-                  </div>
-                )}
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-    </main>
-  )
-}
+                        <div key={bar} className="w-1.5 h-4 rounded-sm" style={{backgroundColor: Math.round(p.combined_
