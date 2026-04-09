@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function Home() {
-  const [productions, setProductions] = useState([])
-  const [typeFilter, setTypeFilter] = useState('all')
+  const [productions, setProductions] = useState<any[]>([])
+    const [typeFilter, setTypeFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
 
   useEffect(() => {
