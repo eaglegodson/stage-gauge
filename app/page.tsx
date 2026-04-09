@@ -40,9 +40,9 @@ export default function Home() {
           <h1 className="font-serif text-2xl font-semibold text-gray-900">Stage Gauge</h1>
           <p className="text-xs text-gray-400 mt-0.5">The home for live performance reviews</p>
         </div>
-        <button className="text-sm text-white px-4 py-2 rounded-full" style={{backgroundColor: '#1D9E75'}}>
+        <a href="/auth" className="text-sm text-white px-4 py-2 rounded-full" style={{backgroundColor: '#1D9E75'}}>
           Sign in
-        </button>
+        </a>
       </header>
       <div className="border-b border-gray-100 px-6 py-3 flex gap-2 overflow-x-auto">
         {typeFilters.map((f) => (
