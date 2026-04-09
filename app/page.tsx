@@ -36,84 +36,71 @@ export default function Home() {
   const cityFilters = ['all', 'Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Canberra', 'Hobart', 'Auckland', 'Wellington', 'Christchurch', 'London']
 
   return (
-    <main className="min-h-screen bg-white">
-      <header className="border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+    <main style={{minHeight: '100vh', backgroundColor: 'white'}}>
+      <header style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-gray-900">Stage Gauge</h1>
-          <p className="text-xs text-gray-400 mt-0.5">The home for live performance reviews</p>
+          <h1 style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#111827'}}>Stage Gauge</h1>
+          <p style={{fontSize: '11px', color: '#9ca3af', marginTop: '2px'}}>The home for live performance reviews</p>
         </div>
         {user ? (
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600">{user.user_metadata?.display_name || user.email}</span>
-            <button
-              onClick={async () => { await supabase.auth.signOut(); setUser(null) }}
-              className="text-sm text-gray-500 underline"
-            >
-              Sign out
-            </button>
+          <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+            <span style={{fontSize: '14px', color: '#4b5563'}}>{user.user_metadata?.display_name || user.email}</span>
+            <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{fontSize: '14px', color: '#6b7280', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer'}}>Sign out</button>
           </div>
         ) : (
-          <a href="/auth" className="text-sm text-white px-4 py-2 rounded-full" style={{backgroundColor: '#1D9E75'}}>
-            Sign in
-          </a>
+          <a href="/auth" style={{fontSize: '14px', color: 'white', padding: '8px 16px', borderRadius: '20px', backgroundColor: '#1D9E75', textDecoration: 'none'}}>Sign in</a>
         )}
       </header>
 
-      <div className="border-b border-gray-100 px-6 py-3 flex gap-2 overflow-x-auto">
+      <div style={{borderBottom: '1px solid #f3f4f6', padding: '12px 24px', display: 'flex', gap: '8px', overflowX: 'auto'}}>
         {typeFilters.map((f) => (
-          <button
-            key={f}
-            onClick={() => setTypeFilter(f)}
-            className="text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap transition-colors capitalize"
-            style={{
-              backgroundColor: typeFilter === f ? '#1D9E75' : '#F3F4F6',
-              color: typeFilter === f ? 'white' : '#6B7280'
-            }}
-          >
+          <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: '500', padding: '6px 12px', borderRadius: '20px', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', backgroundColor: typeFilter === f ? '#1D9E75' : '#f3f4f6', color: typeFilter === f ? 'white' : '#6b7280'}}>
             {f === 'all' ? 'All types' : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
 
-      <div className="border-b border-gray-100 px-6 py-3 flex gap-2 overflow-x-auto">
+      <div style={{borderBottom: '1px solid #f3f4f6', padding: '12px 24px', display: 'flex', gap: '8px', overflowX: 'auto'}}>
         {cityFilters.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCityFilter(c)}
-            className="text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap transition-colors"
-            style={{
-              backgroundColor: cityFilter === c ? '#111827' : '#F3F4F6',
-              color: cityFilter === c ? 'white' : '#6B7280'
-            }}
-          >
+          <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: '500', padding: '6px 12px', borderRadius: '20px', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', backgroundColor: cityFilter === c ? '#111827' : '#f3f4f6', color: cityFilter === c ? 'white' : '#6b7280'}}>
             {c === 'all' ? 'All cities' : c}
           </button>
         ))}
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-8">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">
-          Now showing
-        </h2>
-        <div className="space-y-4">
-          {productions?.map((p) => (<a
-            
-              key={p.production_id}
-              href={"/show/" + p.production_id}
-              className="block border border-gray-100 rounded-xl p-4 hover:border-gray-300 transition-colors"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 capitalize">{p.type}</span>
-                    <span className="text-xs text-gray-400">{p.city}</span>
+      <div style={{maxWidth: '672px', margin: '0 auto', padding: '32px 24px'}}>
+        <h2 style={{fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9ca3af', marginBottom: '24px'}}>Now showing</h2>
+        <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+          {productions?.map((p) => {
+            const score = p.combined_score ? Math.round(p.combined_score) : null
+            return (
+              <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'block', border: '1px solid #f3f4f6', borderRadius: '12px', padding: '16px', textDecoration: 'none', color: 'inherit'}}>
+                <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px'}}>
+                  <div style={{flex: 1, minWidth: 0}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px'}}>
+                      <span style={{fontSize: '11px', fontWeight: '500', padding: '2px 8px', borderRadius: '20px', backgroundColor: '#f3f4f6', color: '#4b5563', textTransform: 'capitalize'}}>{p.type}</span>
+                      <span style={{fontSize: '11px', color: '#9ca3af'}}>{p.city}</span>
+                    </div>
+                    <h3 style={{fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: '600', color: '#111827', lineHeight: '1.3', margin: '0 0 4px 0'}}>{p.title}</h3>
+                    <p style={{fontSize: '14px', color: '#6b7280', margin: 0}}>{p.company} · {p.venue}</p>
                   </div>
-                  <h3 className="font-serif text-lg font-semibold text-gray-900 leading-tight">{p.title}</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">{p.company} · {p.venue}</p>
+                  {score && (
+                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0}}>
+                      <div style={{fontSize: '24px', fontWeight: 'bold', color: '#1D9E75'}}>{score}</div>
+                      <div style={{display: 'flex', gap: '2px', marginTop: '4px'}}>
+                        {[1,2,3,4,5].map((bar) => (
+                          <div key={bar} style={{width: '6px', height: '16px', borderRadius: '2px', backgroundColor: score >= bar * 20 ? '#1D9E75' : '#e5e7eb'}}></div>
+                        ))}
+                      </div>
+                      <div style={{fontSize: '11px', color: '#9ca3af', marginTop: '4px'}}>{(p.critic_count || 0) + (p.audience_count || 0)} reviews</div>
+                    </div>
+                  )}
                 </div>
-                {p.combined_score && (
-                  <div className="flex flex-col items-center flex-shrink-0">
-                    <div className="text-2xl font-bold" style={{color: '#1D9E75'}}>{Math.round(p.combined_score)}</div>
-                    <div className="flex gap-0.5 mt-1">
-                      {[1,2,3,4,5].map((bar) => (
-                        <div key={bar} className="w-1.5 h-4 rounded-sm" style={{backgroundColor: Math.round(p.combined_
+              </a>
+            )
+          })}
+        </div>
+      </div>
+    </main>
+  )
+}
