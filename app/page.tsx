@@ -39,17 +39,20 @@ export default function Home() {
     <main style={{minHeight: '100vh', backgroundColor: 'white'}}>
       <header style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
         <div>
-          <h1 style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#111827'}}>Stage Gauge</h1>
-          <p style={{fontSize: '11px', color: '#9ca3af', marginTop: '2px'}}>The home for live performance reviews</p>
+          <h1 style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#111827', margin: 0}}>Stage Gauge</h1>
+          <p style={{fontSize: '11px', color: '#9ca3af', margin: '2px 0 0 0'}}>The home for live performance reviews</p>
         </div>
-        {user ? (
-          <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-            <span style={{fontSize: '14px', color: '#4b5563'}}>{user.user_metadata?.display_name || user.email}</span>
-            <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{fontSize: '14px', color: '#6b7280', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer'}}>Sign out</button>
-          </div>
-        ) : (
-          <a href="/auth" style={{fontSize: '14px', color: 'white', padding: '8px 16px', borderRadius: '20px', backgroundColor: '#1D9E75', textDecoration: 'none'}}>Sign in</a>
-        )}
+        <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
+          <a href="/search" style={{fontSize: '14px', color: '#6b7280', textDecoration: 'none'}}>Search</a>
+          {user ? (
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+              <span style={{fontSize: '14px', color: '#4b5563'}}>{user.user_metadata?.display_name || user.email}</span>
+              <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{fontSize: '14px', color: '#6b7280', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer'}}>Sign out</button>
+            </div>
+          ) : (
+            <a href="/auth" style={{fontSize: '14px', color: 'white', padding: '8px 16px', borderRadius: '20px', backgroundColor: '#1D9E75', textDecoration: 'none'}}>Sign in</a>
+          )}
+        </div>
       </header>
 
       <div style={{borderBottom: '1px solid #f3f4f6', padding: '12px 24px', display: 'flex', gap: '8px', overflowX: 'auto'}}>
