@@ -96,7 +96,7 @@ export default function Home() {
           Now showing
         </h2>
         <div className="space-y-4">
-          {productions?.map((p) => (
+          {productions?.map((p) => (<a
             
               key={p.production_id}
               href={"/show/" + p.production_id}
