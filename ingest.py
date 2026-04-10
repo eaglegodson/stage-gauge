@@ -40,7 +40,7 @@ EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the te
 {{
   "outlet": "name of publication",
   "reviewer": "critic name or null",
-  "star_rating": 4.5,
+  "star_rating": 4.5 or null if no explicit rating is given — do NOT infer from sentiment,
   "pull_quote": "a complete, standalone sentence from the review that makes sense on its own without context - must start with a capital letter and be grammatically complete, or null",
   "show_title": "canonical name of production only - no subtitles or venue names",
   "company": "performing company or null",

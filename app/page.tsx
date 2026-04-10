@@ -24,6 +24,26 @@ function TypeTile({ type, size = 'sm' }: { type: string, size?: 'sm' | 'lg' }) {
   )
 }
 
+function StarDisplay({ score, size = 'sm' }: { score: number, size?: 'sm' | 'lg' }) {
+  const stars = []
+  const fullStars = Math.floor(score)
+  const hasHalf = score - fullStars >= 0.25 && score - fullStars < 0.75
+  const roundedUp = score - fullStars >= 0.75
+  const total = roundedUp ? fullStars + 1 : fullStars
+  const fontSize = size === 'lg' ? '24px' : '16px'
+
+  for (let i = 1; i <= 5; i++) {
+    if (i <= total) {
+      stars.push(<span key={i} style={{color: '#1D9E75', fontSize}}>★</span>)
+    } else if (i === fullStars + 1 && hasHalf) {
+      stars.push(<span key={i} style={{color: '#1D9E75', fontSize}}>½</span>)
+    } else {
+      stars.push(<span key={i} style={{color: '#E2DDD6', fontSize}}>★</span>)
+    }
+  }
+  return <span style={{display: 'flex', alignItems: 'center', gap: '1px', lineHeight: 1}}>{stars}</span>
+}
+
 function formatDates(start: string, end: string) {
   if (!start && !end) return null
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
@@ -114,9 +134,7 @@ export default function Home() {
     <main style={{minHeight: '100vh', backgroundColor: '#F5F0E8'}}>
       <Header onSearch={toggleSearch} />
 
-      {/* Both filter bars sticky together, just below the header */}
       <div style={{position: 'sticky', top: '56px', zIndex: 90}}>
-        {/* City filter bar */}
         <div style={{backgroundColor: '#0F1A14', borderBottom: '1px solid #1a2e1a', padding: '0 24px'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
             {availableCities.map((c) => (
@@ -126,8 +144,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-
-        {/* Type filter bar */}
         <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
             {availableTypes.map((f) => (
@@ -139,7 +155,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Search */}
       {searchOpen && (
         <div style={{borderBottom: '1px solid #E2DDD6', padding: '16px 24px', backgroundColor: '#FDFAF4'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto'}}>
@@ -163,7 +178,7 @@ export default function Home() {
                         <div style={{fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: '600', color: '#111827'}}>{p.title}</div>
                         <div style={{fontSize: '12px', color: '#6b7280'}}>{p.company} · {p.city}</div>
                       </div>
-                      {p.combined_score && <div style={{fontSize: '18px', fontWeight: 'bold', color: '#1D9E75'}}>{Math.round(p.combined_score)}</div>}
+                      {p.combined_score && <StarDisplay score={p.combined_score} />}
                     </a>
                   ))}
                 </div>
@@ -175,7 +190,6 @@ export default function Home() {
 
       <div style={{maxWidth: '1100px', margin: '0 auto', padding: '40px 24px'}}>
         {featured && (() => {
-          const score = featured.combined_score ? Math.round(featured.combined_score) : null
           const dates = formatDates(featured.season_start, featured.season_end)
           return (
             <a href={"/show/" + featured.production_id} style={{display: 'block', textDecoration: 'none', color: 'inherit', marginBottom: '40px'}}>
@@ -183,8 +197,8 @@ export default function Home() {
                 <TypeTile type={featured.type} size="lg" />
                 <div>
                   <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px'}}>
-                    {score && <span style={{fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#1D9E75'}}>★ Top rated</span>}
-                    {score && <span style={{fontSize: '10px', color: '#D1CBC0'}}>·</span>}
+                    {featured.combined_score && <span style={{fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#1D9E75'}}>★ Top rated</span>}
+                    {featured.combined_score && <span style={{fontSize: '10px', color: '#D1CBC0'}}>·</span>}
                     <span style={{fontSize: '10px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9ca3af'}}>{featured.type}</span>
                     <span style={{fontSize: '10px', color: '#D1CBC0'}}>·</span>
                     <span style={{fontSize: '10px', color: '#9ca3af'}}>{featured.city}</span>
@@ -194,19 +208,15 @@ export default function Home() {
                   <p style={{fontSize: '16px', color: '#4b5563', margin: '0 0 4px 0', fontWeight: '500'}}>{featured.company}</p>
                   <p style={{fontSize: '14px', color: '#9ca3af', margin: 0}}>{featured.venue}</p>
                 </div>
-                {score ? (
-                  <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #E2DDD6', paddingLeft: '32px', minWidth: '110px'}}>
-                    <div style={{fontSize: '54px', fontWeight: '700', color: '#1D9E75', lineHeight: 1}}>{score}</div>
-                    <div style={{display: 'flex', gap: '3px', margin: '10px 0'}}>
-                      {[1,2,3,4,5].map((bar) => (
-                        <div key={bar} style={{width: '7px', height: '20px', borderRadius: '2px', backgroundColor: score >= bar * 20 ? '#1D9E75' : '#E8E3DC'}}></div>
-                      ))}
-                    </div>
+                {featured.combined_score ? (
+                  <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #E2DDD6', paddingLeft: '32px', minWidth: '120px', gap: '8px'}}>
+                    <StarDisplay score={featured.combined_score} size="lg" />
+                    <div style={{fontSize: '13px', color: '#1D9E75', fontWeight: '600'}}>{featured.combined_score.toFixed(1)} / 5</div>
                     <div style={{fontSize: '11px', color: '#9ca3af', textAlign: 'center', lineHeight: '1.5'}}>Stage Gauge<br/>score</div>
-                    <div style={{fontSize: '11px', color: '#9ca3af', marginTop: '8px'}}>{(featured.critic_count || 0) + (featured.audience_count || 0)} reviews</div>
+                    <div style={{fontSize: '11px', color: '#9ca3af'}}>{(featured.critic_count || 0) + (featured.audience_count || 0)} reviews</div>
                   </div>
                 ) : (
-                  <div style={{borderLeft: '1px solid #E2DDD6', paddingLeft: '32px', minWidth: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <div style={{borderLeft: '1px solid #E2DDD6', paddingLeft: '32px', minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <span style={{fontSize: '11px', color: '#D1CBC0', textAlign: 'center'}}>No reviews<br/>yet</span>
                   </div>
                 )}
@@ -222,7 +232,6 @@ export default function Home() {
 
         <div style={{backgroundColor: 'white', border: '1px solid #E2DDD6', borderRadius: '4px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)'}}>
           {rest.map((p, i) => {
-            const score = p.combined_score ? Math.round(p.combined_score) : null
             const dates = formatDates(p.season_start, p.season_end)
             return (
               <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 20px', textDecoration: 'none', color: 'inherit', borderBottom: i < rest.length - 1 ? '1px solid #F5F0E8' : 'none'}}>
@@ -243,16 +252,7 @@ export default function Home() {
                     </>}
                   </div>
                 </div>
-                {score && (
-                  <div style={{display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0}}>
-                    <div style={{display: 'flex', gap: '2px'}}>
-                      {[1,2,3,4,5].map((bar) => (
-                        <div key={bar} style={{width: '4px', height: '14px', borderRadius: '1px', backgroundColor: score >= bar * 20 ? '#1D9E75' : '#E8E3DC'}}></div>
-                      ))}
-                    </div>
-                    <span style={{fontSize: '17px', fontWeight: '700', color: '#1D9E75', width: '32px', textAlign: 'right'}}>{score}</span>
-                  </div>
-                )}
+                {p.combined_score && <StarDisplay score={p.combined_score} />}
               </a>
             )
           })}
