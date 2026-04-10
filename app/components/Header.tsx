@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 
-export default function Header() {
+export default function Header({ onSearch }: { onSearch?: () => void }) {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
@@ -29,6 +29,9 @@ export default function Header() {
         <span style={{fontSize: '11px', color: '#4ade80', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: '500'}}>Beta</span>
       </a>
       <nav style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
+        {onSearch && (
+          <button onClick={onSearch} style={{fontSize: '13px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>🔍 Search</button>
+        )}
         {user && (
           <>
             <a href="/watchlist" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Watchlist</a>

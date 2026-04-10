@@ -108,19 +108,15 @@ export default function Home() {
   const featured = productions[0]
   const rest = productions.slice(1)
 
+  const toggleSearch = () => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }
+
   return (
     <main style={{minHeight: '100vh', backgroundColor: '#F5F0E8'}}>
-      <Header />
+      <Header onSearch={toggleSearch} />
 
       {/* City filter bar */}
       <div style={{backgroundColor: '#0F1A14', borderBottom: '1px solid #1a2e1a', padding: '0 24px'}}>
         <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
-          <button
-            onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }}
-            style={{fontSize: '12px', color: '#6b7280', background: 'none', border: 'none', borderRight: '1px solid #1a2e1a', padding: '10px 16px 10px 0', marginRight: '16px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0}}
-          >
-            {searchOpen ? '✕' : '🔍'}
-          </button>
           {availableCities.map((c) => (
             <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: cityFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: cityFilter === c ? '2px solid #ffffff' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: cityFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
               {c === 'all' ? 'All cities' : c}
