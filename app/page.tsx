@@ -178,7 +178,7 @@ export default function Home() {
         .or(timingFilter === 'past' ? `season_end.lt.${today}` : `season_end.is.null,season_end.gte.${today}`)
 
       if (data) {
-        const cityOrder = ['Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Auckland', 'Wellington', 'Christchurch', 'London']
+        const cityOrder = ['Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Hobart', 'Auckland', 'Wellington', 'Christchurch', 'London']
         const foundCities = Array.from(new Set(data.map((p: any) => p.city).filter(Boolean)))
         const sortedCities = ['all', ...cityOrder.filter(c => foundCities.includes(c))]
         const types = ['all', ...Array.from(new Set(data.map((p: any) => p.type).filter(Boolean))).sort()]
