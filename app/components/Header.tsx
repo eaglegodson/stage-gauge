@@ -53,7 +53,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
             Sign in
           </a>
         )}
-        <a href="/archive" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Archive</a>
+        <a href="/archive" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Past shows</a>
       </nav>
     </header>
   )
