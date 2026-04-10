@@ -34,6 +34,8 @@ FEEDS = [
     {"outlet": "Theatreview", "url": "https://theatreview.org.nz/feed", "city": None, "country": "NZ"},
     # London - dedicated theatre feeds
     {"outlet": "The Guardian", "url": "https://www.theguardian.com/stage/rss", "city": "London", "country": "GB"},
+    {"outlet": "X-Press Magazine", "url": "https://xpressmag.com.au/category/arts-lifestyle/arts-lifestyle-reviews/feed/", "city": "Perth", "country": "AU"},
+    {"outlet": "Theatre Reviews Perth", "url": "https://www.theatrereviewsperth.com.au/feed/", "city": "Perth", "country": "AU"},
     {"outlet": "West End Wilma", "url": "https://westendwilma.com/feed", "city": "London", "country": "GB"},
     {"outlet": "Everything Theatre", "url": "https://everything-theatre.co.uk/feed", "city": "London", "country": "GB"},
     {"outlet": "Exeunt Magazine", "url": "https://exeuntmagazine.com/feed/", "city": "London", "country": "GB"},
