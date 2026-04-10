@@ -17,12 +17,7 @@ function TypeTile({ type, size = 'sm' }: { type: string, size?: 'sm' | 'lg' }) {
   const colors = typeColors[type] || typeColors.theatre
   const dim = size === 'lg' ? { width: '120px', height: '160px', fontSize: '36px' } : { width: '56px', height: '72px', fontSize: '20px' }
   return (
-    <div style={{
-      width: dim.width, height: dim.height, borderRadius: '4px',
-      backgroundColor: colors.bg, flexShrink: 0,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px',
-      border: `1px solid ${colors.accent}22`
-    }}>
+    <div style={{width: dim.width, height: dim.height, borderRadius: '4px', backgroundColor: colors.bg, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px', border: `1px solid ${colors.accent}22`}}>
       <span style={{fontSize: dim.fontSize}}>{colors.emoji}</span>
       <div style={{width: '20px', height: '2px', backgroundColor: colors.accent, borderRadius: '1px'}}></div>
     </div>
@@ -31,14 +26,10 @@ function TypeTile({ type, size = 'sm' }: { type: string, size?: 'sm' | 'lg' }) {
 
 function formatDates(start: string, end: string) {
   if (!start && !end) return null
-  const fmt = (d: string) => {
-    const date = new Date(d)
-    return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
-  }
+  const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
   const now = new Date()
   const endDate = end ? new Date(end) : null
   const startDate = start ? new Date(start) : null
-  
   if (endDate && endDate < now) return null
   if (startDate && startDate > now) return `${fmt(start)} – ${fmt(end)}`
   if (start && end) return `Until ${fmt(end)}`
@@ -47,6 +38,8 @@ function formatDates(start: string, end: string) {
 
 export default function Home() {
   const [productions, setProductions] = useState<any[]>([])
+  const [availableCities, setAvailableCities] = useState<string[]>([])
+  const [availableTypes, setAvailableTypes] = useState<string[]>([])
   const [typeFilter, setTypeFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -67,7 +60,6 @@ export default function Home() {
         .from('production_listing')
         .select('*')
         .or(`title.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%,venue.ilike.%${searchQuery}%`)
-        .or('season_end.is.null,season_end.gte.' + new Date().toISOString().split('T')[0])
         .order('combined_score', { ascending: false, nullsFirst: false })
         .limit(8)
       setSearchResults(data || [])
@@ -77,23 +69,38 @@ export default function Home() {
   }, [searchQuery])
 
   useEffect(() => {
+    const today = new Date().toISOString().split('T')[0]
     async function fetchProductions() {
       let query = supabase
         .from('production_listing')
         .select('*')
+        .or(`season_end.is.null,season_end.gte.${today}`)
         .order('combined_score', { ascending: false, nullsFirst: false })
 
       if (typeFilter !== 'all') query = query.eq('type', typeFilter)
       if (cityFilter !== 'all') query = query.eq('city', cityFilter)
 
       const { data, error } = await query
-      if (!error) setProductions(data)
+      if (!error) setProductions(data || [])
     }
-    fetchProductions()
-  }, [typeFilter, cityFilter])
 
-  const typeFilters = ['all', 'theatre', 'musical', 'opera', 'ballet', 'dance']
-  const cityFilters = ['all', 'Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Canberra', 'Hobart', 'Auckland', 'Wellington', 'Christchurch', 'London']
+    async function fetchFilters() {
+      const { data } = await supabase
+        .from('production_listing')
+        .select('city, type')
+        .or(`season_end.is.null,season_end.gte.${today}`)
+
+      if (data) {
+        const cities = ['all', ...Array.from(new Set(data.map((p: any) => p.city).filter(Boolean))).sort()]
+        const types = ['all', ...Array.from(new Set(data.map((p: any) => p.type).filter(Boolean))).sort()]
+        setAvailableCities(cities)
+        setAvailableTypes(types)
+      }
+    }
+
+    fetchProductions()
+    fetchFilters()
+  }, [typeFilter, cityFilter])
 
   const featured = productions[0]
   const rest = productions.slice(1)
@@ -102,7 +109,6 @@ export default function Home() {
     <main style={{minHeight: '100vh', backgroundColor: '#F5F0E8'}}>
       <Header />
 
-      {/* Filter bar */}
       <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px', position: 'sticky', top: '56px', zIndex: 90}}>
         <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
           <button
@@ -111,13 +117,13 @@ export default function Home() {
           >
             {searchOpen ? '✕' : '🔍 Search'}
           </button>
-          {typeFilters.map((f) => (
+          {availableTypes.map((f) => (
             <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: typeFilter === f ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: typeFilter === f ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: typeFilter === f ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
               {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
           <div style={{width: '1px', height: '16px', backgroundColor: '#243824', margin: '0 8px', flexShrink: 0}}></div>
-          {cityFilters.map((c) => (
+          {availableCities.map((c) => (
             <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: cityFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: cityFilter === c ? '2px solid #ffffff' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: cityFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
               {c === 'all' ? 'All cities' : c}
             </button>
@@ -125,7 +131,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Search */}
       {searchOpen && (
         <div style={{borderBottom: '1px solid #E2DDD6', padding: '16px 24px', backgroundColor: '#FDFAF4'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto'}}>
@@ -160,8 +165,6 @@ export default function Home() {
       )}
 
       <div style={{maxWidth: '1100px', margin: '0 auto', padding: '40px 24px'}}>
-
-        {/* Featured */}
         {featured && (() => {
           const score = featured.combined_score ? Math.round(featured.combined_score) : null
           const dates = formatDates(featured.season_start, featured.season_end)
@@ -203,13 +206,11 @@ export default function Home() {
           )
         })()}
 
-        {/* Section label */}
         <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px'}}>
           <span style={{fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9ca3af', whiteSpace: 'nowrap'}}>All productions</span>
           <div style={{flex: 1, height: '1px', backgroundColor: '#E2DDD6'}}></div>
         </div>
 
-        {/* Listings */}
         <div style={{backgroundColor: 'white', border: '1px solid #E2DDD6', borderRadius: '4px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)'}}>
           {rest.map((p, i) => {
             const score = p.combined_score ? Math.round(p.combined_score) : null
