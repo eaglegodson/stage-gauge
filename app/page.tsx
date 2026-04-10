@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function Home() {
@@ -8,12 +8,39 @@ export default function Home() {
   const [typeFilter, setTypeFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
   const [user, setUser] = useState<any>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searching, setSearching] = useState(false)
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
   }, [])
+
+  useEffect(() => {
+    if (searchOpen && searchRef.current) {
+      searchRef.current.focus()
+    }
+  }, [searchOpen])
+
+  useEffect(() => {
+    if (!searchQuery.trim()) { setSearchResults([]); return }
+    const timer = setTimeout(async () => {
+      setSearching(true)
+      const { data } = await supabase
+        .from('production_listing')
+        .select('*')
+        .or(`title.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%,venue.ilike.%${searchQuery}%`)
+        .order('combined_score', { ascending: false, nullsFirst: false })
+        .limit(8)
+      setSearchResults(data || [])
+      setSearching(false)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   useEffect(() => {
     async function fetchProductions() {
@@ -43,7 +70,9 @@ export default function Home() {
           <p style={{fontSize: '11px', color: '#9ca3af', margin: '2px 0 0 0'}}>The home for live performance reviews</p>
         </div>
         <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-          <a href="/search" style={{fontSize: '14px', color: '#6b7280', textDecoration: 'none'}}>Search</a>
+          <button onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }} style={{fontSize: '14px', color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer'}}>
+            {searchOpen ? '✕ Close' : '🔍 Search'}
+          </button>
           {user ? (
             <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
               <span style={{fontSize: '14px', color: '#4b5563'}}>{user.user_metadata?.display_name || user.email}</span>
@@ -54,6 +83,38 @@ export default function Home() {
           )}
         </div>
       </header>
+
+      {searchOpen && (
+        <div style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', backgroundColor: '#f9fafb'}}>
+          <input
+            ref={searchRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search shows, companies, venues..."
+            style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '12px 16px', fontSize: '15px', color: '#111827', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box'}}
+          />
+          {searchQuery && (
+            <div style={{marginTop: '8px'}}>
+              {searching && <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>Searching...</p>}
+              {!searching && searchResults.length === 0 && searchQuery && (
+                <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>No results for "{searchQuery}"</p>
+              )}
+              <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px'}}>
+                {searchResults.map((p) => (
+                  <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #f3f4f6', textDecoration: 'none', color: 'inherit'}}>
+                    <div>
+                      <div style={{fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#111827'}}>{p.title}</div>
+                      <div style={{fontSize: '13px', color: '#6b7280'}}>{p.company} · {p.city}</div>
+                    </div>
+                    {p.combined_score && <div style={{fontSize: '18px', fontWeight: 'bold', color: '#1D9E75'}}>{Math.round(p.combined_score)}</div>}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{borderBottom: '1px solid #f3f4f6', padding: '12px 24px', display: 'flex', gap: '8px', overflowX: 'auto'}}>
         {typeFilters.map((f) => (
