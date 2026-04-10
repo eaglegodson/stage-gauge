@@ -306,7 +306,12 @@ export default function Home() {
                         <div style={{fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: '600', color: '#111827'}}>{p.title}</div>
                         <div style={{fontSize: '12px', color: '#6b7280'}}>{p.venue || p.company} · {p.city}{p.season_end && new Date(p.season_end) >= new Date() && p.season_start && new Date(p.season_start) <= new Date() ? ' · Until ' + new Date(p.season_end).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) : p.season_start && new Date(p.season_start) > new Date() ? ' · ' + new Date(p.season_start).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) + ' – ' + (p.season_end ? new Date(p.season_end).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) : '') : ''}</div>
                       </div>
-                      {p.combined_score && <StarDisplay score={p.combined_score} />}
+                      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0}}>
+                  {p.combined_score && <StarDisplay score={p.combined_score} />}
+                  {((p.critic_count || 0) + (p.audience_count || 0)) > 0 && (
+                    <span style={{fontSize: '10px', color: '#9ca3af'}}>{(p.critic_count || 0) + (p.audience_count || 0)} review{(p.critic_count || 0) + (p.audience_count || 0) !== 1 ? 's' : ''}</span>
+                  )}
+                </div>
                     </a>
                   ))}
                 </div>
@@ -383,7 +388,12 @@ export default function Home() {
                     </>}
                   </div>
                 </div>
-                {p.combined_score && <StarDisplay score={p.combined_score} />}
+                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0}}>
+                  {p.combined_score && <StarDisplay score={p.combined_score} />}
+                  {((p.critic_count || 0) + (p.audience_count || 0)) > 0 && (
+                    <span style={{fontSize: '10px', color: '#9ca3af'}}>{(p.critic_count || 0) + (p.audience_count || 0)} review{(p.critic_count || 0) + (p.audience_count || 0) !== 1 ? 's' : ''}</span>
+                  )}
+                </div>
               </a>
             )
           })}
