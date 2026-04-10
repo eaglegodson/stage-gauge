@@ -14,20 +14,12 @@ export default function AdminPage() {
   }, [])
 
   async function fetchReviews() {
-    const [critics, audience] = await Promise.all([
-      supabase
-        .from('critic_reviews')
-        .select('*, productions(show_id, venue, city, shows(title))')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('audience_reviews')
-        .select('*, productions(show_id, venue, city, shows(title))')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-    ])
-    setCriticReviews(critics.data || [])
-    setAudienceReviews(audience.data || [])
+    const { data } = await supabase
+      .from('audience_reviews')
+      .select('*, productions(show_id, venue, city, shows(title))')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+    setAudienceReviews(data || [])
     setLoading(false)
   }
 
