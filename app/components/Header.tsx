@@ -29,6 +29,7 @@ export default function Header() {
         <span style={{fontSize: '11px', color: '#4ade80', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: '500'}}>Beta</span>
       </a>
       <nav style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
+        <a href="/archive" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Archive</a>
         {user && (
           <>
             <a href="/watchlist" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Watchlist</a>
