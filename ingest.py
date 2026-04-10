@@ -1,0 +1,277 @@
+import os
+import json
+import feedparser
+import requests
+from datetime import datetime
+from supabase import create_client
+from anthropic import Anthropic
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_SECRET_KEY")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+claude = Anthropic(api_key=ANTHROPIC_API_KEY)
+
+FEEDS = [
+    {"outlet": "ArtsHub", "url": "https://www.artshub.com.au/feed/", "city": None, "country": "AU"},
+    {"outlet": "The Scoop", "url": "https://thescoop.au/feed", "city": None, "country": "AU"},
+    {"outlet": "Limelight", "url": "https://limelight-arts.com.au/live-reviews/feed", "city": None, "country": "AU"},
+    {"outlet": "Aussie Theatre", "url": "https://aussietheatre.com.au/feed", "city": None, "country": "AU"},
+    {"outlet": "Stage Noise", "url": "https://stagenoise.com/rss", "city": "Sydney", "country": "AU"},
+    {"outlet": "Australian Arts Review", "url": "https://artsreview.com.au/category/theatre/feed/", "city": None, "country": "AU"},
+    {"outlet": "Suzy Goes See", "url": "http://www.suzygoessee.com/feed", "city": "Sydney", "country": "AU"},
+    {"outlet": "Theatre Matters", "url": "https://theatrematters.com.au/feed", "city": None, "country": "AU"},
+    {"outlet": "The Age", "url": "https://www.theage.com.au/rss/feed.xml", "city": "Melbourne", "country": "AU"},
+    {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/feed.xml", "city": "Sydney", "country": "AU"},
+    {"outlet": "Brisbane Times", "url": "https://www.brisbanetimes.com.au/rss/feed.xml", "city": "Brisbane", "country": "AU"},
+    {"outlet": "Theatreview", "url": "https://theatreview.org.nz/feed", "city": None, "country": "NZ"},
+    {"outlet": "The Guardian", "url": "https://www.theguardian.com/stage/rss", "city": "London", "country": "GB"},
+    {"outlet": "West End Wilma", "url": "https://westendwilma.com/feed", "city": "London", "country": "GB"},
+    {"outlet": "Everything Theatre", "url": "https://everything-theatre.co.uk/feed", "city": "London", "country": "GB"},
+    {"outlet": "Exeunt Magazine", "url": "https://exeuntmagazine.com/feed/", "city": "London", "country": "GB"},
+]
+
+EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the text of a performing arts review, extract the following and return as JSON only with no other text:
+
+{{
+  "outlet": "name of publication",
+  "reviewer": "critic name or null",
+  "star_rating": 4.5,
+  "pull_quote": "a complete, standalone sentence from the review that makes sense on its own without context - must start with a capital letter and be grammatically complete, or null",
+  "show_title": "canonical name of production only - no subtitles or venue names",
+  "company": "performing company or null",
+  "city": "city where the show is performing or null",
+  "country": "country code e.g. GB, AU, NZ, US or null",
+  "is_arts_review": true,
+  "confidence": 0.9
+}}
+
+is_arts_review should be true only for theatre, musical, opera, ballet, dance, or concert reviews.
+star_rating should be out of 5. If the review uses a different scale (e.g. out of 4, out of 10, or percentage), convert it to a 0-5 scale. If no rating is given, infer a score from the sentiment: glowing=4.5-5, very positive=4-4.5, positive=3.5-4, mixed=3, negative=2, very negative=1.
+Return JSON only. No markdown. No explanation.
+
+Review text:
+{text}
+
+Known shows: {shows}"""
+
+
+def get_known_shows():
+    result = supabase.table("shows").select("title, company").execute()
+    return [f"{s['title']} by {s['company']}" for s in result.data]
+
+
+def get_all_productions():
+    result = supabase.table("productions").select("id, city, country, shows(title)").execute()
+    return result.data
+
+
+def get_existing_urls():
+    result = supabase.table("critic_reviews").select("source_url").execute()
+    return {r["source_url"] for r in result.data if r["source_url"]}
+
+
+def fetch_feed(url):
+    try:
+        resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0 StageGauge/1.0"})
+        return feedparser.parse(resp.text)
+    except Exception as e:
+        print(f"  Feed fetch error: {e}")
+        return None
+
+
+def fetch_full_article(url):
+    try:
+        resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0 StageGauge/1.0"})
+        if resp.status_code == 200:
+            from html.parser import HTMLParser
+            class TextExtractor(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.text = []
+                    self.skip = False
+                def handle_starttag(self, tag, attrs):
+                    if tag in ('script', 'style', 'nav', 'header', 'footer'):
+                        self.skip = True
+                def handle_endtag(self, tag):
+                    if tag in ('script', 'style', 'nav', 'header', 'footer'):
+                        self.skip = False
+                def handle_data(self, data):
+                    if not self.skip and data.strip():
+                        self.text.append(data.strip())
+            parser = TextExtractor()
+            parser.feed(resp.text)
+            return ' '.join(parser.text)[:3000]
+    except:
+        pass
+    return None
+
+
+def extract_review(text, known_shows):
+    try:
+        response = claude.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=600,
+            messages=[{
+                "role": "user",
+                "content": EXTRACTION_PROMPT.format(
+                    text=text[:3000],
+                    shows=", ".join(known_shows[:30])
+                )
+            }]
+        )
+        raw = response.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = raw[raw.find("{"):]
+            raw = raw[:raw.rfind("}")+1]
+        return json.loads(raw)
+    except Exception as e:
+        print(f"  Extraction error: {e}")
+        return None
+
+
+def title_match(search_title, db_title):
+    search = search_title.lower().strip()
+    db = db_title.lower().strip()
+
+    if search in db or db in search:
+        return True
+
+    for suffix in [': the musical', ' - the musical', ', still living it!', ' at micf',
+                   ' plays a talk show host', ' review', ' - review', ', echoes of 78']:
+        search = search.replace(suffix, '').strip()
+        db = db.replace(suffix, '').strip()
+
+    if search in db or db in search:
+        return True
+
+    stop_words = {'the', 'a', 'an', 'and', 'or', 'of', 'in', 'at', 'to', 'is', 'it', 's'}
+    search_words = {w for w in search.split() if w not in stop_words and len(w) > 2}
+    db_words = {w for w in db.split() if w not in stop_words and len(w) > 2}
+
+    if len(search_words) > 0 and len(db_words) > 0:
+        overlap = search_words & db_words
+        overlap_ratio = len(overlap) / min(len(search_words), len(db_words))
+        if overlap_ratio >= 0.6 and len(overlap) >= 2:
+            return True
+
+    return False
+
+
+def find_production(show_title, city=None, country=None, all_productions=None):
+    if not show_title or not all_productions:
+        return None
+
+    if city:
+        for prod in all_productions:
+            show = prod.get("shows") or {}
+            db_title = show.get("title") or ""
+            prod_city = (prod.get("city") or "").lower()
+            if title_match(show_title, db_title) and city.lower() in prod_city:
+                return prod["id"]
+
+    if country:
+        for prod in all_productions:
+            show = prod.get("shows") or {}
+            db_title = show.get("title") or ""
+            prod_country = (prod.get("country") or "").upper()
+            if title_match(show_title, db_title) and country.upper() == prod_country:
+                return prod["id"]
+
+    return None
+
+
+def normalise_score(star_rating):
+    if star_rating is None:
+        return None
+    return min(100, max(0, int(float(star_rating) * 20)))
+
+
+def run_pipeline():
+    print(f"Pipeline starting at {datetime.now()}")
+    known_shows = get_known_shows()
+    all_productions = get_all_productions()
+    print(f"Loaded {len(known_shows)} shows, {len(all_productions)} productions")
+    existing_urls = get_existing_urls()
+    imported = 0
+    skipped = 0
+
+    for feed in FEEDS:
+        print(f"\nFetching {feed['outlet']}...")
+        parsed = fetch_feed(feed["url"])
+        if not parsed:
+            continue
+
+        entries = parsed.entries[:20]
+        print(f"  Found {len(entries)} entries")
+
+        for entry in entries:
+            url = entry.get("link", "")
+            if not url or url in existing_urls:
+                skipped += 1
+                continue
+
+            title = entry.get("title", "")
+            summary = entry.get("summary", "")
+            text = f"{title}\n\n{summary}"
+
+            # First pass with RSS summary
+            extracted = extract_review(text, known_shows)
+            if not extracted or not extracted.get("is_arts_review"):
+                continue
+
+            # If no star rating, fetch full article to try to get one
+            if extracted.get("star_rating") is None:
+                full_text = fetch_full_article(url)
+                if full_text:
+                    extracted2 = extract_review(full_text, known_shows)
+                    if extracted2 and extracted2.get("is_arts_review"):
+                        # Use full article data but keep original if better
+                        if extracted2.get("star_rating") is not None:
+                            extracted["star_rating"] = extracted2["star_rating"]
+                        if extracted2.get("pull_quote") and not extracted.get("pull_quote"):
+                            extracted["pull_quote"] = extracted2["pull_quote"]
+
+            confidence = float(extracted.get("confidence", 0))
+            city = extracted.get("city") or feed.get("city")
+            country = extracted.get("country") or feed.get("country")
+            production_id = find_production(extracted.get("show_title"), city, country, all_productions)
+
+            if not production_id:
+                print(f"  No DB match: {extracted.get('show_title')} ({city})")
+                continue
+
+            normalised = normalise_score(extracted.get("star_rating"))
+            status = "approved" if confidence >= 0.85 else "pending"
+
+            review = {
+                "production_id": production_id,
+                "outlet": feed["outlet"],
+                "reviewer": extracted.get("reviewer"),
+                "published_date": entry.get("published", None),
+                "star_rating": extracted.get("star_rating"),
+                "normalised_score": normalised,
+                "pull_quote": extracted.get("pull_quote"),
+                "source_url": url,
+                "auto_imported": True,
+                "confidence_score": confidence,
+                "status": status,
+            }
+
+            try:
+                supabase.table("critic_reviews").insert(review).execute()
+                existing_urls.add(url)
+                imported += 1
+                print(f"  ✓ {extracted.get('show_title')} [{status}] score:{normalised}")
+            except Exception as e:
+                print(f"  ✗ Insert error: {e}")
+
+    print(f"\nDone. Imported: {imported}, Skipped: {skipped}")
+
+
+if __name__ == "__main__":
+    run_pipeline()
