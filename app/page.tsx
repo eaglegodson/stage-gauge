@@ -78,6 +78,7 @@ export default function Home() {
   const [timingFilter, setTimingFilter] = useState('all')
   const [companyFilter, setCompanyFilter] = useState('all')
   const [availableCompanies, setAvailableCompanies] = useState<string[]>([])
+  const [nearestCity, setNearestCity] = useState<string>('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -87,6 +88,46 @@ export default function Home() {
   useEffect(() => {
     if (searchOpen && searchRef.current) searchRef.current.focus()
   }, [searchOpen])
+
+  useEffect(() => {
+    // Detect user city via IP geolocation
+    const cityMap: Record<string, string> = {
+      // Australia
+      'melbourne': 'Melbourne',
+      'sydney': 'Sydney',
+      'brisbane': 'Brisbane',
+      'perth': 'Perth',
+      'adelaide': 'Adelaide',
+      'canberra': 'Canberra',
+      'hobart': 'Hobart',
+      'geelong': 'Melbourne',
+      'gold coast': 'Brisbane',
+      'sunshine coast': 'Brisbane',
+      'newcastle': 'Sydney',
+      'wollongong': 'Sydney',
+      // NZ
+      'auckland': 'Auckland',
+      'wellington': 'Wellington',
+      'christchurch': 'Christchurch',
+      // UK
+      'london': 'London',
+    }
+    const coveredCities = ['Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Auckland', 'Wellington', 'Christchurch', 'London']
+
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        const userCity = (data.city || '').toLowerCase()
+        const mapped = cityMap[userCity]
+        if (mapped && coveredCities.includes(mapped)) {
+          setCityFilter(mapped)
+        } else if (mapped) {
+          // Nearby city — highlight but don't filter
+          setNearestCity(mapped)
+        }
+      })
+      .catch(() => {}) // Silently fail
+  }, [])
 
   useEffect(() => {
     if (!searchQuery.trim()) { setSearchResults([]); return }
@@ -187,11 +228,15 @@ export default function Home() {
         {/* City filter bar */}
         <div style={{backgroundColor: '#0F1A14', padding: '0 24px'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
-            {availableCities.map((c) => (
-              <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: cityFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: cityFilter === c ? '2px solid #ffffff' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: cityFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
-                {c === 'all' ? 'All cities' : c}
-              </button>
-            ))}
+            {availableCities.map((c) => {
+              const isActive = cityFilter === c
+              const isNearest = c === nearestCity && cityFilter === 'all'
+              return (
+                <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: isActive ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: isActive ? '2px solid #ffffff' : isNearest ? '2px solid #1D9E7566' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: isActive ? '#ffffff' : isNearest ? '#a3c9a8' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
+                  {c === 'all' ? 'All cities' : c}{isNearest ? ' ★' : ''}
+                </button>
+              )
+            })}
           </div>
         </div>
 
