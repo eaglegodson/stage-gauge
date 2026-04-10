@@ -30,14 +30,13 @@ FEEDS = [
     {"outlet": "The Age", "url": "https://www.theage.com.au/rss/feed.xml", "city": "Melbourne", "country": "AU"},
     {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/feed.xml", "city": "Sydney", "country": "AU"},
     {"outlet": "Brisbane Times", "url": "https://www.brisbanetimes.com.au/rss/feed.xml", "city": "Brisbane", "country": "AU"},
-    {"outlet": "Stuff NZ", "url": "https://www.stuff.co.nz/rss", "city": None, "country": "NZ"},
+    # NZ
+    {"outlet": "Theatreview", "url": "https://theatreview.org.nz/feed", "city": None, "country": "NZ"},
     # London - dedicated theatre feeds
     {"outlet": "The Guardian", "url": "https://www.theguardian.com/stage/rss", "city": "London", "country": "GB"},
-    {"outlet": "WhatsOnStage", "url": "https://www.whatsonstage.com/news/feed.rss", "city": "London", "country": "GB"},
-    {"outlet": "The Stage", "url": "https://www.thestage.co.uk/feed", "city": "London", "country": "GB"},
     {"outlet": "West End Wilma", "url": "https://westendwilma.com/feed", "city": "London", "country": "GB"},
     {"outlet": "Everything Theatre", "url": "https://everything-theatre.co.uk/feed", "city": "London", "country": "GB"},
-    {"outlet": "London Theatre", "url": "https://www.londontheatre.co.uk/feed", "city": "London", "country": "GB"},
+    {"outlet": "Exeunt Magazine", "url": "https://exeuntmagazine.com/feed/", "city": "London", "country": "GB"},
 ]
 
 EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the text of a performing arts review, extract the following and return as JSON only with no other text:
@@ -50,7 +49,7 @@ EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the te
   "show_title": "canonical name of production only - no subtitles or venue names",
   "company": "performing company or null",
   "city": "city where the show is performing or null",
-  "country": "country code e.g. GB, AU, US or null",
+  "country": "country code e.g. GB, AU, NZ, US or null",
   "is_arts_review": true,
   "confidence": 0.9
 }}
