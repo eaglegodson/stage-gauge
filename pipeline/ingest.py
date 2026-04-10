@@ -17,9 +17,17 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 claude = Anthropic(api_key=ANTHROPIC_API_KEY)
 
 FEEDS = [
+    # ANZ
     {"outlet": "ArtsHub", "url": "https://www.artshub.com.au/feed/", "city": None, "country": "AU"},
     {"outlet": "The Age", "url": "https://www.theage.com.au/rss/feed.xml", "city": "Melbourne", "country": "AU"},
     {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/feed.xml", "city": "Sydney", "country": "AU"},
+    {"outlet": "Brisbane Times", "url": "https://www.brisbanetimes.com.au/rss/feed.xml", "city": "Brisbane", "country": "AU"},
+    {"outlet": "Stuff NZ", "url": "https://www.stuff.co.nz/rss", "city": None, "country": "NZ"},
+    # London
+    {"outlet": "The Guardian", "url": "https://www.theguardian.com/stage/rss", "city": "London", "country": "GB"},
+    {"outlet": "Time Out London", "url": "https://www.timeout.com/london/theatre/feed.xml", "city": "London", "country": "GB"},
+    {"outlet": "WhatsOnStage", "url": "https://www.whatsonstage.com/feed/", "city": "London", "country": "GB"},
+    {"outlet": "The Stage", "url": "https://www.thestage.co.uk/feed", "city": "London", "country": "GB"},
 ]
 
 EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the text of a performing arts review, extract the following and return as JSON only with no other text:
