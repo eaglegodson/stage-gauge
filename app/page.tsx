@@ -241,11 +241,11 @@ export default function Home() {
                     <span style={{fontSize: '10px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9ca3af'}}>{featured.type}</span>
                     <span style={{fontSize: '10px', color: '#D1CBC0'}}>·</span>
                     <span style={{fontSize: '10px', color: '#9ca3af'}}>{featured.city}</span>
-                    {dates && <><span style={{fontSize: '10px', color: '#D1CBC0'}}>·</span><span style={{fontSize: '10px', color: '#9ca3af'}}>{dates}</span></>}
                   </div>
                   <h2 style={{fontFamily: 'Georgia, serif', fontSize: '36px', fontWeight: '600', color: '#111827', lineHeight: '1.15', margin: '0 0 12px 0', letterSpacing: '-0.5px'}}>{featured.title}</h2>
                   <p style={{fontSize: '16px', color: '#4b5563', margin: '0 0 4px 0', fontWeight: '500'}}>{featured.company}</p>
                   <p style={{fontSize: '14px', color: '#9ca3af', margin: 0}}>{featured.venue}</p>
+                  {dates && <p style={{fontSize: '13px', color: '#1D9E75', margin: '8px 0 0 0', fontWeight: '500'}}>{dates}</p>}
                 </div>
                 {featured.combined_score ? (
                   <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #E2DDD6', paddingLeft: '32px', minWidth: '120px', gap: '8px'}}>
