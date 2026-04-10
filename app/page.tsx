@@ -64,7 +64,6 @@ export default function Home() {
       let query = supabase
         .from('production_listing')
         .select('*')
-        .not('combined_score', 'is', null)
         .order('combined_score', { ascending: false })
 
       if (typeFilter !== 'all') query = query.eq('type', typeFilter)
