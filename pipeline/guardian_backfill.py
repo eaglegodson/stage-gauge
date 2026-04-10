@@ -75,7 +75,7 @@ no_match = []
 page = 1
 total_fetched = 0
 
-while page <= 10:  # fetch up to 10 pages = 500 articles
+while page <= 20:  # fetch up to 10 pages = 500 articles
     print(f"\nFetching page {page}...")
     params = {
         "api-key": GUARDIAN_API_KEY,
@@ -86,7 +86,7 @@ while page <= 10:  # fetch up to 10 pages = 500 articles
         "page-size": 50,
         "order-by": "newest",
         "page": page,
-        "from-date": "2025-10-01"
+        "from-date": "2025-01-01"
     }
     
     try:
@@ -107,7 +107,7 @@ while page <= 10:  # fetch up to 10 pages = 500 articles
         fields = item.get("fields", {})
         url = fields.get("shortUrl") or item.get("webUrl", "")
         
-        if not url or url in existing_urls:
+        if not url:
             continue
 
         total_fetched += 1
@@ -148,10 +148,23 @@ while page <= 10:  # fetch up to 10 pages = 500 articles
         }
 
         try:
-            supabase.table("critic_reviews").insert(review).execute()
-            existing_urls.add(url)
-            imported += 1
-            print(f"  ✓ {extracted.get('show_title')} — {extracted.get('star_rating')}★")
+            # Check if review already exists
+            existing = supabase.table("critic_reviews").select("id,star_rating").eq("source_url", url).execute()
+            if existing.data:
+                # Update star rating if we now have one and didn't before
+                if review.get("star_rating") and not existing.data[0].get("star_rating"):
+                    supabase.table("critic_reviews").update({
+                        "star_rating": review["star_rating"],
+                        "production_id": review["production_id"],
+                        "status": "approved"
+                    }).eq("source_url", url).execute()
+                    imported += 1
+                    print(f"  ↑ Updated: {extracted.get('show_title')} — {extracted.get('star_rating')}★")
+            else:
+                supabase.table("critic_reviews").insert(review).execute()
+                existing_urls.add(url)
+                imported += 1
+                print(f"  ✓ {extracted.get('show_title')} — {extracted.get('star_rating')}★")
         except Exception as e:
             print(f"  ✗ {e}")
 
