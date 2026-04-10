@@ -17,29 +17,33 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 claude = Anthropic(api_key=ANTHROPIC_API_KEY)
 
 FEEDS = [
-    {"outlet": "The Age", "url": "https://www.theage.com.au/rss/entertainment/arts.xml", "city": "Melbourne", "country": "AU"},
-    {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/entertainment/arts.xml", "city": "Sydney", "country": "AU"},
     {"outlet": "ArtsHub", "url": "https://www.artshub.com.au/feed/", "city": None, "country": "AU"},
-    {"outlet": "Time Out Melbourne", "url": "https://www.timeout.com/melbourne/feed.xml", "city": "Melbourne", "country": "AU"},
-    {"outlet": "Time Out Sydney", "url": "https://www.timeout.com/sydney/feed.xml", "city": "Sydney", "country": "AU"},
+    {"outlet": "The Age", "url": "https://www.theage.com.au/rss/feed.xml", "city": "Melbourne", "country": "AU"},
+    {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/feed.xml", "city": "Sydney", "country": "AU"},
 ]
 
-EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the text of a performing arts review, extract:
-1. outlet: name of the publication
-2. reviewer: critic's name if present (null if not)
-3. star_rating: numeric rating out of 5 (null if not present)
-4. pull_quote: the single most representative sentence from the review (max 25 words, null if nothing suitable)
-5. show_title: the name of the production being reviewed
-6. company: the performing company (null if not clear)
-7. city: city where the performance took place (null if not clear)
-8. is_arts_review: true if this is a performing arts review (theatre, musical, opera, ballet, dance, concert), false otherwise
-9. confidence: your confidence 0-1 that you've extracted correctly
+EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the text of a performing arts review, extract the following and return as JSON only with no other text:
 
-Return JSON only. No other text.
+{{
+  "outlet": "name of publication",
+  "reviewer": "critic name or null",
+  "star_rating": 4.5,
+  "pull_quote": "best sentence under 25 words or null",
+  "show_title": "name of production",
+  "company": "performing company or null",
+  "city": "city or null",
+  "is_arts_review": true,
+  "confidence": 0.9
+}}
 
-Review text: {text}
+is_arts_review should be true only for theatre, musical, opera, ballet, dance, or concert reviews.
+star_rating should be null if not mentioned.
+Return JSON only. No markdown. No explanation.
 
-Known shows in database: {shows}"""
+Review text:
+{text}
+
+Known shows: {shows}"""
 
 
 def get_known_shows():
@@ -52,39 +56,47 @@ def get_existing_urls():
     return {r["source_url"] for r in result.data if r["source_url"]}
 
 
-def fetch_article_text(url):
+def fetch_feed(url):
     try:
-        resp = requests.get(url, timeout=10, headers={"User-Agent": "StageGauge/1.0"})
-        return resp.text[:3000]
-    except:
+        resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0 StageGauge/1.0"})
+        return feedparser.parse(resp.text)
+    except Exception as e:
+        print(f"  Feed fetch error: {e}")
         return None
 
 
 def extract_review(text, known_shows):
     try:
         response = claude.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=500,
+            model="claude-haiku-4-5-20251001",
+            max_tokens=600,
             messages=[{
                 "role": "user",
                 "content": EXTRACTION_PROMPT.format(
                     text=text[:2000],
-                    shows=", ".join(known_shows[:50])
+                    shows=", ".join(known_shows[:30])
                 )
             }]
         )
         raw = response.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = raw[raw.find("{"):]
+            raw = raw[:raw.rfind("}")+1]
         return json.loads(raw)
     except Exception as e:
-        print(f"Extraction error: {e}")
+        print(f"  Extraction error: {e}")
         return None
 
 
-def find_production(show_title, company, city):
-    result = supabase.table("productions").select("id, shows(title, company)").execute()
+def find_production(show_title):
+    if not show_title:
+        return None
+    result = supabase.table("productions").select("id, shows(title)").execute()
     for prod in result.data:
-        show = prod.get("shows", {})
-        if show_title and show_title.lower() in (show.get("title") or "").lower():
+        show = prod.get("shows") or {}
+        db_title = (show.get("title") or "").lower()
+        search_title = show_title.lower()
+        if search_title in db_title or db_title in search_title:
             return prod["id"]
     return None
 
@@ -98,72 +110,68 @@ def normalise_score(star_rating):
 def run_pipeline():
     print(f"Pipeline starting at {datetime.now()}")
     known_shows = get_known_shows()
+    print(f"Loaded {len(known_shows)} shows from database")
     existing_urls = get_existing_urls()
     imported = 0
     skipped = 0
 
     for feed in FEEDS:
         print(f"\nFetching {feed['outlet']}...")
-        try:
-            parsed = feedparser.parse(feed["url"])
-            entries = parsed.entries[:20]
-            print(f"  Found {len(entries)} entries")
+        parsed = fetch_feed(feed["url"])
+        if not parsed:
+            continue
 
-            for entry in entries:
-                url = entry.get("link", "")
-                if not url or url in existing_urls:
-                    skipped += 1
-                    continue
+        entries = parsed.entries[:20]
+        print(f"  Found {len(entries)} entries")
 
-                title = entry.get("title", "")
-                summary = entry.get("summary", "")
-                text = f"{title}\n\n{summary}"
+        for entry in entries:
+            url = entry.get("link", "")
+            if not url or url in existing_urls:
+                skipped += 1
+                continue
 
-                extracted = extract_review(text, known_shows)
-                if not extracted:
-                    continue
+            title = entry.get("title", "")
+            summary = entry.get("summary", "")
+            text = f"{title}\n\n{summary}"
 
-                if not extracted.get("is_arts_review"):
-                    continue
+            extracted = extract_review(text, known_shows)
+            if not extracted:
+                continue
 
-                confidence = float(extracted.get("confidence", 0))
-                production_id = find_production(
-                    extracted.get("show_title"),
-                    extracted.get("company"),
-                    extracted.get("city") or feed.get("city")
-                )
+            if not extracted.get("is_arts_review"):
+                continue
 
-                if not production_id:
-                    print(f"  No match found for: {extracted.get('show_title')}")
-                    continue
+            confidence = float(extracted.get("confidence", 0))
+            production_id = find_production(extracted.get("show_title"))
 
-                normalised = normalise_score(extracted.get("star_rating"))
-                status = "approved" if confidence >= 0.85 else "pending"
+            if not production_id:
+                print(f"  No DB match: {extracted.get('show_title')}")
+                continue
 
-                review = {
-                    "production_id": production_id,
-                    "outlet": feed["outlet"],
-                    "reviewer": extracted.get("reviewer"),
-                    "published_date": entry.get("published", None),
-                    "star_rating": extracted.get("star_rating"),
-                    "normalised_score": normalised,
-                    "pull_quote": extracted.get("pull_quote"),
-                    "source_url": url,
-                    "auto_imported": True,
-                    "confidence_score": confidence,
-                    "status": status,
-                }
+            normalised = normalise_score(extracted.get("star_rating"))
+            status = "approved" if confidence >= 0.85 else "pending"
 
-                try:
-                    supabase.table("critic_reviews").insert(review).execute()
-                    existing_urls.add(url)
-                    imported += 1
-                    print(f"  ✓ Imported: {extracted.get('show_title')} ({status})")
-                except Exception as e:
-                    print(f"  ✗ Insert error: {e}")
+            review = {
+                "production_id": production_id,
+                "outlet": feed["outlet"],
+                "reviewer": extracted.get("reviewer"),
+                "published_date": entry.get("published", None),
+                "star_rating": extracted.get("star_rating"),
+                "normalised_score": normalised,
+                "pull_quote": extracted.get("pull_quote"),
+                "source_url": url,
+                "auto_imported": True,
+                "confidence_score": confidence,
+                "status": status,
+            }
 
-        except Exception as e:
-            print(f"  Feed error: {e}")
+            try:
+                supabase.table("critic_reviews").insert(review).execute()
+                existing_urls.add(url)
+                imported += 1
+                print(f"  ✓ {extracted.get('show_title')} [{status}] score:{normalised}")
+            except Exception as e:
+                print(f"  ✗ Insert error: {e}")
 
     print(f"\nDone. Imported: {imported}, Skipped: {skipped}")
 
