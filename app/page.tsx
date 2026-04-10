@@ -39,8 +39,8 @@ function formatDates(start: string, end: string) {
   const endDate = end ? new Date(end) : null
   const startDate = start ? new Date(start) : null
   
-  if (endDate && endDate < now) return null // Don't show past shows dates
-  if (startDate && startDate > now) return `Opens ${fmt(start)}`
+  if (endDate && endDate < now) return null
+  if (startDate && startDate > now) return `${fmt(start)} – ${fmt(end)}`
   if (start && end) return `Until ${fmt(end)}`
   return null
 }
