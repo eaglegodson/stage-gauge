@@ -114,25 +114,28 @@ export default function Home() {
     <main style={{minHeight: '100vh', backgroundColor: '#F5F0E8'}}>
       <Header onSearch={toggleSearch} />
 
-      {/* City filter bar */}
-      <div style={{backgroundColor: '#0F1A14', borderBottom: '1px solid #1a2e1a', padding: '0 24px'}}>
-        <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
-          {availableCities.map((c) => (
-            <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: cityFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: cityFilter === c ? '2px solid #ffffff' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: cityFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
-              {c === 'all' ? 'All cities' : c}
-            </button>
-          ))}
+      {/* Both filter bars sticky together, just below the header */}
+      <div style={{position: 'sticky', top: '56px', zIndex: 90}}>
+        {/* City filter bar */}
+        <div style={{backgroundColor: '#0F1A14', borderBottom: '1px solid #1a2e1a', padding: '0 24px'}}>
+          <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
+            {availableCities.map((c) => (
+              <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: cityFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: cityFilter === c ? '2px solid #ffffff' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: cityFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
+                {c === 'all' ? 'All cities' : c}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Type filter bar */}
-      <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px', position: 'sticky', top: '56px', zIndex: 90}}>
-        <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
-          {availableTypes.map((f) => (
-            <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: typeFilter === f ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: typeFilter === f ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: typeFilter === f ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
-              {f === 'all' ? 'All types' : f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+        {/* Type filter bar */}
+        <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px'}}>
+          <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
+            {availableTypes.map((f) => (
+              <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: typeFilter === f ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: typeFilter === f ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: typeFilter === f ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
+                {f === 'all' ? 'All types' : f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
