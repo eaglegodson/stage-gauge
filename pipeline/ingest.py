@@ -45,7 +45,7 @@ EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the te
 
 is_arts_review should be true only for theatre, musical, opera, ballet, dance, or concert reviews.
 star_rating should be null if not mentioned.
-city should be the city where the performance is taking place, not where the publication is based.
+show_title should be the canonical title only - strip subtitles, venue names, performer names.
 Return JSON only. No markdown. No explanation.
 
 Review text:
@@ -57,6 +57,11 @@ Known shows: {shows}"""
 def get_known_shows():
     result = supabase.table("shows").select("title, company").execute()
     return [f"{s['title']} by {s['company']}" for s in result.data]
+
+
+def get_all_productions():
+    result = supabase.table("productions").select("id, city, country, shows(title)").execute()
+    return result.data
 
 
 def get_existing_urls():
@@ -96,32 +101,58 @@ def extract_review(text, known_shows):
         return None
 
 
-def find_production(show_title, city=None, country=None):
-    if not show_title:
-        return None
-    result = supabase.table("productions").select("id, city, country, shows(title)").execute()
+def title_match(search_title, db_title):
+    """Check if titles match, allowing for partial matches on significant words."""
+    search = search_title.lower().strip()
+    db = db_title.lower().strip()
     
-    # First try: match title AND city
-    if city:
-        for prod in result.data:
-            show = prod.get("shows") or {}
-            db_title = (show.get("title") or "").lower()
-            search_title = show_title.lower()
-            prod_city = (prod.get("city") or "").lower()
-            search_city = city.lower()
-            if (search_title in db_title or db_title in search_title) and search_city in prod_city:
-                return prod["id"]
+    # Direct containment
+    if search in db or db in search:
+        return True
     
-    # Second try: match title AND country
-    if country:
-        for prod in result.data:
-            show = prod.get("shows") or {}
-            db_title = (show.get("title") or "").lower()
-            search_title = show_title.lower()
-            prod_country = (prod.get("country") or "").upper()
-            if (search_title in db_title or db_title in search_title) and country.upper() == prod_country:
-                return prod["id"]
+    # Strip common suffixes and try again
+    for suffix in [': the musical', ' - the musical', ', still living it!', ' at micf', ' plays a talk show host']:
+        search = search.replace(suffix, '').strip()
+    
+    if search in db or db in search:
+        return True
+    
+    # Word overlap - if 3+ significant words match
+    stop_words = {'the', 'a', 'an', 'and', 'or', 'of', 'in', 'at', 'to', 'is', 'it', 's'}
+    search_words = {w for w in search.split() if w not in stop_words and len(w) > 2}
+    db_words = {w for w in db.split() if w not in stop_words and len(w) > 2}
+    
+    if len(search_words) > 0 and len(db_words) > 0:
+        overlap = search_words & db_words
+        overlap_ratio = len(overlap) / min(len(search_words), len(db_words))
+        if overlap_ratio >= 0.6 and len(overlap) >= 2:
+            return True
+    
+    return False
 
+
+def find_production(show_title, city=None, country=None, all_productions=None):
+    if not show_title or not all_productions:
+        return None
+    
+    # First try: title + city match
+    if city:
+        for prod in all_productions:
+            show = prod.get("shows") or {}
+            db_title = show.get("title") or ""
+            prod_city = (prod.get("city") or "").lower()
+            if title_match(show_title, db_title) and city.lower() in prod_city:
+                return prod["id"]
+    
+    # Second try: title + country match
+    if country:
+        for prod in all_productions:
+            show = prod.get("shows") or {}
+            db_title = show.get("title") or ""
+            prod_country = (prod.get("country") or "").upper()
+            if title_match(show_title, db_title) and country.upper() == prod_country:
+                return prod["id"]
+    
     return None
 
 
@@ -134,7 +165,8 @@ def normalise_score(star_rating):
 def run_pipeline():
     print(f"Pipeline starting at {datetime.now()}")
     known_shows = get_known_shows()
-    print(f"Loaded {len(known_shows)} shows from database")
+    all_productions = get_all_productions()
+    print(f"Loaded {len(known_shows)} shows, {len(all_productions)} productions from database")
     existing_urls = get_existing_urls()
     imported = 0
     skipped = 0
@@ -166,10 +198,9 @@ def run_pipeline():
                 continue
 
             confidence = float(extracted.get("confidence", 0))
-            
             city = extracted.get("city") or feed.get("city")
             country = extracted.get("country") or feed.get("country")
-            production_id = find_production(extracted.get("show_title"), city, country)
+            production_id = find_production(extracted.get("show_title"), city, country, all_productions)
 
             if not production_id:
                 print(f"  No DB match: {extracted.get('show_title')} ({city})")
