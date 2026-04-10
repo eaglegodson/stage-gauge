@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../../lib/supabase'
 
 export default function Header() {
   const [user, setUser] = useState<any>(null)
@@ -40,7 +40,7 @@ export default function Header() {
             <span style={{fontSize: '13px', color: '#6b7280'}}>{user.user_metadata?.display_name || user.email}</span>
             <button
               onClick={async () => { await supabase.auth.signOut(); window.location.reload() }}
-              style={{fontSize: '13px', color: '#6b7280', textDecoration: 'none', background: 'none', border: '1px solid #374151', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer'}}
+              style={{fontSize: '13px', color: '#6b7280', background: 'none', border: '1px solid #374151', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer'}}
             >
               Sign out
             </button>
