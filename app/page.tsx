@@ -70,6 +70,7 @@ export default function Home() {
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0]
+
     async function fetchProductions() {
       let query = supabase
         .from('production_listing')
@@ -91,9 +92,11 @@ export default function Home() {
         .or(`season_end.is.null,season_end.gte.${today}`)
 
       if (data) {
-        const cities = ['all', ...Array.from(new Set(data.map((p: any) => p.city).filter(Boolean))).sort()]
+        const cityOrder = ['Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Auckland', 'Wellington', 'Christchurch', 'London']
+        const foundCities = Array.from(new Set(data.map((p: any) => p.city).filter(Boolean)))
+        const sortedCities = ['all', ...cityOrder.filter(c => foundCities.includes(c))]
         const types = ['all', ...Array.from(new Set(data.map((p: any) => p.type).filter(Boolean))).sort()]
-        setAvailableCities(cities)
+        setAvailableCities(sortedCities)
         setAvailableTypes(types)
       }
     }
@@ -109,20 +112,15 @@ export default function Home() {
     <main style={{minHeight: '100vh', backgroundColor: '#F5F0E8'}}>
       <Header />
 
-      <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px', position: 'sticky', top: '56px', zIndex: 90}}>
+      {/* City filter bar */}
+      <div style={{backgroundColor: '#0F1A14', borderBottom: '1px solid #1a2e1a', padding: '0 24px'}}>
         <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
           <button
             onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }}
-            style={{fontSize: '12px', color: '#6b7280', background: 'none', border: 'none', borderRight: '1px solid #243824', padding: '10px 16px 10px 0', marginRight: '16px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0}}
+            style={{fontSize: '12px', color: '#6b7280', background: 'none', border: 'none', borderRight: '1px solid #1a2e1a', padding: '10px 16px 10px 0', marginRight: '16px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0}}
           >
-            {searchOpen ? '✕' : '🔍 Search'}
+            {searchOpen ? '✕' : '🔍'}
           </button>
-          {availableTypes.map((f) => (
-            <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: typeFilter === f ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: typeFilter === f ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: typeFilter === f ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
-              {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
-          <div style={{width: '1px', height: '16px', backgroundColor: '#243824', margin: '0 8px', flexShrink: 0}}></div>
           {availableCities.map((c) => (
             <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: cityFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: cityFilter === c ? '2px solid #ffffff' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: cityFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
               {c === 'all' ? 'All cities' : c}
@@ -131,6 +129,18 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Type filter bar */}
+      <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px', position: 'sticky', top: '56px', zIndex: 90}}>
+        <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
+          {availableTypes.map((f) => (
+            <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: typeFilter === f ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: typeFilter === f ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: typeFilter === f ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
+              {f === 'all' ? 'All types' : f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Search */}
       {searchOpen && (
         <div style={{borderBottom: '1px solid #E2DDD6', padding: '16px 24px', backgroundColor: '#FDFAF4'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto'}}>
