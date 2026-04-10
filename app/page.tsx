@@ -66,6 +66,9 @@ function getTimingFilter(start: string, end: string, timing: string) {
   if (timing === 'later') {
     return startDate && startDate > threeMonths
   }
+  if (timing === 'past') {
+    return endDate && endDate < now
+  }
   return true
 }
 
@@ -152,7 +155,7 @@ export default function Home() {
       let query = supabase
         .from('production_listing')
         .select('*')
-        .or(`season_end.is.null,season_end.gte.${today}`)
+        .or(timingFilter === 'past' ? `season_end.lt.${today}` : `season_end.is.null,season_end.gte.${today}`)
         .order('combined_score', { ascending: false, nullsFirst: false })
 
       if (typeFilter !== 'all') query = query.eq('type', typeFilter)
@@ -172,7 +175,7 @@ export default function Home() {
       const { data } = await supabase
         .from('production_listing')
         .select('city, type')
-        .or(`season_end.is.null,season_end.gte.${today}`)
+        .or(timingFilter === 'past' ? `season_end.lt.${today}` : `season_end.is.null,season_end.gte.${today}`)
 
       if (data) {
         const cityOrder = ['Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Auckland', 'Wellington', 'Christchurch', 'London']
@@ -186,7 +189,7 @@ export default function Home() {
             .from('production_listing')
             .select('company')
             .eq('city', cityFilter)
-            .or(`season_end.is.null,season_end.gte.${today}`)
+            .or(timingFilter === 'past' ? `season_end.lt.${today}` : `season_end.is.null,season_end.gte.${today}`)
           if (cityData) {
             const companies = Array.from(new Set(cityData.map((p: any) => p.company).filter(Boolean))).sort() as string[]
             setAvailableCompanies(companies)
@@ -218,6 +221,7 @@ export default function Home() {
     { key: 'now', label: 'Playing now' },
     { key: 'soon', label: 'Coming soon' },
     { key: 'later', label: 'Later' },
+    { key: 'past', label: 'Past shows' },
   ]
 
   return (
