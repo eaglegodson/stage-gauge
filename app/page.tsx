@@ -215,7 +215,7 @@ export default function Home() {
                       <TypeTile type={p.type} />
                       <div style={{flex: 1}}>
                         <div style={{fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: '600', color: '#111827'}}>{p.title}</div>
-                        <div style={{fontSize: '12px', color: '#6b7280'}}>{p.company} · {p.city}{p.season_end && new Date(p.season_end) >= new Date() && p.season_start && new Date(p.season_start) <= new Date() ? ' · Until ' + new Date(p.season_end).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) : p.season_start && new Date(p.season_start) > new Date() ? ' · ' + new Date(p.season_start).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) + ' – ' + (p.season_end ? new Date(p.season_end).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) : '') : ''}</div>
+                        <div style={{fontSize: '12px', color: '#6b7280'}}>{p.venue || p.company} · {p.city}{p.season_end && new Date(p.season_end) >= new Date() && p.season_start && new Date(p.season_start) <= new Date() ? ' · Until ' + new Date(p.season_end).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) : p.season_start && new Date(p.season_start) > new Date() ? ' · ' + new Date(p.season_start).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) + ' – ' + (p.season_end ? new Date(p.season_end).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) : '') : ''}</div>
                       </div>
                       {p.combined_score && <StarDisplay score={p.combined_score} />}
                     </a>
@@ -282,7 +282,7 @@ export default function Home() {
                 <div style={{flex: 1, minWidth: 0}}>
                   <div style={{display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap'}}>
                     <span style={{fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: '600', color: '#111827'}}>{p.title}</span>
-                    <span style={{fontSize: '12px', color: '#9ca3af'}}>{p.company}</span>
+                    <span style={{fontSize: '12px', color: '#9ca3af'}}>{p.venue || p.company}</span>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', flexWrap: 'wrap'}}>
                     <span style={{fontSize: '11px', color: '#9ca3af', textTransform: 'capitalize'}}>{p.type}</span>
