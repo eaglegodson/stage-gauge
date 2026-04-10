@@ -24,22 +24,16 @@ function TypeTile({ type, size = 'sm' }: { type: string, size?: 'sm' | 'lg' }) {
   )
 }
 
-function StarDisplay({ score, size = 'sm' }: { score: number, size?: 'sm' | 'lg' }) {
+function StarDisplay({ score }: { score: number }) {
   const stars = []
   const fullStars = Math.floor(score)
   const hasHalf = score - fullStars >= 0.25 && score - fullStars < 0.75
   const roundedUp = score - fullStars >= 0.75
   const total = roundedUp ? fullStars + 1 : fullStars
-  const fontSize = size === 'lg' ? '24px' : '16px'
-
   for (let i = 1; i <= 5; i++) {
-    if (i <= total) {
-      stars.push(<span key={i} style={{color: '#1D9E75', fontSize}}>★</span>)
-    } else if (i === fullStars + 1 && hasHalf) {
-      stars.push(<span key={i} style={{color: '#1D9E75', fontSize}}>½</span>)
-    } else {
-      stars.push(<span key={i} style={{color: '#E2DDD6', fontSize}}>★</span>)
-    }
+    if (i <= total) stars.push(<span key={i} style={{color: '#1D9E75', fontSize: '16px'}}>★</span>)
+    else if (i === fullStars + 1 && hasHalf) stars.push(<span key={i} style={{color: '#1D9E75', fontSize: '16px'}}>½</span>)
+    else stars.push(<span key={i} style={{color: '#E2DDD6', fontSize: '16px'}}>★</span>)
   }
   return <span style={{display: 'flex', alignItems: 'center', gap: '1px', lineHeight: 1}}>{stars}</span>
 }
@@ -56,12 +50,32 @@ function formatDates(start: string, end: string) {
   return null
 }
 
+function getTimingFilter(start: string, end: string, timing: string) {
+  if (timing === 'all') return true
+  const now = new Date()
+  const startDate = start ? new Date(start) : null
+  const endDate = end ? new Date(end) : null
+  const threeMonths = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000)
+
+  if (timing === 'now') {
+    return startDate && startDate <= now && (!endDate || endDate >= now)
+  }
+  if (timing === 'soon') {
+    return startDate && startDate > now && startDate <= threeMonths
+  }
+  if (timing === 'later') {
+    return startDate && startDate > threeMonths
+  }
+  return true
+}
+
 export default function Home() {
   const [productions, setProductions] = useState<any[]>([])
   const [availableCities, setAvailableCities] = useState<string[]>([])
   const [availableTypes, setAvailableTypes] = useState<string[]>([])
   const [typeFilter, setTypeFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
+  const [timingFilter, setTimingFilter] = useState('all')
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -102,7 +116,12 @@ export default function Home() {
       if (cityFilter !== 'all') query = query.eq('city', cityFilter)
 
       const { data, error } = await query
-      if (!error) setProductions(data || [])
+      if (!error) {
+        const filtered = (data || []).filter(p =>
+          getTimingFilter(p.season_start, p.season_end, timingFilter)
+        )
+        setProductions(filtered)
+      }
     }
 
     async function fetchFilters() {
@@ -123,19 +142,26 @@ export default function Home() {
 
     fetchProductions()
     fetchFilters()
-  }, [typeFilter, cityFilter])
+  }, [typeFilter, cityFilter, timingFilter])
 
   const featured = productions[0]
   const rest = productions.slice(1)
-
   const toggleSearch = () => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }
+
+  const timingFilters = [
+    { key: 'all', label: 'All shows' },
+    { key: 'now', label: 'Playing now' },
+    { key: 'soon', label: 'Coming soon' },
+    { key: 'later', label: 'Later' },
+  ]
 
   return (
     <main style={{minHeight: '100vh', backgroundColor: '#F5F0E8'}}>
       <Header onSearch={toggleSearch} />
 
       <div style={{position: 'sticky', top: '56px', zIndex: 90}}>
-        <div style={{backgroundColor: '#0F1A14', borderBottom: '1px solid #1a2e1a', padding: '0 24px'}}>
+        {/* City filter bar */}
+        <div style={{backgroundColor: '#0F1A14', padding: '0 24px'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
             {availableCities.map((c) => (
               <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: cityFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: cityFilter === c ? '2px solid #ffffff' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: cityFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
@@ -144,11 +170,24 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px'}}>
+
+        {/* Type filter bar */}
+        <div style={{backgroundColor: '#1a2e1a', padding: '0 24px'}}>
           <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
             {availableTypes.map((f) => (
               <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: typeFilter === f ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: typeFilter === f ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: typeFilter === f ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
                 {f === 'all' ? 'All types' : f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Timing filter bar */}
+        <div style={{backgroundColor: '#162316', borderBottom: '1px solid #1a2e1a', padding: '0 24px'}}>
+          <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
+            {timingFilters.map((f) => (
+              <button key={f.key} onClick={() => setTimingFilter(f.key)} style={{fontSize: '12px', fontWeight: timingFilter === f.key ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: timingFilter === f.key ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: timingFilter === f.key ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
+                {f.label}
               </button>
             ))}
           </div>
@@ -210,9 +249,9 @@ export default function Home() {
                 </div>
                 {featured.combined_score ? (
                   <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #E2DDD6', paddingLeft: '32px', minWidth: '120px', gap: '8px'}}>
-                    <StarDisplay score={featured.combined_score} size="lg" />
-                    <div style={{fontSize: '13px', color: '#1D9E75', fontWeight: '600'}}>{featured.combined_score.toFixed(1)} / 5</div>
-                    <div style={{fontSize: '11px', color: '#9ca3af', textAlign: 'center', lineHeight: '1.5'}}>Stage Gauge<br/>score</div>
+                    <StarDisplay score={featured.combined_score} />
+                    <div style={{fontSize: '13px', fontWeight: '600', color: '#1D9E75'}}>{Number(featured.combined_score).toFixed(1)} / 5</div>
+                    <div style={{fontSize: '11px', color: '#9ca3af', textAlign: 'center'}}>Stage Gauge score</div>
                     <div style={{fontSize: '11px', color: '#9ca3af'}}>{(featured.critic_count || 0) + (featured.audience_count || 0)} reviews</div>
                   </div>
                 ) : (
@@ -226,11 +265,14 @@ export default function Home() {
         })()}
 
         <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px'}}>
-          <span style={{fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9ca3af', whiteSpace: 'nowrap'}}>All productions</span>
+          <span style={{fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9ca3af', whiteSpace: 'nowrap'}}>Playing now</span>
           <div style={{flex: 1, height: '1px', backgroundColor: '#E2DDD6'}}></div>
         </div>
 
         <div style={{backgroundColor: 'white', border: '1px solid #E2DDD6', borderRadius: '4px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)'}}>
+          {rest.length === 0 && (
+            <p style={{padding: '32px', textAlign: 'center', color: '#9ca3af', fontSize: '14px'}}>No shows match this filter.</p>
+          )}
           {rest.map((p, i) => {
             const dates = formatDates(p.season_start, p.season_end)
             return (
