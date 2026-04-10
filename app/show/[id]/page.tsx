@@ -11,6 +11,8 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const [user, setUser] = useState<any>(null)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [id, setId] = useState<string>('')
+  const [onWatchlist, setOnWatchlist] = useState(false)
+  const [watchlistId, setWatchlistId] = useState<string | null>(null)
 
   useEffect(() => {
     params.then(({ id }) => {
@@ -24,10 +26,29 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         setProduction(prod)
         setCriticReviews(critics || [])
         setAudienceReviews(audience || [])
-        setUser(session?.user ?? null)
+        const u = session?.user ?? null
+        setUser(u)
+        if (u) {
+          supabase.from('watchlist').select('id').eq('user_id', u.id).eq('production_id', id).single()
+            .then(({ data }) => {
+              if (data) { setOnWatchlist(true); setWatchlistId(data.id) }
+            })
+        }
       })
     })
   }, [params])
+
+  async function toggleWatchlist() {
+    if (!user) { window.location.href = '/auth'; return }
+    if (onWatchlist && watchlistId) {
+      await supabase.from('watchlist').delete().eq('id', watchlistId)
+      setOnWatchlist(false)
+      setWatchlistId(null)
+    } else {
+      const { data } = await supabase.from('watchlist').insert({ user_id: user.id, production_id: id }).select().single()
+      if (data) { setOnWatchlist(true); setWatchlistId(data.id) }
+    }
+  }
 
   if (!production) return <div style={{padding: '40px', color: '#111'}}>Loading...</div>
 
@@ -35,8 +56,9 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
 
   return (
     <div style={{minHeight: '100vh', backgroundColor: 'white'}}>
-      <header style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px'}}>
+      <header style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
         <a href="/" style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#111827', textDecoration: 'none'}}>Stage Gauge</a>
+        <a href="/watchlist" style={{fontSize: '14px', color: '#6b7280', textDecoration: 'none'}}>Watchlist</a>
       </header>
 
       <div style={{maxWidth: '672px', margin: '0 auto', padding: '32px 24px'}}>
@@ -52,7 +74,13 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
             <p style={{fontSize: '16px', color: '#4b5563', margin: '0 0 4px 0'}}>{production.company}</p>
             <p style={{fontSize: '14px', color: '#9ca3af', margin: '0 0 4px 0'}}>{production.venue}</p>
             {production.director && <p style={{fontSize: '14px', color: '#9ca3af', margin: '0 0 4px 0'}}>Dir. {production.director}</p>}
-            {production.lead_performer && <p style={{fontSize: '14px', color: '#9ca3af', margin: 0}}>Starring {production.lead_performer}</p>}
+            {production.lead_performer && <p style={{fontSize: '14px', color: '#9ca3af', margin: '0 0 16px 0'}}>Starring {production.lead_performer}</p>}
+            <button
+              onClick={toggleWatchlist}
+              style={{fontSize: '13px', color: onWatchlist ? '#1D9E75' : '#6b7280', padding: '8px 16px', borderRadius: '20px', border: onWatchlist ? '1px solid #1D9E75' : '1px solid #e5e7eb', backgroundColor: 'white', cursor: 'pointer'}}
+            >
+              {onWatchlist ? '✓ On watchlist' : '+ Add to watchlist'}
+            </button>
           </div>
 
           {score && (
