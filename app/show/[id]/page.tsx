@@ -25,8 +25,8 @@ function StarDisplay({ score, size = 'sm' }: { score: number, size?: 'sm' | 'lg'
   return <span style={{display: 'flex', alignItems: 'center', gap: '1px', lineHeight: 1}}>{stars}</span>
 }
 
-export default function ShowPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function ShowPage({ params }: { params: Promise<{ id: string }> }) {
+  const [id, setId] = useState<string>('')
   const [production, setProduction] = useState<any>(null)
   const [scores, setScores] = useState<any>(null)
   const [criticReviews, setCriticReviews] = useState<any[]>([])
@@ -36,6 +36,12 @@ export default function ShowPage({ params }: { params: { id: string } }) {
   const [showReviewForm, setShowReviewForm] = useState(false)
 
   useEffect(() => {
+    params.then(({ id }) => setId(id))
+  }, [params])
+
+  useEffect(() => {
+    if (!id) return
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
@@ -68,7 +74,7 @@ export default function ShowPage({ params }: { params: { id: string } }) {
   }, [id])
 
   useEffect(() => {
-    if (!user) return
+    if (!user || !id) return
     supabase.from('watchlist')
       .select('id')
       .eq('production_id', id)
