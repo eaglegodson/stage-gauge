@@ -17,13 +17,11 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 claude = Anthropic(api_key=ANTHROPIC_API_KEY)
 
 FEEDS = [
-    # ANZ
     {"outlet": "ArtsHub", "url": "https://www.artshub.com.au/feed/", "city": None, "country": "AU"},
     {"outlet": "The Age", "url": "https://www.theage.com.au/rss/feed.xml", "city": "Melbourne", "country": "AU"},
     {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/feed.xml", "city": "Sydney", "country": "AU"},
     {"outlet": "Brisbane Times", "url": "https://www.brisbanetimes.com.au/rss/feed.xml", "city": "Brisbane", "country": "AU"},
     {"outlet": "Stuff NZ", "url": "https://www.stuff.co.nz/rss", "city": None, "country": "NZ"},
-    # London
     {"outlet": "The Guardian", "url": "https://www.theguardian.com/stage/rss", "city": "London", "country": "GB"},
     {"outlet": "Time Out London", "url": "https://www.timeout.com/london/theatre/feed.xml", "city": "London", "country": "GB"},
     {"outlet": "WhatsOnStage", "url": "https://www.whatsonstage.com/feed/", "city": "London", "country": "GB"},
@@ -39,13 +37,15 @@ EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the te
   "pull_quote": "best sentence under 25 words or null",
   "show_title": "name of production",
   "company": "performing company or null",
-  "city": "city or null",
+  "city": "city where the show is performing or null",
+  "country": "country code e.g. GB, AU, US or null",
   "is_arts_review": true,
   "confidence": 0.9
 }}
 
 is_arts_review should be true only for theatre, musical, opera, ballet, dance, or concert reviews.
 star_rating should be null if not mentioned.
+city should be the city where the performance is taking place, not where the publication is based.
 Return JSON only. No markdown. No explanation.
 
 Review text:
@@ -96,16 +96,32 @@ def extract_review(text, known_shows):
         return None
 
 
-def find_production(show_title):
+def find_production(show_title, city=None, country=None):
     if not show_title:
         return None
-    result = supabase.table("productions").select("id, shows(title)").execute()
-    for prod in result.data:
-        show = prod.get("shows") or {}
-        db_title = (show.get("title") or "").lower()
-        search_title = show_title.lower()
-        if search_title in db_title or db_title in search_title:
-            return prod["id"]
+    result = supabase.table("productions").select("id, city, country, shows(title)").execute()
+    
+    # First try: match title AND city
+    if city:
+        for prod in result.data:
+            show = prod.get("shows") or {}
+            db_title = (show.get("title") or "").lower()
+            search_title = show_title.lower()
+            prod_city = (prod.get("city") or "").lower()
+            search_city = city.lower()
+            if (search_title in db_title or db_title in search_title) and search_city in prod_city:
+                return prod["id"]
+    
+    # Second try: match title AND country
+    if country:
+        for prod in result.data:
+            show = prod.get("shows") or {}
+            db_title = (show.get("title") or "").lower()
+            search_title = show_title.lower()
+            prod_country = (prod.get("country") or "").upper()
+            if (search_title in db_title or db_title in search_title) and country.upper() == prod_country:
+                return prod["id"]
+
     return None
 
 
@@ -150,10 +166,13 @@ def run_pipeline():
                 continue
 
             confidence = float(extracted.get("confidence", 0))
-            production_id = find_production(extracted.get("show_title"))
+            
+            city = extracted.get("city") or feed.get("city")
+            country = extracted.get("country") or feed.get("country")
+            production_id = find_production(extracted.get("show_title"), city, country)
 
             if not production_id:
-                print(f"  No DB match: {extracted.get('show_title')}")
+                print(f"  No DB match: {extracted.get('show_title')} ({city})")
                 continue
 
             normalised = normalise_score(extracted.get("star_rating"))
