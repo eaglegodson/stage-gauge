@@ -76,6 +76,8 @@ export default function Home() {
   const [typeFilter, setTypeFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
   const [timingFilter, setTimingFilter] = useState('all')
+  const [companyFilter, setCompanyFilter] = useState('all')
+  const [availableCompanies, setAvailableCompanies] = useState<string[]>([])
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -114,6 +116,7 @@ export default function Home() {
 
       if (typeFilter !== 'all') query = query.eq('type', typeFilter)
       if (cityFilter !== 'all') query = query.eq('city', cityFilter)
+      if (companyFilter !== 'all') query = query.eq('company', companyFilter)
 
       const { data, error } = await query
       if (!error) {
@@ -135,6 +138,19 @@ export default function Home() {
         const foundCities = Array.from(new Set(data.map((p: any) => p.city).filter(Boolean)))
         const sortedCities = ['all', ...cityOrder.filter(c => foundCities.includes(c))]
         const types = ['all', ...Array.from(new Set(data.map((p: any) => p.type).filter(Boolean))).sort()]
+
+        // Fetch companies for selected city
+        if (cityFilter !== 'all') {
+          const { data: cityData } = await supabase
+            .from('production_listing')
+            .select('company')
+            .eq('city', cityFilter)
+            .or(`season_end.is.null,season_end.gte.${today}`)
+          if (cityData) {
+            const companies = Array.from(new Set(cityData.map((p: any) => p.company).filter(Boolean))).sort() as string[]
+            setAvailableCompanies(companies)
+          }
+        }
         setAvailableCities(sortedCities)
         setAvailableTypes(types)
       }
@@ -142,11 +158,19 @@ export default function Home() {
 
     fetchProductions()
     fetchFilters()
-  }, [typeFilter, cityFilter, timingFilter])
+  }, [typeFilter, cityFilter, timingFilter, companyFilter])
 
   const featured = productions[0]
   const rest = productions.slice(1)
   const toggleSearch = () => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }
+
+  // Reset company filter when city changes to 'all'
+  useEffect(() => {
+    if (cityFilter === 'all') {
+      setCompanyFilter('all')
+      setAvailableCompanies([])
+    }
+  }, [cityFilter])
 
   const timingFilters = [
     { key: 'all', label: 'All shows' },
@@ -170,6 +194,22 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* Company filter bar - only shown when a city is selected */}
+        {cityFilter !== 'all' && availableCompanies.length > 0 && (
+          <div style={{backgroundColor: '#132613', padding: '0 24px'}}>
+            <div style={{maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto'}}>
+              <button onClick={() => setCompanyFilter('all')} style={{fontSize: '12px', fontWeight: companyFilter === 'all' ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: companyFilter === 'all' ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: companyFilter === 'all' ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
+                All companies
+              </button>
+              {availableCompanies.map((c) => (
+                <button key={c} onClick={() => setCompanyFilter(c)} style={{fontSize: '12px', fontWeight: companyFilter === c ? '600' : '400', padding: '10px 14px', whiteSpace: 'nowrap', border: 'none', borderBottom: companyFilter === c ? '2px solid #1D9E75' : '2px solid transparent', cursor: 'pointer', backgroundColor: 'transparent', color: companyFilter === c ? '#ffffff' : '#6b7280', marginBottom: '-1px', flexShrink: 0}}>
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Type filter bar */}
         <div style={{backgroundColor: '#1a2e1a', padding: '0 24px'}}>
