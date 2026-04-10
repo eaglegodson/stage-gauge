@@ -67,6 +67,7 @@ export default function Home() {
         .from('production_listing')
         .select('*')
         .or(`title.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%,venue.ilike.%${searchQuery}%`)
+        .or('season_end.is.null,season_end.gte.' + new Date().toISOString().split('T')[0])
         .order('combined_score', { ascending: false, nullsFirst: false })
         .limit(8)
       setSearchResults(data || [])
