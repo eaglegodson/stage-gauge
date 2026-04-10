@@ -21,9 +21,7 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (searchOpen && searchRef.current) {
-      searchRef.current.focus()
-    }
+    if (searchOpen && searchRef.current) searchRef.current.focus()
   }, [searchOpen])
 
   useEffect(() => {
@@ -71,8 +69,9 @@ export default function Home() {
         </div>
         <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
           <button onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }} style={{fontSize: '14px', color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer'}}>
-            {searchOpen ? '✕ Close' : '🔍 Search'}
+            {searchOpen ? '✕' : '🔍 Search'}
           </button>
+          {user && <a href="/watchlist" style={{fontSize: '14px', color: '#6b7280', textDecoration: 'none'}}>Watchlist</a>}
           {user ? (
             <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
               <span style={{fontSize: '14px', color: '#4b5563'}}>{user.user_metadata?.display_name || user.email}</span>
@@ -97,9 +96,7 @@ export default function Home() {
           {searchQuery && (
             <div style={{marginTop: '8px'}}>
               {searching && <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>Searching...</p>}
-              {!searching && searchResults.length === 0 && searchQuery && (
-                <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>No results for "{searchQuery}"</p>
-              )}
+              {!searching && searchResults.length === 0 && <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>No results for "{searchQuery}"</p>}
               <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px'}}>
                 {searchResults.map((p) => (
                   <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #f3f4f6', textDecoration: 'none', color: 'inherit'}}>
