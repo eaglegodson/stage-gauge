@@ -2,23 +2,17 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+import Header from './components/Header'
 
 export default function Home() {
   const [productions, setProductions] = useState<any[]>([])
   const [typeFilter, setTypeFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
-  const [user, setUser] = useState<any>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [searching, setSearching] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-    })
-  }, [])
 
   useEffect(() => {
     if (searchOpen && searchRef.current) searchRef.current.focus()
@@ -61,99 +55,95 @@ export default function Home() {
   const cityFilters = ['all', 'Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Canberra', 'Hobart', 'Auckland', 'Wellington', 'Christchurch', 'London']
 
   return (
-    <main style={{minHeight: '100vh', backgroundColor: 'white'}}>
-      <header style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-        <div>
-          <h1 style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#111827', margin: 0}}>Stage Gauge</h1>
-          <p style={{fontSize: '11px', color: '#9ca3af', margin: '2px 0 0 0'}}>The home for live performance reviews</p>
-        </div>
-        <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-          <button onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }} style={{fontSize: '14px', color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer'}}>
-            {searchOpen ? '✕' : '🔍 Search'}
+    <main style={{minHeight: '100vh', backgroundColor: '#FAFAF8'}}>
+      <Header />
+
+      <div style={{backgroundColor: '#0F1A14', padding: '0 24px 0 24px', borderBottom: '1px solid #1a2e20'}}>
+        <div style={{maxWidth: '900px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '12px', paddingBottom: '12px'}}>
+          <button
+            onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }}
+            style={{fontSize: '13px', color: '#6b7280', background: 'none', border: '1px solid #1f2d23', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', marginRight: '8px'}}
+          >
+            {searchOpen ? '✕ Close' : '🔍 Search'}
           </button>
-          {user && <a href="/watchlist" style={{fontSize: '14px', color: '#6b7280', textDecoration: 'none'}}>Watchlist</a>}
-          {user ? (
-            <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-              <span style={{fontSize: '14px', color: '#4b5563'}}>{user.user_metadata?.display_name || user.email}</span>
-              <button onClick={async () => { await supabase.auth.signOut(); setUser(null) }} style={{fontSize: '14px', color: '#6b7280', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer'}}>Sign out</button>
-            </div>
-          ) : (
-            <a href="/auth" style={{fontSize: '14px', color: 'white', padding: '8px 16px', borderRadius: '20px', backgroundColor: '#1D9E75', textDecoration: 'none'}}>Sign in</a>
-          )}
+          {typeFilters.map((f) => (
+            <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: '500', padding: '5px 12px', borderRadius: '20px', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', backgroundColor: typeFilter === f ? '#1D9E75' : 'transparent', color: typeFilter === f ? 'white' : '#6b7280'}}>
+              {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
         </div>
-      </header>
+      </div>
+
+      <div style={{backgroundColor: '#0F1A14', borderBottom: '1px solid #1a2e20', padding: '0 24px'}}>
+        <div style={{maxWidth: '900px', margin: '0 auto', display: 'flex', gap: '8px', paddingBottom: '12px', overflowX: 'auto'}}>
+          {cityFilters.map((c) => (
+            <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: '500', padding: '5px 12px', borderRadius: '20px', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', backgroundColor: cityFilter === c ? '#ffffff15' : 'transparent', color: cityFilter === c ? 'white' : '#6b7280'}}>
+              {c === 'all' ? 'All cities' : c}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {searchOpen && (
-        <div style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', backgroundColor: '#f9fafb'}}>
-          <input
-            ref={searchRef}
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search shows, companies, venues..."
-            style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '12px 16px', fontSize: '15px', color: '#111827', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box'}}
-          />
-          {searchQuery && (
-            <div style={{marginTop: '8px'}}>
-              {searching && <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>Searching...</p>}
-              {!searching && searchResults.length === 0 && <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>No results for "{searchQuery}"</p>}
-              <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px'}}>
-                {searchResults.map((p) => (
-                  <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #f3f4f6', textDecoration: 'none', color: 'inherit'}}>
-                    <div>
-                      <div style={{fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#111827'}}>{p.title}</div>
-                      <div style={{fontSize: '13px', color: '#6b7280'}}>{p.company} · {p.city}</div>
-                    </div>
-                    {p.combined_score && <div style={{fontSize: '18px', fontWeight: 'bold', color: '#1D9E75'}}>{Math.round(p.combined_score)}</div>}
-                  </a>
-                ))}
+        <div style={{borderBottom: '1px solid #e5e7eb', padding: '16px 24px', backgroundColor: 'white'}}>
+          <div style={{maxWidth: '900px', margin: '0 auto'}}>
+            <input
+              ref={searchRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search shows, companies, venues..."
+              style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '12px 16px', fontSize: '15px', color: '#111827', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box'}}
+            />
+            {searchQuery && (
+              <div style={{marginTop: '8px'}}>
+                {searching && <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>Searching...</p>}
+                {!searching && searchResults.length === 0 && <p style={{fontSize: '14px', color: '#9ca3af', padding: '8px 0'}}>No results for "{searchQuery}"</p>}
+                <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px'}}>
+                  {searchResults.map((p) => (
+                    <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #f3f4f6', textDecoration: 'none', color: 'inherit'}}>
+                      <div>
+                        <div style={{fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#111827'}}>{p.title}</div>
+                        <div style={{fontSize: '13px', color: '#6b7280'}}>{p.company} · {p.city}</div>
+                      </div>
+                      {p.combined_score && <div style={{fontSize: '18px', fontWeight: 'bold', color: '#1D9E75'}}>{Math.round(p.combined_score)}</div>}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
-      <div style={{borderBottom: '1px solid #f3f4f6', padding: '12px 24px', display: 'flex', gap: '8px', overflowX: 'auto'}}>
-        {typeFilters.map((f) => (
-          <button key={f} onClick={() => setTypeFilter(f)} style={{fontSize: '12px', fontWeight: '500', padding: '6px 12px', borderRadius: '20px', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', backgroundColor: typeFilter === f ? '#1D9E75' : '#f3f4f6', color: typeFilter === f ? 'white' : '#6b7280'}}>
-            {f === 'all' ? 'All types' : f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      <div style={{borderBottom: '1px solid #f3f4f6', padding: '12px 24px', display: 'flex', gap: '8px', overflowX: 'auto'}}>
-        {cityFilters.map((c) => (
-          <button key={c} onClick={() => setCityFilter(c)} style={{fontSize: '12px', fontWeight: '500', padding: '6px 12px', borderRadius: '20px', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', backgroundColor: cityFilter === c ? '#111827' : '#f3f4f6', color: cityFilter === c ? 'white' : '#6b7280'}}>
-            {c === 'all' ? 'All cities' : c}
-          </button>
-        ))}
-      </div>
-
-      <div style={{maxWidth: '672px', margin: '0 auto', padding: '32px 24px'}}>
-        <h2 style={{fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9ca3af', marginBottom: '24px'}}>Now showing</h2>
-        <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+      <div style={{maxWidth: '900px', margin: '0 auto', padding: '32px 24px'}}>
+        <p style={{fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9ca3af', marginBottom: '20px'}}>
+          {cityFilter === 'all' ? 'All cities' : cityFilter} · {typeFilter === 'all' ? 'All types' : typeFilter}
+        </p>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px'}}>
           {productions?.map((p) => {
             const score = p.combined_score ? Math.round(p.combined_score) : null
             return (
-              <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'block', border: '1px solid #f3f4f6', borderRadius: '12px', padding: '16px', textDecoration: 'none', color: 'inherit'}}>
-                <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px'}}>
+              <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'block', border: '1px solid #e8e8e4', borderRadius: '12px', padding: '20px', textDecoration: 'none', color: 'inherit', backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)'}}>
+                <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px'}}>
                   <div style={{flex: 1, minWidth: 0}}>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px'}}>
-                      <span style={{fontSize: '11px', fontWeight: '500', padding: '2px 8px', borderRadius: '20px', backgroundColor: '#f3f4f6', color: '#4b5563', textTransform: 'capitalize'}}>{p.type}</span>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px'}}>
+                      <span style={{fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '20px', backgroundColor: '#f0fdf4', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em'}}>{p.type}</span>
                       <span style={{fontSize: '11px', color: '#9ca3af'}}>{p.city}</span>
                     </div>
-                    <h3 style={{fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: '600', color: '#111827', lineHeight: '1.3', margin: '0 0 4px 0'}}>{p.title}</h3>
-                    <p style={{fontSize: '14px', color: '#6b7280', margin: 0}}>{p.company} · {p.venue}</p>
+                    <h3 style={{fontFamily: 'Georgia, serif', fontSize: '17px', fontWeight: '600', color: '#111827', lineHeight: '1.3', margin: '0 0 6px 0'}}>{p.title}</h3>
+                    <p style={{fontSize: '13px', color: '#6b7280', margin: 0, lineHeight: '1.4'}}>{p.company}</p>
+                    <p style={{fontSize: '12px', color: '#9ca3af', margin: '2px 0 0 0'}}>{p.venue}</p>
                   </div>
                   {score && (
                     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0}}>
-                      <div style={{fontSize: '24px', fontWeight: 'bold', color: '#1D9E75'}}>{score}</div>
-                      <div style={{display: 'flex', gap: '2px', marginTop: '4px'}}>
+                      <div style={{fontSize: '26px', fontWeight: '700', color: '#1D9E75', lineHeight: 1}}>{score}</div>
+                      <div style={{display: 'flex', gap: '2px', marginTop: '6px'}}>
                         {[1,2,3,4,5].map((bar) => (
-                          <div key={bar} style={{width: '6px', height: '16px', borderRadius: '2px', backgroundColor: score >= bar * 20 ? '#1D9E75' : '#e5e7eb'}}></div>
+                          <div key={bar} style={{width: '5px', height: '14px', borderRadius: '2px', backgroundColor: score >= bar * 20 ? '#1D9E75' : '#e5e7eb'}}></div>
                         ))}
                       </div>
-                      <div style={{fontSize: '11px', color: '#9ca3af', marginTop: '4px'}}>{(p.critic_count || 0) + (p.audience_count || 0)} reviews</div>
+                      <div style={{fontSize: '10px', color: '#9ca3af', marginTop: '4px'}}>{(p.critic_count || 0) + (p.audience_count || 0)} reviews</div>
                     </div>
                   )}
                 </div>
