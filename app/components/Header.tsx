@@ -36,6 +36,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
           <>
             <a href="/watchlist" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Watchlist</a>
             <a href="/admin" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Moderation</a>
+            <a href="/archive" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Past shows</a>
           </>
         )}
         {user ? (
@@ -53,7 +54,6 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
             Sign in
           </a>
         )}
-        <a href="/archive" style={{fontSize: '13px', color: '#9ca3af', textDecoration: 'none'}}>Past shows</a>
       </nav>
     </header>
   )
