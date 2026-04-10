@@ -46,7 +46,7 @@ EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the te
   "outlet": "name of publication",
   "reviewer": "critic name or null",
   "star_rating": 4.5,
-  "pull_quote": "best sentence under 25 words or null",
+  "pull_quote": "a complete, standalone sentence from the review that makes sense on its own without context - must start with a capital letter and be grammatically complete, or null",
   "show_title": "canonical name of production only - no subtitles or venue names",
   "company": "performing company or null",
   "city": "city where the show is performing or null",
