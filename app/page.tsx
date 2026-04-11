@@ -34,7 +34,7 @@ export default function Home() {
       'auckland': 'Auckland', 'wellington': 'Wellington', 'christchurch': 'Christchurch',
       'london': 'London',
     }
-    const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Auckland','Wellington','Christchurch','London']
+    const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
     fetch('https://ipapi.co/json/').then(r => r.json()).then(async data => {
       const mapped = cityMap[(data.city || '').toLowerCase()]
       const city = (mapped && covered.includes(mapped)) ? mapped : 'Melbourne'

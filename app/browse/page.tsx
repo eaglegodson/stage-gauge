@@ -171,7 +171,7 @@ export default function Browse() {
 
   useEffect(() => {
     const cityMap: Record<string, string> = { 'melbourne': 'Melbourne', 'sydney': 'Sydney', 'brisbane': 'Brisbane', 'perth': 'Perth', 'adelaide': 'Adelaide', 'hobart': 'Hobart', 'geelong': 'Melbourne', 'gold coast': 'Brisbane', 'newcastle': 'Sydney', 'auckland': 'Auckland', 'wellington': 'Wellington', 'christchurch': 'Christchurch', 'london': 'London' }
-    const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Auckland','Wellington','Christchurch','London']
+    const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
     fetch('https://ipapi.co/json/').then(r => r.json()).then(data => {
       const mapped = cityMap[(data.city || '').toLowerCase()]
       if (mapped && covered.includes(mapped)) setCityFilter([mapped])
@@ -208,7 +208,7 @@ export default function Browse() {
     async function fetchFilters() {
       const { data } = await supabase.from('production_listing').select('city, type').or('season_end.is.null,season_end.gte.' + today)
       if (data) {
-        const cityOrder = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Auckland','Wellington','Christchurch','London']
+        const cityOrder = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
         const foundCities = Array.from(new Set(data.map((p: any) => p.city).filter(Boolean))) as string[]
         setAvailableCities(['all', ...cityOrder.filter(c => foundCities.includes(c))])
         setAvailableTypes(['all', ...Array.from(new Set(data.map((p: any) => p.type).filter(Boolean))).sort() as string[]])
