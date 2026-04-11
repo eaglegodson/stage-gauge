@@ -31,23 +31,23 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
       </a>
       <nav style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         {onSearch && (
-          <button onClick={onSearch} style={{ fontSize: '13px', color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <button onClick={onSearch} style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             Search
           </button>
         )}
         {user && (
           <>
-            <a href="/watchlist" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>Watchlist</a>
-            <a href="/admin" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>Moderation</a>
+            <a href="/watchlist" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>Watchlist</a>
+            <a href="/admin" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>Moderation</a>
           </>
         )}
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '13px', color: '#4b5563' }}>{user.user_metadata?.display_name || user.email}</span>
+            <span style={{ fontSize: '13px', color: '#9ca3af' }}>{user.user_metadata?.display_name || user.email}</span>
             <button
               onClick={async () => { await supabase.auth.signOut(); window.location.reload() }}
-              style={{ fontSize: '13px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer' }}
+              style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer' }}
             >
               Sign out
             </button>
