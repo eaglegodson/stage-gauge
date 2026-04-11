@@ -94,7 +94,7 @@ export default function Home() {
             Now in Beta
           </div>
           <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '52px', fontWeight: '600', color: '#f1f5f9', lineHeight: '1.15', margin: '0 0 20px 0', letterSpacing: '-1px' }}>
-            The home for live<br />performance reviews
+            You care about what you see.<br />So do we.
           </h1>
           <p style={{ fontSize: '18px', color: '#9ca3af', margin: '0 0 40px 0', lineHeight: '1.6', maxWidth: '560px', marginLeft: 'auto', marginRight: 'auto' }}>
             StageGauge aggregates critic and audience reviews for theatre, opera, ballet, musicals and dance across Australia, New Zealand and London.
