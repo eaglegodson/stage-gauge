@@ -52,7 +52,7 @@ export default function ArchivePage() {
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
-    <main style={{minHeight: '100vh', backgroundColor: '#F5F0E8'}}>
+    <main style={{minHeight: '100vh', backgroundColor: '#14141f'}}>
       <Header />
 
       <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px'}}>
@@ -73,22 +73,22 @@ export default function ArchivePage() {
 
       <div style={{maxWidth: '1100px', margin: '0 auto', padding: '40px 24px'}}>
         <div style={{marginBottom: '32px'}}>
-          <h1 style={{fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#111827', margin: '0 0 8px 0'}}>Archive</h1>
+          <h1 style={{fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 8px 0'}}>Archive</h1>
           <p style={{fontSize: '14px', color: '#9ca3af', margin: 0}}>Past productions — {productions.length} shows</p>
         </div>
 
-        <div style={{backgroundColor: 'white', border: '1px solid #E2DDD6', borderRadius: '4px', overflow: 'hidden'}}>
+        <div style={{backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '4px', overflow: 'hidden'}}>
           {productions.length === 0 && (
             <p style={{padding: '32px', textAlign: 'center', color: '#9ca3af', fontSize: '14px'}}>No past productions found.</p>
           )}
           {productions.map((p, i) => {
             const score = p.combined_score ? Math.round(p.combined_score) : null
             return (
-              <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 20px', textDecoration: 'none', color: 'inherit', borderBottom: i < productions.length - 1 ? '1px solid #F5F0E8' : 'none', opacity: 0.75}}>
+              <a key={p.production_id} href={"/show/" + p.production_id} style={{display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 20px', textDecoration: 'none', color: 'inherit', borderBottom: i < productions.length - 1 ? '1px solid #14141f' : 'none', opacity: 0.75}}>
                 <TypeTile type={p.type} />
                 <div style={{flex: 1, minWidth: 0}}>
                   <div style={{display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap'}}>
-                    <span style={{fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: '600', color: '#111827'}}>{p.title}</span>
+                    <span style={{fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: '600', color: '#f1f5f9'}}>{p.title}</span>
                     <span style={{fontSize: '12px', color: '#9ca3af'}}>{p.company}</span>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px'}}>

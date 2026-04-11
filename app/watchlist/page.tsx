@@ -35,15 +35,15 @@ export default function WatchlistPage() {
   }
 
   return (
-    <div style={{minHeight: '100vh', backgroundColor: 'white'}}>
+    <div style={{minHeight: '100vh', backgroundColor: '#1e1e2e'}}>
       <header style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-        <a href="/" style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#111827', textDecoration: 'none'}}>Stage Gauge</a>
+        <a href="/" style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', textDecoration: 'none'}}>Stage Gauge</a>
         {user && <span style={{fontSize: '14px', color: '#9ca3af'}}>{user.user_metadata?.display_name || user.email}</span>}
       </header>
 
       <div style={{maxWidth: '672px', margin: '0 auto', padding: '32px 24px'}}>
         <a href="/" style={{fontSize: '14px', color: '#9ca3af', textDecoration: 'none', display: 'block', marginBottom: '24px'}}>← Back</a>
-        <h1 style={{fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#111827', marginBottom: '8px'}}>Watchlist</h1>
+        <h1 style={{fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#f1f5f9', marginBottom: '8px'}}>Watchlist</h1>
 
         {!user && !loading && (
           <div style={{textAlign: 'center', padding: '48px 0'}}>
@@ -70,10 +70,10 @@ export default function WatchlistPage() {
               <div key={item.id} style={{border: '1px solid #f3f4f6', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px'}}>
                 <a href={"/show/" + prod.id} style={{flex: 1, textDecoration: 'none', color: 'inherit'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px'}}>
-                    <span style={{fontSize: '11px', fontWeight: '500', padding: '2px 8px', borderRadius: '20px', backgroundColor: '#f3f4f6', color: '#4b5563', textTransform: 'capitalize'}}>{show.type}</span>
+                    <span style={{fontSize: '11px', fontWeight: '500', padding: '2px 8px', borderRadius: '20px', backgroundColor: '#f3f4f6', color: '#9ca3af', textTransform: 'capitalize'}}>{show.type}</span>
                     <span style={{fontSize: '11px', color: '#9ca3af'}}>{prod.city}</span>
                   </div>
-                  <div style={{fontFamily: 'Georgia, serif', fontSize: '17px', fontWeight: '600', color: '#111827'}}>{show.title}</div>
+                  <div style={{fontFamily: 'Georgia, serif', fontSize: '17px', fontWeight: '600', color: '#f1f5f9'}}>{show.title}</div>
                   <div style={{fontSize: '13px', color: '#6b7280'}}>{show.company} · {prod.venue}</div>
                 </a>
                 <button

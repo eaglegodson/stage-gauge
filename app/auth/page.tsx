@@ -37,13 +37,13 @@ export default function AuthPage() {
   }
 
   return (
-    <div style={{backgroundColor: 'white', minHeight: '100vh', padding: '0'}}>
+    <div style={{backgroundColor: '#1e1e2e', minHeight: '100vh', padding: '0'}}>
       <div style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px'}}>
-        <a href="/" style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#111827', textDecoration: 'none'}}>Stage Gauge</a>
+        <a href="/" style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', textDecoration: 'none'}}>Stage Gauge</a>
       </div>
 
       <div style={{maxWidth: '380px', margin: '60px auto', padding: '0 24px'}}>
-        <h1 style={{fontFamily: 'Georgia, serif', fontSize: '26px', fontWeight: '600', color: '#111827', marginBottom: '8px'}}>
+        <h1 style={{fontFamily: 'Georgia, serif', fontSize: '26px', fontWeight: '600', color: '#f1f5f9', marginBottom: '8px'}}>
           {mode === 'signup' ? 'Create account' : 'Sign in'}
         </h1>
         <p style={{fontSize: '14px', color: '#6b7280', marginBottom: '32px'}}>
@@ -58,7 +58,7 @@ export default function AuthPage() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Eaglegodson"
-              style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#111827', backgroundColor: '#fff', boxSizing: 'border-box'}}
+              style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#f1f5f9', backgroundColor: '#fff', boxSizing: 'border-box'}}
             />
           </div>
         )}
@@ -70,7 +70,7 @@ export default function AuthPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#111827', backgroundColor: '#fff', boxSizing: 'border-box'}}
+            style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#f1f5f9', backgroundColor: '#fff', boxSizing: 'border-box'}}
           />
         </div>
 
@@ -81,7 +81,7 @@ export default function AuthPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#111827', backgroundColor: '#fff', boxSizing: 'border-box'}}
+            style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#f1f5f9', backgroundColor: '#fff', boxSizing: 'border-box'}}
           />
         </div>
 
