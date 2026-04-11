@@ -123,14 +123,14 @@ export default function Home() {
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
           {tiles.map((tile, i) => (
-            <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block' }}>
+            <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
               <div
-                style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #2a2a3e', transition: 'transform 0.15s, border-color 0.15s', cursor: 'pointer' }}
+                style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #2a2a3e', transition: 'transform 0.15s, border-color 0.15s', cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.borderColor = tile.accent + '66' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.borderColor = '#2a2a3e' }}
               >
                 <div style={{ background: tile.gradient, height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>{tile.icon}</div>
-                <div style={{ background: '#1e1e2e', padding: '16px' }}>
+                <div style={{ background: '#1e1e2e', padding: '16px', flex: 1 }}>
                   <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '14px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0', lineHeight: '1.3' }}>{tile.title}</h3>
                   <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, lineHeight: '1.5' }}>{tile.desc}</p>
                 </div>
