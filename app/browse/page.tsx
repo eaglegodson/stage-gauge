@@ -163,6 +163,7 @@ export default function Browse() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [searching, setSearching] = useState(false)
+  const [geoLoaded, setGeoLoaded] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { if (searchOpen && searchRef.current) searchRef.current.focus() }, [searchOpen])
@@ -174,7 +175,7 @@ export default function Browse() {
     fetch('https://ipapi.co/json/').then(r => r.json()).then(data => {
       const mapped = cityMap[(data.city || '').toLowerCase()]
       if (mapped && covered.includes(mapped)) setCityFilter([mapped])
-    }).catch(() => {})
+    }).catch(() => {}).finally(() => setGeoLoaded(true))
   }, [])
 
   useEffect(() => {
@@ -190,6 +191,7 @@ export default function Browse() {
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0]
+    if (!geoLoaded) return
     async function fetchProductions() {
       let query = supabase.from('production_listing').select('*').or(timingFilter.includes('past') && timingFilter.length === 1 ? 'season_end.lt.' + today : 'season_end.is.null,season_end.gte.' + today).order('combined_score', { ascending: false, nullsFirst: false })
       const activeCities = cityFilter.filter(c => c !== 'all')
@@ -219,7 +221,7 @@ export default function Browse() {
     }
     fetchProductions()
     fetchFilters()
-  }, [typeFilter, cityFilter, timingFilter, companyFilter])
+  }, [typeFilter, cityFilter, timingFilter, companyFilter, geoLoaded])
 
   const featured = productions[0]
   const rest = productions.slice(1)
