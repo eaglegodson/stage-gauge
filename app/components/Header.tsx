@@ -16,41 +16,18 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
     const saved = localStorage.getItem('stagegauge-theme')
     if (saved === 'light') {
       setLightMode(true)
-      applyLightMode(true)
+      document.body.classList.add('light-mode')
     }
   }, [])
-
-  function applyLightMode(on: boolean) {
-    const root = document.documentElement
-    if (on) {
-      root.style.setProperty('--bg-primary', '#ffffff')
-      root.style.setProperty('--bg-secondary', '#f3f4f6')
-      root.style.setProperty('--bg-card', '#ffffff')
-      root.style.setProperty('--border-color', '#e5e7eb')
-      root.style.setProperty('--text-primary', '#111827')
-      root.style.setProperty('--text-secondary', '#6b7280')
-      root.style.setProperty('--header-bg', '#ffffff')
-      root.style.setProperty('--header-border', '#e5e7eb')
-      document.body.style.backgroundColor = '#f3f4f6'
-      document.body.style.color = '#111827'
-    } else {
-      root.style.setProperty('--bg-primary', '#14141f')
-      root.style.setProperty('--bg-secondary', '#1e1e2e')
-      root.style.setProperty('--bg-card', '#1e1e2e')
-      root.style.setProperty('--border-color', '#2a2a3e')
-      root.style.setProperty('--text-primary', '#f1f5f9')
-      root.style.setProperty('--text-secondary', '#9ca3af')
-      root.style.setProperty('--header-bg', '#0f0f1a')
-      root.style.setProperty('--header-border', '#1e1e2e')
-      document.body.style.backgroundColor = '#14141f'
-      document.body.style.color = '#f1f5f9'
-    }
-  }
 
   function toggleMode() {
     const next = !lightMode
     setLightMode(next)
-    applyLightMode(next)
+    if (next) {
+      document.body.classList.add('light-mode')
+    } else {
+      document.body.classList.remove('light-mode')
+    }
     localStorage.setItem('stagegauge-theme', next ? 'light' : 'dark')
   }
 
