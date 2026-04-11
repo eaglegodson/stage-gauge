@@ -36,6 +36,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
             Search
           </button>
         )}
+        <a href="/about" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>About</a>
         {user && (
           <>
             <a href="/watchlist" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>Watchlist</a>
