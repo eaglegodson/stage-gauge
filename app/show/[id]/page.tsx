@@ -172,7 +172,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
             )}
           </div>
           <div style={{ marginTop: '24px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <a href={getTicketUrl(show?.company, production.city, show?.title, production.country)} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', backgroundColor: '#1D9E75', color: 'white', textDecoration: 'none', fontWeight: '600', display: 'inline-block' }}>Buy tickets</a>
+            <a href={production.ticket_url || getTicketUrl(show?.company, production.city, show?.title, production.country)} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', backgroundColor: '#1D9E75', color: 'white', textDecoration: 'none', fontWeight: '600', display: 'inline-block' }}>Buy tickets</a>
             <button
               onClick={toggleWatchlist}
               style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.2)'}`, backgroundColor: watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}
