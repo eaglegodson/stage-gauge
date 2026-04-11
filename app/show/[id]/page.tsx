@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../../lib/supabase'
 import Header from '../../components/Header'
+import Footer from '../../components/Footer'
 import ReviewForm from './review'
 
 const typeConfig: Record<string, { gradient: string, accent: string, emoji: string }> = {
@@ -13,7 +14,6 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
   dance:    { gradient: 'linear-gradient(160deg, #0f2d1a 0%, #0f8f5a 100%)', accent: '#34D399', emoji: '💃' },
   concert:  { gradient: 'linear-gradient(160deg, #2d230f 0%, #b57d10 100%)', accent: '#FBBF24', emoji: '🎻' },
 }
-
 
 const ticketingUrls: Record<string, string> = {
   'Melbourne Theatre Company': 'https://www.mtc.com.au/tickets',
@@ -119,11 +119,12 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   }
 
   if (!production) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#14141f' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
       <Header />
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px', textAlign: 'center' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px', textAlign: 'center', flex: 1 }}>
         <p style={{ color: '#4b5563' }}>Loading...</p>
       </div>
+      <Footer />
     </div>
   )
 
@@ -132,10 +133,9 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#14141f' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
       <Header />
 
-      {/* Hero banner */}
       <div style={{ background: cfg.gradient, padding: '48px 24px 32px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>← All shows</a>
@@ -145,7 +145,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
               <div style={{ width: '24px', height: '2px', borderRadius: '1px', background: cfg.accent }}></div>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.accent }}>{show?.type}</span>
                 <span style={{ color: 'rgba(255,255,255,0.3)' }}>·</span>
                 <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>{production.city}</span>
@@ -183,9 +183,8 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         </div>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
 
-        {/* Critic Reviews */}
         <div style={{ marginBottom: '32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
             <h2 style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563', margin: 0 }}>Critic reviews · {criticReviews.length}</h2>
@@ -217,7 +216,6 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
           )}
         </div>
 
-        {/* Audience Reviews */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
@@ -256,6 +254,8 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
       {showReviewForm && user && (
         <ReviewForm productionId={id} user={user} onClose={() => setShowReviewForm(false)} />
       )}
+
+      <Footer />
     </div>
   )
 }

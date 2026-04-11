@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 const typeColors: Record<string, { bg: string, accent: string, emoji: string }> = {
   theatre:  { bg: '#1C2B3A', accent: '#4A90D9', emoji: '🎭' },
   musical:  { bg: '#2D1B3D', accent: '#C084FC', emoji: '🎵' },
-  opera:    { bg: '#2B1A1A', accent: '#F87171', emoji: '🎶' },
+  opera:    { bg: '#2B1A1A', accent: '#F87171', emoji: '🎼' },
   ballet:   { bg: '#1A2440', accent: '#60A5FA', emoji: '🩰' },
   dance:    { bg: '#1A2D2A', accent: '#34D399', emoji: '💃' },
   concert:  { bg: '#2D2A1A', accent: '#FBBF24', emoji: '🎻' },
@@ -52,7 +53,7 @@ export default function ArchivePage() {
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
-    <main style={{minHeight: '100vh', backgroundColor: '#14141f'}}>
+    <main style={{minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column'}}>
       <Header />
 
       <div style={{backgroundColor: '#1a2e1a', borderBottom: '1px solid #162316', padding: '0 24px'}}>
@@ -71,7 +72,7 @@ export default function ArchivePage() {
         </div>
       </div>
 
-      <div style={{maxWidth: '1100px', margin: '0 auto', padding: '40px 24px'}}>
+      <div style={{maxWidth: '1100px', margin: '0 auto', padding: '40px 24px', flex: 1, width: '100%', boxSizing: 'border-box'}}>
         <div style={{marginBottom: '32px'}}>
           <h1 style={{fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 8px 0'}}>Archive</h1>
           <p style={{fontSize: '14px', color: '#9ca3af', margin: 0}}>Past productions — {productions.length} shows</p>
@@ -116,6 +117,8 @@ export default function ArchivePage() {
           })}
         </div>
       </div>
+
+      <Footer />
     </main>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Header from './components/Header'
+import Footer from './components/Footer'
 import { supabase } from '../lib/supabase'
 
 const typeConfig: Record<string, { gradient: string, accent: string, emoji: string }> = {
@@ -68,12 +69,10 @@ export default function Home() {
   const cfg = show ? (typeConfig[show.type] || typeConfig.theatre) : null
 
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#14141f' }}>
+    <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
       <Header />
 
-      {/* Hero with fading background */}
       <div style={{ position: 'relative', overflow: 'hidden', minHeight: '520px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        {/* Fading gradient backgrounds */}
         {shows.map((s: any, i: number) => {
           const c = typeConfig[s.type] || typeConfig.theatre
           return (
@@ -85,10 +84,8 @@ export default function Home() {
             }} />
           )
         })}
-        {/* Dark overlay */}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #14141f 0%, rgba(20,20,31,0.6) 40%, rgba(20,20,31,0.85) 80%, #14141f 100%)' }} />
 
-        {/* Content */}
         <div style={{ position: 'relative', maxWidth: '900px', margin: '0 auto', padding: '80px 24px 48px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }}>
           <div style={{ display: 'inline-block', background: 'rgba(29,158,117,0.15)', border: '1px solid rgba(29,158,117,0.3)', borderRadius: '20px', padding: '6px 16px', fontSize: '12px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '24px' }}>
             Now in Beta
@@ -104,7 +101,6 @@ export default function Home() {
             <a href="/auth" style={{ fontSize: '15px', fontWeight: '500', color: '#9ca3af', padding: '12px 28px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', backgroundColor: 'rgba(255,255,255,0.05)' }}>Create account</a>
           </div>
 
-          {/* Now playing caption */}
           {show && cfg && (
             <a href={'/show/' + show.production_id} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px 16px', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}>
               <span style={{ fontSize: '20px' }}>{cfg.emoji}</span>
@@ -125,7 +121,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px', width: '100%', boxSizing: 'border-box' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
           {tiles.map((tile, i) => (
             <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
@@ -148,8 +144,8 @@ export default function Home() {
       <div style={{ borderTop: '1px solid #1e1e2e', padding: '32px 24px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: '48px', flexWrap: 'wrap' }}>
           {[
-            { number: '380+', label: 'Productions' },
-            { number: '150+', label: 'Reviews' },
+            { number: '485+', label: 'Productions' },
+            { number: '160+', label: 'Reviews' },
             { number: '10+', label: 'Cities' },
           ].map((stat, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
@@ -159,6 +155,8 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      <Footer />
     </main>
   )
 }

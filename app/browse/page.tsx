@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 const typeConfig: Record<string, { gradient: string, accent: string, emoji: string }> = {
   theatre:  { gradient: 'linear-gradient(160deg, #0f2744 0%, #1a6bb5 100%)', accent: '#4A90D9', emoji: '🎭' },
@@ -227,7 +228,7 @@ export default function Browse() {
   const rest = productions.slice(1)
 
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#14141f' }}>
+    <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
       <Header onSearch={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }} />
       <div style={{ position: 'sticky', top: '56px', zIndex: 90, backgroundColor: '#0f0f1a', borderBottom: '1px solid #1e1e2e', padding: '10px 24px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -263,7 +264,7 @@ export default function Browse() {
           </div>
         </div>
       )}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
         {featured && <div style={{ marginBottom: '32px' }}><ShowCard p={featured} featured /></div>}
         {rest.length > 0 && (
           <>
@@ -278,6 +279,7 @@ export default function Browse() {
         )}
         {productions.length === 0 && <p style={{ textAlign: 'center', color: '#4b5563', fontSize: '14px', paddingTop: '60px' }}>No shows match this filter.</p>}
       </div>
+      <Footer />
     </main>
   )
 }
