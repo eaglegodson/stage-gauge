@@ -373,10 +373,10 @@ export default function Home() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             {[
-              { icon: '🗺️', title: 'Discover what's on near you', desc: 'Browse current and upcoming productions in your city and beyond.' },
-              { icon: '📰', title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.' },
-              { icon: '⭐', title: 'Rate and review shows you've seen', desc: 'Share your take and contribute to the Stage Gauge score.' },
-              { icon: '🔖', title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.' },
+              { icon: "🗺️", title: "Discover what's on near you", desc: "Browse current and upcoming productions in your city and beyond." },
+              { icon: "📰", title: "Read critic and audience reviews", desc: "Aggregated reviews from leading outlets alongside real audience voices." },
+              { icon: "⭐", title: "Rate and review shows you've seen", desc: "Share your take and contribute to the Stage Gauge score." },
+              { icon: "🔖", title: "Save shows to your watchlist", desc: "Keep track of shows you want to see and never miss an opening." },
             ].map((tile, i) => (
               <div key={i} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '20px' }}>
                 <div style={{ fontSize: '24px', marginBottom: '10px' }}>{tile.icon}</div>
