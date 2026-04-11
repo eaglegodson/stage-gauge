@@ -46,7 +46,7 @@ export default function Home() {
         .eq('city', city)
         .or('season_end.is.null,season_end.gte.' + today)
         .not('combined_score', 'is', null)
-        .order('combined_score', { ascending: False })
+        .order('combined_score', { ascending: false })
         .limit(8)
       if (productions && productions.length > 0) setShows(productions)
     }).catch(() => {})
