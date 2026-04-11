@@ -178,7 +178,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
               rel="noopener noreferrer"
               style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', backgroundColor: '#1D9E75', color: 'white', textDecoration: 'none', fontWeight: '600', display: 'inline-block' }}
             >
-              Buy tickets →
+              Buy tickets &#8594;
             </a>
             <button
               onClick={toggleWatchlist}
