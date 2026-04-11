@@ -83,7 +83,7 @@ export default function AuthPage() {
             {mode === 'signup' ? 'Create account' : 'Sign in'}
           </h1>
           <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '28px', marginTop: 0 }}>
-            {mode === 'signup' ? 'Join the Stage Gauge community' : 'Welcome back'}
+            {mode === 'signup' ? 'Join the StageGauge community' : 'Welcome back'}
           </p>
 
           {mode === 'signup' && (

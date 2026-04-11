@@ -16,7 +16,7 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
 const tiles = [
   { icon: '🗺️', title: "Discover what's on near you", desc: 'Browse current and upcoming productions in your city and beyond.', href: '/browse', gradient: 'linear-gradient(160deg, #0f2744 0%, #1a6bb5 100%)', accent: '#4A90D9' },
   { icon: '📰', title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/browse', gradient: 'linear-gradient(160deg, #2d0f4a 0%, #8b2fc9 100%)', accent: '#C084FC' },
-  { icon: '⭐', title: "Rate and review shows you've seen", desc: 'Share your take and contribute to the Stage Gauge score.', href: '/auth', gradient: 'linear-gradient(160deg, #0f2d1a 0%, #0f8f5a 100%)', accent: '#34D399' },
+  { icon: '⭐', title: "Rate and review shows you've seen", desc: 'Share your take and contribute to the StageGauge score.', href: '/auth', gradient: 'linear-gradient(160deg, #0f2d1a 0%, #0f8f5a 100%)', accent: '#34D399' },
   { icon: '🔖', title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.', href: '/auth', gradient: 'linear-gradient(160deg, #2d230f 0%, #b57d10 100%)', accent: '#FBBF24' },
 ]
 
@@ -97,7 +97,7 @@ export default function Home() {
             The home for live<br />performance reviews
           </h1>
           <p style={{ fontSize: '18px', color: '#9ca3af', margin: '0 0 40px 0', lineHeight: '1.6', maxWidth: '560px', marginLeft: 'auto', marginRight: 'auto' }}>
-            Stage Gauge aggregates critic and audience reviews for theatre, opera, ballet, musicals and dance across Australia, New Zealand and London.
+            StageGauge aggregates critic and audience reviews for theatre, opera, ballet, musicals and dance across Australia, New Zealand and London.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '40px' }}>
             <a href="/browse" style={{ fontSize: '15px', fontWeight: '600', color: 'white', padding: '12px 28px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>Browse shows</a>

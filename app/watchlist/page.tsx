@@ -37,7 +37,7 @@ export default function WatchlistPage() {
   return (
     <div style={{minHeight: '100vh', backgroundColor: '#1e1e2e'}}>
       <header style={{borderBottom: '1px solid #f3f4f6', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-        <a href="/" style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', textDecoration: 'none'}}>Stage Gauge</a>
+        <a href="/" style={{fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', textDecoration: 'none'}}>StageGauge</a>
         {user && <span style={{fontSize: '14px', color: '#9ca3af'}}>{user.user_metadata?.display_name || user.email}</span>}
       </header>
 

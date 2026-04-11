@@ -26,7 +26,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
       zIndex: 100
     }}>
       <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: '10px' }}>
-        <span style={{ fontFamily: 'Georgia, serif', fontSize: '20px', fontWeight: '600', color: '#f1f5f9', letterSpacing: '-0.3px' }}>Stage Gauge</span>
+        <span style={{ fontFamily: 'Georgia, serif', fontSize: '20px', fontWeight: '600', color: '#f1f5f9', letterSpacing: '-0.3px' }}>StageGauge</span>
         <span style={{ fontSize: '10px', color: '#1D9E75', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: '600' }}>Beta</span>
       </a>
       <nav style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
