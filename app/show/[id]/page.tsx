@@ -14,6 +14,55 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
   concert:  { gradient: 'linear-gradient(160deg, #2d230f 0%, #b57d10 100%)', accent: '#FBBF24', emoji: '🎻' },
 }
 
+
+const ticketingUrls: Record<string, string> = {
+  'Melbourne Theatre Company': 'https://www.mtc.com.au/tickets',
+  'Sydney Theatre Company': 'https://www.sydneytheatre.com.au/whats-on',
+  'Belvoir St Theatre': 'https://belvoir.com.au/whats-on',
+  'Malthouse Theatre': 'https://malthousetheatre.com.au/whats-on',
+  'Griffin Theatre Company': 'https://griffintheatre.com.au/whats-on',
+  'Ensemble Theatre': 'https://ensembletheatre.com.au/whats-on',
+  'Queensland Theatre': 'https://queenslandtheatre.com.au/whats-on',
+  'Queensland Theatre Company': 'https://queenslandtheatre.com.au/whats-on',
+  'Opera Australia': 'https://opera.org.au/performances',
+  'Australian Ballet': 'https://australianballet.com.au/performances',
+  'Bangarra Dance Theatre': 'https://bangarra.com.au/performances',
+  'Australian Ballet and Bangarra Dance Theatre': 'https://australianballet.com.au/performances',
+  'Queensland Ballet': 'https://queenslandballet.com.au/performances',
+  'West Australian Ballet': 'https://waballet.com.au/performances',
+  'West Australian Opera': 'https://waopera.asn.au/performances',
+  'Victorian Opera': 'https://victorianopera.com.au/performances',
+  'Black Swan State Theatre Company': 'https://blackswantheatre.com.au/whats-on',
+  'State Theatre Company South Australia': 'https://statetheatrecompany.com.au/whats-on',
+  'State Opera South Australia': 'https://stateopera.com.au/performances',
+  'Opera Queensland': 'https://operaqld.com.au/performances',
+  'Bell Shakespeare': 'https://bellshakespeare.com.au/performances',
+  'Red Stitch Actors Theatre': 'https://redstitch.net/whats-on',
+  'La Mama Theatre': 'https://lamama.com.au/whats-on',
+  'Canberra Theatre Centre': 'https://canberratheatrecentre.com.au/whats-on',
+  'Marriner Theatres': 'https://www.ticketmaster.com.au',
+  'Michael Cassel Group': 'https://www.ticketmaster.com.au',
+  'Crossroads Live': 'https://www.ticketmaster.com.au',
+  'John Frost for Crossroads Live': 'https://www.ticketmaster.com.au',
+  'Disney Theatrical': 'https://www.ticketmaster.com.au',
+  'Disney Theatrical Productions': 'https://www.ticketmaster.com.au',
+  'QPAC': 'https://www.qpac.com.au/whats-on',
+  'BIG Live': 'https://www.ticketmaster.com.au',
+  'On Your Feet Australia': 'https://www.ticketmaster.com.au',
+  'Soho Theatre': 'https://sohotheatre.com',
+  'West End': 'https://www.ticketmaster.com.au',
+}
+
+function getTicketUrl(company: string, city: string, title: string, country: string): string {
+  if (country === 'GB') {
+    return 'https://www.todaytix.com/search?q=' + encodeURIComponent(title)
+  }
+  if (country === 'NZ') {
+    return 'https://www.ticketmaster.co.nz/search?q=' + encodeURIComponent(title)
+  }
+  return ticketingUrls[company] || ('https://www.ticketmaster.com.au/search?q=' + encodeURIComponent(title))
+}
+
 function StarDisplay({ score, size = 'sm' }: { score: number, size?: 'sm' | 'lg' }) {
   const stars = []
   const fullStars = Math.floor(score)
@@ -122,7 +171,15 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
               </div>
             )}
           </div>
-          <div style={{ marginTop: '24px' }}>
+          <div style={{ marginTop: '24px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            
+              href={getTicketUrl(show?.company, production.city, show?.title, production.country)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', backgroundColor: '#1D9E75', color: 'white', textDecoration: 'none', fontWeight: '600', display: 'inline-block' }}
+            >
+              Buy tickets →
+            </a>
             <button
               onClick={toggleWatchlist}
               style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.2)'}`, backgroundColor: watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}
