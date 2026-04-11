@@ -366,6 +366,27 @@ export default function Home() {
       )}
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
+        {/* Value proposition */}
+        <div style={{ marginBottom: '40px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 8px 0' }}>Stage Gauge lets you</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+            {[
+              { icon: '🗺️', title: 'Discover what's on near you', desc: 'Browse current and upcoming productions in your city and beyond.' },
+              { icon: '📰', title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.' },
+              { icon: '⭐', title: 'Rate and review shows you've seen', desc: 'Share your take and contribute to the Stage Gauge score.' },
+              { icon: '🔖', title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.' },
+            ].map((tile, i) => (
+              <div key={i} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '20px' }}>
+                <div style={{ fontSize: '24px', marginBottom: '10px' }}>{tile.icon}</div>
+                <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '14px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0', lineHeight: '1.3' }}>{tile.title}</h3>
+                <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, lineHeight: '1.5' }}>{tile.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Featured */}
         {featured && (
           <div style={{ marginBottom: '32px' }}>
