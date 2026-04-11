@@ -210,7 +210,7 @@ export default function Home() {
   const [availableCompanies, setAvailableCompanies] = useState<string[]>([])
   const [cityFilter, setCityFilter] = useState<string[]>(['all'])
   const [typeFilter, setTypeFilter] = useState<string[]>(['all'])
-  const [timingFilter, setTimingFilter] = useState<string[]>(['all'])
+  const [timingFilter, setTimingFilter] = useState<string[]>(['now'])
   const [companyFilter, setCompanyFilter] = useState<string[]>(['all'])
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
