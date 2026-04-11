@@ -65,7 +65,6 @@ export default function Home() {
 
       {/* Tiles */}
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px' }}>
-        <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', textAlign: 'center', margin: '0 0 24px 0' }}>Stage Gauge lets you</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
           {tiles.map((tile, i) => (
             <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block' }}>
