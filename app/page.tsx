@@ -90,7 +90,7 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
   )
 }
 
-function FilterDropdown({ label, options, value, onChange }: { label: string, options: string[], value: string, onChange: (v: string) => void }) {
+function FilterDropdown({ label, options, values, onChange, allKey = 'all' }: { label: string, options: string[], values: string[], onChange: (v: string[]) => void, allKey?: string }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -102,8 +102,25 @@ function FilterDropdown({ label, options, value, onChange }: { label: string, op
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const active = value !== 'all' && value !== ''
-  const displayLabel = active ? options.find(o => o === value) || label : label
+  const isAll = values.length === 0 || (values.length === 1 && values[0] === allKey)
+  const active = !isAll
+
+  function toggle(opt: string) {
+    if (opt === allKey) { onChange([allKey]); return }
+    const without = values.filter(v => v !== allKey)
+    if (without.includes(opt)) {
+      const next = without.filter(v => v !== opt)
+      onChange(next.length === 0 ? [allKey] : next)
+    } else {
+      onChange([...without, opt])
+    }
+  }
+
+  const displayLabel = active
+    ? values.length === 1
+      ? values[0].charAt(0).toUpperCase() + values[0].slice(1)
+      : `${label} (${values.length})`
+    : label
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -137,30 +154,36 @@ function FilterDropdown({ label, options, value, onChange }: { label: string, op
           borderRadius: '8px',
           overflow: 'hidden',
           zIndex: 100,
-          minWidth: '150px',
+          minWidth: '160px',
           boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
-          {options.map(opt => (
-            <button
-              key={opt}
-              onClick={() => { onChange(opt); setOpen(false) }}
-              style={{
-                display: 'block',
-                width: '100%',
-                padding: '9px 14px',
-                textAlign: 'left',
-                fontSize: '12px',
-                color: value === opt ? '#1D9E75' : '#9ca3af',
-                background: value === opt ? '#0f2d1a' : 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={e => { if (value !== opt) (e.currentTarget as HTMLElement).style.background = '#1e1e2e' }}
-              onMouseLeave={e => { if (value !== opt) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-            >
-              {opt === 'all' ? `All ${label.toLowerCase()}s` : opt.charAt(0).toUpperCase() + opt.slice(1)}
-            </button>
-          ))}
+          {options.map(opt => {
+            const selected = values.includes(opt)
+            return (
+              <button
+                key={opt}
+                onClick={() => toggle(opt)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '9px 14px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  color: selected ? '#1D9E75' : '#9ca3af',
+                  background: selected ? '#0f2d1a' : 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#1e1e2e' }}
+                onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+              >
+                <span style={{ width: '14px', height: '14px', border: `1px solid ${selected ? '#1D9E75' : '#4b5563'}`, borderRadius: '3px', background: selected ? '#1D9E75' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '9px', color: '#14141f' }}>{selected ? '✓' : ''}</span>
+                {opt === allKey ? `All ${label.toLowerCase()}s` : opt.charAt(0).toUpperCase() + opt.slice(1)}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
@@ -168,7 +191,7 @@ function FilterDropdown({ label, options, value, onChange }: { label: string, op
 }
 
 function getTimingFilter(start: string, end: string, timing: string) {
-  if (timing === 'all') return true
+  if (!timing || timing === 'all') return true
   const now = new Date()
   const startDate = start ? new Date(start) : null
   const endDate = end ? new Date(end) : null
@@ -185,10 +208,10 @@ export default function Home() {
   const [availableCities, setAvailableCities] = useState<string[]>([])
   const [availableTypes, setAvailableTypes] = useState<string[]>([])
   const [availableCompanies, setAvailableCompanies] = useState<string[]>([])
-  const [cityFilter, setCityFilter] = useState('all')
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [timingFilter, setTimingFilter] = useState('all')
-  const [companyFilter, setCompanyFilter] = useState('all')
+  const [cityFilter, setCityFilter] = useState<string[]>(['all'])
+  const [typeFilter, setTypeFilter] = useState<string[]>(['all'])
+  const [timingFilter, setTimingFilter] = useState<string[]>(['all'])
+  const [companyFilter, setCompanyFilter] = useState<string[]>(['all'])
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -201,7 +224,7 @@ export default function Home() {
   }, [searchOpen])
 
   useEffect(() => {
-    if (cityFilter === 'all') { setCompanyFilter('all'); setAvailableCompanies([]) }
+    if (cityFilter.includes('all') || cityFilter.length === 0) { setCompanyFilter(['all']); setAvailableCompanies([]) }
   }, [cityFilter])
 
   useEffect(() => {
@@ -215,7 +238,7 @@ export default function Home() {
     const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Auckland','Wellington','Christchurch','London']
     fetch('https://ipapi.co/json/').then(r => r.json()).then(data => {
       const mapped = cityMap[(data.city || '').toLowerCase()]
-      if (mapped && covered.includes(mapped)) setCityFilter(mapped)
+      if (mapped && covered.includes(mapped)) setCityFilter([mapped])
       else if (mapped) setNearestCity(mapped)
     }).catch(() => {})
   }, [])
@@ -237,13 +260,17 @@ export default function Home() {
     const today = new Date().toISOString().split('T')[0]
     async function fetchProductions() {
       let query = supabase.from('production_listing').select('*')
-        .or(timingFilter === 'past' ? `season_end.lt.${today}` : `season_end.is.null,season_end.gte.${today}`)
+        .or(timingFilter.includes('past') && timingFilter.length === 1 ? `season_end.lt.${today}` : `season_end.is.null,season_end.gte.${today}`)
         .order('combined_score', { ascending: false, nullsFirst: false })
-      if (typeFilter !== 'all') query = query.eq('type', typeFilter)
-      if (cityFilter !== 'all') query = query.eq('city', cityFilter)
-      if (companyFilter !== 'all') query = query.eq('company', companyFilter)
+      const activeTypes = typeFilter.filter(t => t !== 'all')
+      if (activeTypes.length > 0) query = query.in('type', activeTypes)
+      const activeCities = cityFilter.filter(c => c !== 'all')
+      if (activeCities.length > 0) query = query.in('city', activeCities)
+      const activeCompanies = companyFilter.filter(c => c !== 'all')
+      if (activeCompanies.length > 0) query = query.in('company', activeCompanies)
       const { data } = await query
-      const filtered = (data || []).filter(p => getTimingFilter(p.season_start, p.season_end, timingFilter))
+      const activeTimings = timingFilter.filter(t => t !== 'all')
+      const filtered = activeTimings.length === 0 ? (data || []) : (data || []).filter(p => activeTimings.some(t => getTimingFilter(p.season_start, p.season_end, t)))
       setProductions(filtered)
     }
     async function fetchFilters() {
@@ -255,9 +282,10 @@ export default function Home() {
         setAvailableCities(['all', ...cityOrder.filter(c => foundCities.includes(c))])
         setAvailableTypes(['all', ...Array.from(new Set(data.map((p: any) => p.type).filter(Boolean))).sort() as string[]])
       }
-      if (cityFilter !== 'all') {
+      const activeCitiesForCompany = cityFilter.filter(c => c !== 'all')
+      if (activeCitiesForCompany.length > 0) {
         const { data: cd } = await supabase.from('production_listing').select('company')
-          .eq('city', cityFilter).or(`season_end.is.null,season_end.gte.${today}`)
+          .in('city', activeCitiesForCompany).or(`season_end.is.null,season_end.gte.${today}`)
         if (cd) setAvailableCompanies(Array.from(new Set(cd.map((p: any) => p.company).filter(Boolean))).sort() as string[])
       }
     }
@@ -286,17 +314,17 @@ export default function Home() {
           <FilterDropdown
             label="City"
             options={availableCities}
-            value={cityFilter}
-            onChange={v => { setCityFilter(v); setCompanyFilter('all') }}
+            values={cityFilter}
+            onChange={v => { setCityFilter(v); setCompanyFilter(['all']) }}
           />
           {availableCompanies.length > 0 && (
-            <FilterDropdown label="Company" options={['all', ...availableCompanies]} value={companyFilter} onChange={setCompanyFilter} />
+            <FilterDropdown label="Company" options={['all', ...availableCompanies]} values={companyFilter} onChange={setCompanyFilter} />
           )}
-          <FilterDropdown label="Type" options={availableTypes} value={typeFilter} onChange={setTypeFilter} />
+          <FilterDropdown label="Type" options={availableTypes} values={typeFilter} onChange={setTypeFilter} />
           <FilterDropdown
             label="Timing"
             options={timingOptions.map(t => t.key)}
-            value={timingFilter}
+            values={timingFilter}
             onChange={setTimingFilter}
           />
         </div>
