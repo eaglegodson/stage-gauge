@@ -149,9 +149,8 @@ export default function Home() {
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: '48px', flexWrap: 'wrap' }}>
           {[
             { number: '380+', label: 'Productions' },
-            { number: '10+', label: 'Cities' },
             { number: '150+', label: 'Reviews' },
-            { number: '16', label: 'Outlets' },
+            { number: '10+', label: 'Cities' },
           ].map((stat, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#1D9E75' }}>{stat.number}</div>
