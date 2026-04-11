@@ -28,8 +28,8 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
   if (featured) {
     return (
       <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-        <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', display: 'grid', gridTemplateColumns: '200px 1fr', minHeight: '200px' }}>
-          <div style={{ background: cfg.gradient, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+        <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ background: cfg.gradient, height: '160px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
             <span style={{ fontSize: '48px' }}>{cfg.emoji}</span>
             <div style={{ width: '32px', height: '3px', borderRadius: '2px', background: cfg.accent }}></div>
           </div>
