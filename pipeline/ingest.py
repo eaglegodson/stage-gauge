@@ -26,6 +26,7 @@ FEEDS = [
     {"outlet": "Australian Arts Review", "url": "https://artsreview.com.au/category/theatre/feed/", "city": None, "country": "AU"},
     {"outlet": "Suzy Goes See", "url": "http://www.suzygoessee.com/feed", "city": "Sydney", "country": "AU"},
     {"outlet": "Theatre Matters", "url": "https://theatrematters.com.au/feed", "city": None, "country": "AU"},
+    {"outlet": "Man in Chair", "url": "https://simonparrismaninchair.com/feed/", "city": None, "country": "AU"},
     # ANZ - general (arts section filtered by AI)
     {"outlet": "The Age", "url": "https://www.theage.com.au/rss/feed.xml", "city": "Melbourne", "country": "AU"},
     {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/feed.xml", "city": "Sydney", "country": "AU"},
@@ -243,17 +244,16 @@ def run_pipeline():
     run_guardian_pipeline()
 
 
-
 def run_guardian_pipeline():
     """Fetch Guardian theatre reviews via the Content API which includes star ratings."""
     print("\nFetching Guardian API...")
-    
+
     GUARDIAN_API_KEY = os.environ.get("GUARDIAN_API_KEY", "ad3eeb51-81df-49ca-ac81-8c195bee341e")
-    
+
     known_shows = get_known_shows()
     all_productions = get_all_productions()
     existing_urls = get_existing_urls()
-    
+
     url = "https://content.guardianapis.com/search"
     params = {
         "api-key": GUARDIAN_API_KEY,
@@ -264,52 +264,51 @@ def run_guardian_pipeline():
         "page-size": 50,
         "order-by": "newest"
     }
-    
+
     try:
         r = requests.get(url, params=params, timeout=15)
         data = r.json()
     except Exception as e:
         print(f"  Guardian API error: {e}")
         return
-    
+
     results = data.get("response", {}).get("results", [])
     print(f"  Found {len(results)} articles")
-    
+
     imported = 0
     for item in results:
         fields = item.get("fields", {})
         article_url = fields.get("shortUrl") or item.get("webUrl", "")
-        
+
         if not article_url or article_url in existing_urls:
             continue
-        
+
         star_rating_raw = fields.get("starRating")
         star_rating = float(star_rating_raw) if star_rating_raw else None
-        
+
         headline = fields.get("headline", "")
         body = fields.get("bodyText", "")[:2000]
         text = f"{headline}\n\n{body}"
-        
+
         extracted = extract_review(text, known_shows)
         if not extracted or not extracted.get("is_arts_review"):
             continue
-        
-        # Override star rating with Guardian API value if available
+
         if star_rating is not None:
             extracted["star_rating"] = star_rating
-        
+
         confidence = float(extracted.get("confidence", 0))
         city = extracted.get("city") or "London"
         country = extracted.get("country") or "GB"
         production_id = find_production(extracted.get("show_title"), city, country, all_productions)
-        
+
         if not production_id:
             print(f"  No DB match: {extracted.get('show_title')} ({city})")
             continue
-        
+
         normalised = normalise_score(extracted.get("star_rating"))
         status = "approved" if confidence >= 0.85 else "pending"
-        
+
         review = {
             "production_id": production_id,
             "outlet": "The Guardian",
@@ -323,7 +322,7 @@ def run_guardian_pipeline():
             "confidence_score": confidence,
             "status": status,
         }
-        
+
         try:
             supabase.table("critic_reviews").insert(review).execute()
             existing_urls.add(article_url)
@@ -332,7 +331,7 @@ def run_guardian_pipeline():
             print(f"  ✓ {extracted.get('show_title')} [{status}] {stars}")
         except Exception as e:
             print(f"  ✗ Insert error: {e}")
-    
+
     print(f"  Guardian API: imported {imported} reviews")
 
 
