@@ -26,6 +26,24 @@ export default function Home() {
   const [currentShow, setCurrentShow] = useState(0)
   const [visible, setVisible] = useState(true)
   const [userCity, setUserCity] = useState('')
+  const [stats, setStats] = useState({ productions: 0, reviews: 0, cities: 0 })
+
+  useEffect(() => {
+    async function fetchStats() {
+      const [prodResult, reviewResult, cityResult] = await Promise.all([
+        supabase.from('productions').select('id', { count: 'exact', head: true }),
+        supabase.from('critic_reviews').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+        supabase.from('productions').select('city', { count: 'exact' }),
+      ])
+      const cities = new Set((cityResult.data || []).map((p: any) => p.city).filter(Boolean))
+      setStats({
+        productions: prodResult.count || 0,
+        reviews: reviewResult.count || 0,
+        cities: cities.size,
+      })
+    }
+    fetchStats()
+  }, [])
 
   useEffect(() => {
     const cityMap: Record<string, string> = {
@@ -141,9 +159,9 @@ export default function Home() {
       <div style={{ borderTop: '1px solid #1e1e2e', padding: '32px 24px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: '48px', flexWrap: 'wrap' }}>
           {[
-            { number: '485+', label: 'Productions' },
-            { number: '175+', label: 'Reviews' },
-            { number: '10+', label: 'Cities' },
+            { number: stats.productions > 0 ? stats.productions + '+' : '—', label: 'Productions' },
+            { number: stats.reviews > 0 ? stats.reviews + '+' : '—', label: 'Reviews' },
+            { number: stats.cities > 0 ? stats.cities + '+' : '—', label: 'Cities' },
           ].map((stat, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#1D9E75' }}>{stat.number}</div>
