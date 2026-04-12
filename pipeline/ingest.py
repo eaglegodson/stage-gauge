@@ -141,6 +141,12 @@ def title_match(search_title, db_title):
     search = search_title.lower().strip()
     db = db_title.lower().strip()
 
+    # Strip leading "the " so "Book of Mormon" matches "The Book of Mormon"
+    if search.startswith("the "):
+        search = search[4:]
+    if db.startswith("the "):
+        db = db[4:]
+
     if search in db or db in search:
         return True
 
