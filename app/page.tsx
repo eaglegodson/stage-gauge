@@ -149,7 +149,7 @@ export default function Home() {
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.borderColor = '#2a2a3e' }}
               >
                 <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '14px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0', lineHeight: '1.3' }}>{tile.title}</h3>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, lineHeight: '1.5' }}>{tile.desc}</p>
+                <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0, lineHeight: '1.5' }}>{tile.desc}</p>
               </div>
             </a>
           ))}
