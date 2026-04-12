@@ -54,13 +54,66 @@ const ticketingUrls: Record<string, string> = {
 }
 
 function getTicketUrl(company: string, city: string, title: string, country: string): string {
+  const t = encodeURIComponent(title)
+
+  // Company direct ticketing pages
+  const companyDirect: Record<string, string> = {
+    'Melbourne Theatre Company': 'https://www.mtc.com.au/whats-on/',
+    'Malthouse Theatre': 'https://www.malthousetheatre.com.au/whats-on/',
+    'Red Stitch Actors Theatre': 'https://www.redstitch.net/whats-on/',
+    'Victorian Opera': 'https://www.victorianopera.com.au/whats-on/',
+    'Sydney Theatre Company': 'https://www.sydneytheatre.com.au/whats-on/',
+    'Belvoir St Theatre': 'https://belvoir.com.au/whats-on/',
+    'Griffin Theatre Company': 'https://griffintheatre.com.au/whats-on/',
+    'Ensemble Theatre': 'https://www.ensemble.com.au/whats-on/',
+    'Hayes Theatre Co': 'https://hayestheatre.com.au/whats-on/',
+    'Queensland Theatre': 'https://www.queenslandtheatre.com.au/whats-on/',
+    'Opera Queensland': 'https://www.operaqueensland.com.au/whats-on/',
+    'Queensland Ballet': 'https://www.queenslandballet.com.au/whats-on/',
+    'Black Swan State Theatre': 'https://www.bsstc.com.au/whats-on/',
+    'West Australian Opera': 'https://www.waopera.asn.au/whats-on/',
+    'West Australian Ballet': 'https://waballet.com.au/whats-on/',
+    'State Theatre Company SA': 'https://statetheatrecompany.com.au/whats-on/',
+    'State Opera SA': 'https://stateopera.com.au/whats-on/',
+    'Opera Australia': 'https://opera.org.au/whats-on/',
+    'Australian Ballet': 'https://australianballet.com.au/whats-on/',
+    'Bangarra Dance Theatre': 'https://bangarra.com.au/whats-on/',
+    'Bell Shakespeare': 'https://www.bellshakespeare.com.au/whats-on/',
+    'Canberra Theatre Centre': 'https://www.canberratheatrecentre.com.au/whats-on/',
+    'Auckland Theatre Company': 'https://atc.co.nz/whats-on/',
+    'Circa Wellington': 'https://www.circa.co.nz/whats-on/',
+    'National Theatre': 'https://www.nationaltheatre.org.uk/whats-on/',
+    'Donmar Warehouse': 'https://www.donmarwarehouse.com/whats-on/',
+    'Almeida Theatre': 'https://almeida.co.uk/whats-on/',
+    'Old Vic': 'https://www.oldvictheatre.com/whats-on/',
+    'Royal Court Theatre': 'https://royalcourttheatre.com/whats-on/',
+    "Shakespeare's Globe": 'https://www.shakespearesglobe.com/whats-on/',
+  }
+
+  if (companyDirect[company]) {
+    return companyDirect[company]
+  }
+
+  // TodayTix city search for AU cities with good coverage
+  const todayTixCities: Record<string, string> = {
+    'Melbourne': 'melbourne',
+    'Sydney': 'sydney',
+    'Brisbane': 'brisbane',
+    'Adelaide': 'adelaide',
+    'Perth': 'perth',
+  }
+
   if (country === 'GB') {
-    return 'https://www.todaytix.com/search?q=' + encodeURIComponent(title)
+    return 'https://www.todaytix.com/london/search?q=' + t
   }
   if (country === 'NZ') {
-    return 'https://www.ticketmaster.co.nz/search?q=' + encodeURIComponent(title)
+    return 'https://www.ticketmaster.co.nz/search?tm_link=tm_homeA_header_search&q=' + t
   }
-  return ticketingUrls[company] || ('https://www.ticketmaster.com.au/search?q=' + encodeURIComponent(title))
+  if (todayTixCities[city]) {
+    return `https://www.todaytix.com/${todayTixCities[city]}/search?q=${t}`
+  }
+
+  return 'https://www.ticketmaster.com.au/search?q=' + t
 }
 
 function StarDisplay({ score, size = 'sm' }: { score: number, size?: 'sm' | 'lg' }) {
