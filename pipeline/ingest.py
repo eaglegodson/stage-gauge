@@ -82,6 +82,17 @@ def get_existing_urls():
     return {r["source_url"] for r in result.data if r["source_url"]}
 
 
+def get_existing_reviewer_dates():
+    """Load existing production_id + reviewer + published_date combos to prevent Nine masthead duplicates."""
+    result = supabase.table("critic_reviews").select("production_id, reviewer, published_date").execute()
+    combos = set()
+    for r in result.data:
+        if r.get("production_id") and r.get("reviewer") and r.get("published_date"):
+            key = f"{r['production_id']}|{r['reviewer'].strip().lower()}|{str(r['published_date'])[:10]}"
+            combos.add(key)
+    return combos
+
+
 def fetch_feed(url):
     try:
         resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0 StageGauge/1.0"})
@@ -177,8 +188,10 @@ def run_pipeline():
     all_productions = get_all_productions()
     print(f"Loaded {len(known_shows)} shows, {len(all_productions)} productions")
     existing_urls = get_existing_urls()
+    existing_reviewer_dates = get_existing_reviewer_dates()
     imported = 0
     skipped = 0
+    deduped = 0
 
     for feed in FEEDS:
         print(f"\nFetching {feed['outlet']}...")
@@ -215,14 +228,25 @@ def run_pipeline():
                 print(f"  No DB match: {extracted.get('show_title')} ({city})")
                 continue
 
+            # Deduplicate Nine mastheads — skip if same reviewer + production + date already exists
+            reviewer = extracted.get("reviewer")
+            published_date = entry.get("published", "")[:10]
+            if reviewer and published_date and production_id:
+                dedup_key = f"{production_id}|{reviewer.strip().lower()}|{published_date}"
+                if dedup_key in existing_reviewer_dates:
+                    print(f"  ⟳ Duplicate review skipped: {extracted.get('show_title')} ({feed['outlet']})")
+                    deduped += 1
+                    continue
+                existing_reviewer_dates.add(dedup_key)
+
             normalised = normalise_score(extracted.get("star_rating"))
             status = "approved" if confidence >= 0.85 else "pending"
 
             review = {
                 "production_id": production_id,
                 "outlet": feed["outlet"],
-                "reviewer": extracted.get("reviewer"),
-                "published_date": entry.get("published", None),
+                "reviewer": reviewer,
+                "published_date": published_date or None,
                 "star_rating": extracted.get("star_rating"),
                 "normalised_score": normalised,
                 "pull_quote": extracted.get("pull_quote"),
@@ -240,7 +264,7 @@ def run_pipeline():
             except Exception as e:
                 print(f"  ✗ Insert error: {e}")
 
-    print(f"\nDone. Imported: {imported}, Skipped: {skipped}")
+    print(f"\nDone. Imported: {imported}, Skipped: {skipped}, Deduplicated: {deduped}")
     run_guardian_pipeline()
 
 
