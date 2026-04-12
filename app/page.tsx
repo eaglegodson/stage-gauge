@@ -15,10 +15,10 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
 }
 
 const tiles = [
-  { icon: '🗺️', title: "Discover what's on near you", desc: 'Browse current and upcoming productions in your city and beyond.', href: '/browse', accent: '#4A90D9' },
-  { icon: '📰', title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/browse', accent: '#C084FC' },
-  { icon: '⭐', title: "Rate and review shows you've seen", desc: 'Share your take and contribute to the StageGauge score.', href: '/auth', accent: '#34D399' },
-  { icon: '🔖', title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.', href: '/auth', accent: '#FBBF24' },
+  { title: "Discover what's on near you", desc: 'Browse current and upcoming productions in your city and beyond.', href: '/browse', accent: '#4A90D9' },
+  { title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/browse', accent: '#C084FC' },
+  { title: "Rate and review shows you've seen", desc: 'Share your take and contribute to the StageGauge score.', href: '/auth', accent: '#34D399' },
+  { title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.', href: '/auth', accent: '#FBBF24' },
 ]
 
 export default function Home() {
@@ -130,7 +130,6 @@ export default function Home() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.borderColor = tile.accent + '66' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.borderColor = '#2a2a3e' }}
               >
-                <div style={{ fontSize: '24px', marginBottom: '12px' }}>{tile.icon}</div>
                 <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '14px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0', lineHeight: '1.3' }}>{tile.title}</h3>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, lineHeight: '1.5' }}>{tile.desc}</p>
               </div>
