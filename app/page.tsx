@@ -161,7 +161,7 @@ export default function Home() {
           {[
             { number: stats.productions > 0 ? stats.productions + '+' : '—', label: 'Productions' },
             { number: stats.reviews > 0 ? stats.reviews + '+' : '—', label: 'Reviews' },
-            { number: stats.cities > 0 ? stats.cities + '+' : '—', label: 'Cities' },
+            { number: '10+', label: 'Cities' },
           ].map((stat, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#1D9E75' }}>{stat.number}</div>
