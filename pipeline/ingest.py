@@ -259,7 +259,26 @@ def run_pipeline():
             production_id = find_production(extracted.get("show_title"), city, country, all_productions)
 
             if not production_id:
-                print(f"  No DB match: {extracted.get('show_title')} ({city})")
+                # Save to unmatched_reviews instead of dropping
+                unmatched = {
+                    "outlet": feed["outlet"],
+                    "reviewer": extracted.get("reviewer"),
+                    "published_date": entry.get("published", "")[:10] or None,
+                    "star_rating": extracted.get("star_rating"),
+                    "pull_quote": extracted.get("pull_quote"),
+                    "source_url": url,
+                    "show_title": extracted.get("show_title"),
+                    "company": extracted.get("company"),
+                    "city": city,
+                    "country": country,
+                    "confidence": float(extracted.get("confidence", 0)),
+                    "status": "pending",
+                }
+                try:
+                    supabase.table("unmatched_reviews").insert(unmatched).execute()
+                    print(f"  ⚑ Saved unmatched: {extracted.get('show_title')} ({city})")
+                except Exception as e:
+                    print(f"  No DB match: {extracted.get('show_title')} ({city})")
                 continue
 
             # Also deduplicate by reviewer + production + date for named reviewers
@@ -361,8 +380,26 @@ def run_guardian_pipeline():
         production_id = find_production(extracted.get("show_title"), city, country, all_productions)
 
         if not production_id:
-            print(f"  No DB match: {extracted.get('show_title')} ({city})")
-            continue
+                unmatched = {
+                    "outlet": "The Guardian",
+                    "reviewer": fields.get("byline"),
+                    "published_date": item.get("webPublicationDate", "")[:10] or None,
+                    "star_rating": extracted.get("star_rating"),
+                    "pull_quote": extracted.get("pull_quote"),
+                    "source_url": article_url,
+                    "show_title": extracted.get("show_title"),
+                    "company": extracted.get("company"),
+                    "city": city,
+                    "country": country,
+                    "confidence": float(extracted.get("confidence", 0)),
+                    "status": "pending",
+                }
+                try:
+                    supabase.table("unmatched_reviews").insert(unmatched).execute()
+                    print(f"  ⚑ Saved unmatched: {extracted.get('show_title')} ({city})")
+                except Exception:
+                    print(f"  No DB match: {extracted.get('show_title')} ({city})")
+                continue
 
         normalised = normalise_score(extracted.get("star_rating"))
         status = "approved" if confidence >= 0.85 else "pending"
