@@ -74,7 +74,7 @@ export default function ReviewsPage() {
 
     let filtered = (data || []).filter(r => r.productions)
     if (cityFilter !== 'all') {
-      filtered = filtered.filter(r => r.productions?.city === cityFilter)
+      filtered = filtered.filter(r => (r.productions as any)?.city === cityFilter)
     }
 
     setReviews(filtered)
@@ -131,7 +131,7 @@ export default function ReviewsPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {reviews.map(review => {
-            const prod = review.productions
+            const prod = review.productions as any
             const show = prod?.shows
             const cfg = TYPE_CONFIG[show?.type] || TYPE_CONFIG.theatre
             return (
