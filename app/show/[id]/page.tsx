@@ -86,6 +86,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const [audienceReviews, setAudienceReviews] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
   const [watchlisted, setWatchlisted] = useState(false)
+  const [seen, setSeen] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
 
   useEffect(() => { params.then(({ id }) => setId(id)) }, [params])
@@ -105,7 +106,20 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
     if (!user || !id) return
     supabase.from('watchlist').select('id').eq('production_id', id).eq('user_id', user.id)
       .maybeSingle().then(({ data }) => setWatchlisted(!!data))
+    supabase.from('seen').select('id').eq('production_id', id).eq('user_id', user.id)
+      .maybeSingle().then(({ data }) => setSeen(!!data))
   }, [user, id])
+
+  async function toggleSeen() {
+    if (!user) return window.location.href = '/auth'
+    if (seen) {
+      await supabase.from('seen').delete().eq('production_id', id).eq('user_id', user.id)
+      setSeen(false)
+    } else {
+      await supabase.from('seen').insert({ production_id: id, user_id: user.id })
+      setSeen(true)
+    }
+  }
 
   async function toggleWatchlist() {
     if (!user) return window.location.href = '/auth'
@@ -178,6 +192,12 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
               style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.2)'}`, backgroundColor: watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}
             >
               {watchlisted ? '✓ Watchlisted' : '+ Watchlist'}
+            </button>
+            <button
+              onClick={toggleSeen}
+              style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${seen ? '#f1f5f9' : 'rgba(255,255,255,0.2)'}`, backgroundColor: seen ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}
+            >
+              {seen ? '✓ Seen this' : '👁 I saw this'}
             </button>
           </div>
         </div>
