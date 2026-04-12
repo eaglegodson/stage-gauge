@@ -18,7 +18,7 @@ const tiles = [
   { title: "Discover what's on near you", desc: 'Browse current and upcoming productions in your city and beyond.', href: '/browse', accent: '#4A90D9' },
   { title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/browse', accent: '#C084FC' },
   { title: "Rate and review shows you've seen", desc: 'Share your take and contribute to the StageGauge score.', href: '/auth', accent: '#34D399' },
-  { title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.', href: '/auth', accent: '#FBBF24' },
+  { title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.', href: '/watchlist', accent: '#FBBF24' },
 ]
 
 export default function Home() {
