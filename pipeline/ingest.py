@@ -42,6 +42,8 @@ FEEDS = [
     {"outlet": "Exeunt Magazine", "url": "https://exeuntmagazine.com/feed/", "city": "London", "country": "GB"},
 ]
 
+NINE_DOMAINS = ['theage.com.au', 'smh.com.au', 'brisbanetimes.com.au']
+
 EXTRACTION_PROMPT = """You are an arts review extraction assistant. Given the text of a performing arts review, extract the following and return as JSON only with no other text:
 
 {{
@@ -83,7 +85,7 @@ def get_existing_urls():
 
 
 def get_existing_reviewer_dates():
-    """Load existing production_id + reviewer + published_date combos to prevent Nine masthead duplicates."""
+    """Load existing production_id + reviewer + published_date combos to prevent duplicates."""
     result = supabase.table("critic_reviews").select("production_id, reviewer, published_date").execute()
     combos = set()
     for r in result.data:
@@ -91,6 +93,16 @@ def get_existing_reviewer_dates():
             key = f"{r['production_id']}|{r['reviewer'].strip().lower()}|{str(r['published_date'])[:10]}"
             combos.add(key)
     return combos
+
+
+def get_url_path(url):
+    """Extract the article path from a URL, stripping domain and query params."""
+    try:
+        path = '/' + '/'.join(url.split('/')[3:])
+        path = path.split('?')[0]
+        return path
+    except:
+        return url
 
 
 def fetch_feed(url):
@@ -189,6 +201,13 @@ def run_pipeline():
     print(f"Loaded {len(known_shows)} shows, {len(all_productions)} productions")
     existing_urls = get_existing_urls()
     existing_reviewer_dates = get_existing_reviewer_dates()
+
+    # Build a set of existing Nine article paths for deduplication
+    existing_nine_paths = set()
+    for url in existing_urls:
+        if any(d in url for d in NINE_DOMAINS):
+            existing_nine_paths.add(get_url_path(url))
+
     imported = 0
     skipped = 0
     deduped = 0
@@ -207,6 +226,15 @@ def run_pipeline():
             if not url or url in existing_urls:
                 skipped += 1
                 continue
+
+            # Deduplicate Nine mastheads by URL path
+            if any(d in url for d in NINE_DOMAINS):
+                url_path = get_url_path(url)
+                if url_path in existing_nine_paths:
+                    print(f"  ⟳ Nine duplicate skipped: {url_path}")
+                    deduped += 1
+                    continue
+                existing_nine_paths.add(url_path)
 
             title = entry.get("title", "")
             summary = entry.get("summary", "")
@@ -228,13 +256,13 @@ def run_pipeline():
                 print(f"  No DB match: {extracted.get('show_title')} ({city})")
                 continue
 
-            # Deduplicate Nine mastheads — skip if same reviewer + production + date already exists
+            # Also deduplicate by reviewer + production + date for named reviewers
             reviewer = extracted.get("reviewer")
             published_date = entry.get("published", "")[:10]
             if reviewer and published_date and production_id:
                 dedup_key = f"{production_id}|{reviewer.strip().lower()}|{published_date}"
                 if dedup_key in existing_reviewer_dates:
-                    print(f"  ⟳ Duplicate review skipped: {extracted.get('show_title')} ({feed['outlet']})")
+                    print(f"  ⟳ Reviewer duplicate skipped: {extracted.get('show_title')} ({feed['outlet']})")
                     deduped += 1
                     continue
                 existing_reviewer_dates.add(dedup_key)
