@@ -46,23 +46,24 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    const cityMap: Record<string, string> = {
-      'melbourne': 'Melbourne', 'sydney': 'Sydney', 'brisbane': 'Brisbane',
-      'perth': 'Perth', 'adelaide': 'Adelaide', 'hobart': 'Hobart',
-      'geelong': 'Melbourne', 'gold coast': 'Brisbane', 'newcastle': 'Sydney',
-      'auckland': 'Auckland', 'wellington': 'Wellington', 'christchurch': 'Christchurch',
-      'london': 'London',
+    const timezoneToCity: Record<string, string> = {
+      'Australia/Melbourne': 'Melbourne',
+      'Australia/Sydney': 'Sydney',
+      'Australia/Brisbane': 'Brisbane',
+      'Australia/Perth': 'Perth',
+      'Australia/Adelaide': 'Adelaide',
+      'Australia/Hobart': 'Hobart',
+      'Australia/Darwin': 'Melbourne',
+      'Australia/ACT': 'Canberra',
+      'Australia/Canberra': 'Canberra',
+      'Pacific/Auckland': 'Auckland',
+      'Pacific/Wellington': 'Wellington',
+      'Europe/London': 'London',
     }
-    const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
 
     async function detectAndFetch() {
-      let city = 'Melbourne'
-      try {
-        const res = await fetch('https://ipwho.is/')
-        const data = await res.json()
-        const mapped = cityMap[(data.city || '').toLowerCase()]
-        if (mapped && covered.includes(mapped)) city = mapped
-      } catch {}
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      const city = timezoneToCity[timezone] || 'Melbourne'
       setUserCity(city)
       const today = new Date().toISOString().split('T')[0]
       const { data: productions } = await supabase

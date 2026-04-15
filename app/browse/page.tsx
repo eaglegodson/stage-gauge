@@ -171,20 +171,24 @@ export default function Browse() {
   useEffect(() => { if (cityFilter.includes('all') || cityFilter.length === 0) { setCompanyFilter(['all']); setAvailableCompanies([]) } }, [cityFilter])
 
   useEffect(() => {
-    const cityMap: Record<string, string> = { 'melbourne': 'Melbourne', 'sydney': 'Sydney', 'brisbane': 'Brisbane', 'perth': 'Perth', 'adelaide': 'Adelaide', 'hobart': 'Hobart', 'geelong': 'Melbourne', 'gold coast': 'Brisbane', 'newcastle': 'Sydney', 'auckland': 'Auckland', 'wellington': 'Wellington', 'christchurch': 'Christchurch', 'london': 'London' }
-    const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
-    const timeout = setTimeout(() => setGeoLoaded(true), 2000)
-    fetch('https://ipwho.is/').then(r => r.json()).then(data => {
-      console.log('GEO RESPONSE:', data)
-      const mapped = cityMap[(data.city || '').toLowerCase()]
-      console.log('MAPPED CITY:', mapped)
-      if (mapped && covered.includes(mapped)) setCityFilter([mapped])
-    }).catch((err) => {
-      console.log('GEO ERROR:', err)
-    }).finally(() => {
-      clearTimeout(timeout)
-      setGeoLoaded(true)
-    })
+    const timezoneToCity: Record<string, string> = {
+      'Australia/Melbourne': 'Melbourne',
+      'Australia/Sydney': 'Sydney',
+      'Australia/Brisbane': 'Brisbane',
+      'Australia/Perth': 'Perth',
+      'Australia/Adelaide': 'Adelaide',
+      'Australia/Hobart': 'Hobart',
+      'Australia/Darwin': 'Melbourne',
+      'Australia/ACT': 'Canberra',
+      'Australia/Canberra': 'Canberra',
+      'Pacific/Auckland': 'Auckland',
+      'Pacific/Wellington': 'Wellington',
+      'Europe/London': 'London',
+    }
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const city = timezoneToCity[timezone]
+    if (city) setCityFilter([city])
+    setGeoLoaded(true)
   }, [])
 
   useEffect(() => {
