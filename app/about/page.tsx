@@ -16,7 +16,7 @@ export default function About() {
             You care about what you see. So do we.
           </h1>
           <p style={{ fontSize: '18px', color: '#9ca3af', lineHeight: '1.7', margin: 0 }}>
-            StageGauge is a review aggregator for live performance — think Rotten Tomatoes, but for theatre, opera, ballet, musicals and dance.
+            StageGauge is a review aggregator for live performance — theatre, opera, ballet, musicals and dance.
           </p>
         </div>
       </div>
@@ -26,7 +26,7 @@ export default function About() {
         <section style={{ marginBottom: '56px' }}>
           <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 16px 0' }}>What StageGauge does</h2>
           <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 16px 0' }}>
-            Every night, StageGauge pulls reviews from leading arts publications across Australia, New Zealand and London — outlets like The Guardian, ArtsHub, Limelight, Theatreview, Suzy Goes See, West End Wilma and more. We extract the star rating, pull a representative quote, and attach the review to the right production in our database.
+            Every night, StageGauge pulls reviews from leading arts publications across Australia, New Zealand and London. We extract the star rating, pull a representative quote, and attach the review to the right production in our database.
           </p>
           <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: 0 }}>
             The result is a single place where you can see how a show is tracking across all the critics — plus what real audience members think. No more hunting across a dozen websites to figure out if something is worth your time and money.
