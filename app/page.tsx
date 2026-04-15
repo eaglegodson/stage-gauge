@@ -54,9 +54,9 @@ export default function Home() {
       'london': 'London',
     }
     const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
-    fetch('https://ipapi.co/json/').then(r => r.json()).then(async data => {
-      const mapped = cityMap[(data.city || '').toLowerCase()]
-      const city = (mapped && covered.includes(mapped)) ? mapped : 'Melbourne'
+    fetch('https://freeipapi.com/api/json').then(r => r.json()).then(data => {
+      const mapped = cityMap[(data.cityName || '').toLowerCase()]
+      if (mapped && covered.includes(mapped)) setCityFilter([mapped])
       setUserCity(city)
       const today = new Date().toISOString().split('T')[0]
       const { data: productions } = await supabase
