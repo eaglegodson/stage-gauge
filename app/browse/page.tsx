@@ -164,6 +164,7 @@ export default function Browse() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [searching, setSearching] = useState(false)
+  const [geoLoaded, setGeoLoaded] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { if (searchOpen && searchRef.current) searchRef.current.focus() }, [searchOpen])
@@ -172,10 +173,14 @@ export default function Browse() {
   useEffect(() => {
     const cityMap: Record<string, string> = { 'melbourne': 'Melbourne', 'sydney': 'Sydney', 'brisbane': 'Brisbane', 'perth': 'Perth', 'adelaide': 'Adelaide', 'hobart': 'Hobart', 'geelong': 'Melbourne', 'gold coast': 'Brisbane', 'newcastle': 'Sydney', 'auckland': 'Auckland', 'wellington': 'Wellington', 'christchurch': 'Christchurch', 'london': 'London' }
     const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
+    const timeout = setTimeout(() => setGeoLoaded(true), 2000)
     fetch('https://ipapi.co/json/').then(r => r.json()).then(data => {
       const mapped = cityMap[(data.city || '').toLowerCase()]
       if (mapped && covered.includes(mapped)) setCityFilter([mapped])
-    }).catch(() => {})
+    }).catch(() => {}).finally(() => {
+      clearTimeout(timeout)
+      setGeoLoaded(true)
+    })
   }, [])
 
   useEffect(() => {
@@ -190,6 +195,7 @@ export default function Browse() {
   }, [searchQuery])
 
   useEffect(() => {
+    if (!geoLoaded) return
     const today = new Date().toISOString().split('T')[0]
     async function fetchProductions() {
       let query = supabase.from('production_listing').select('*').or(timingFilter.includes('past') && timingFilter.length === 1 ? 'season_end.lt.' + today : 'season_end.is.null,season_end.gte.' + today).order('combined_score', { ascending: false, nullsFirst: false })
@@ -220,7 +226,7 @@ export default function Browse() {
     }
     fetchProductions()
     fetchFilters()
-  }, [typeFilter, cityFilter, timingFilter, companyFilter])
+  }, [typeFilter, cityFilter, timingFilter, companyFilter, geoLoaded])
 
   const featured = productions[0]
   const rest = productions.slice(1)
@@ -263,8 +269,9 @@ export default function Browse() {
         </div>
       )}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
-        {featured && <div style={{ marginBottom: '32px' }}><ShowCard p={featured} featured /></div>}
-        {rest.length > 0 && (
+        {!geoLoaded && <p style={{ textAlign: 'center', color: '#4b5563', fontSize: '14px', paddingTop: '60px' }}>Detecting your location...</p>}
+        {geoLoaded && featured && <div style={{ marginBottom: '32px' }}><ShowCard p={featured} featured /></div>}
+        {geoLoaded && rest.length > 0 && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563' }}>All productions</span>
@@ -275,7 +282,7 @@ export default function Browse() {
             </div>
           </>
         )}
-        {productions.length === 0 && <p style={{ textAlign: 'center', color: '#4b5563', fontSize: '14px', paddingTop: '60px' }}>No shows match this filter.</p>}
+        {geoLoaded && productions.length === 0 && <p style={{ textAlign: 'center', color: '#4b5563', fontSize: '14px', paddingTop: '60px' }}>No shows match this filter.</p>}
       </div>
       <Footer />
     </main>
