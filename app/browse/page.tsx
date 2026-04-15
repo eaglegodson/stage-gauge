@@ -175,9 +175,13 @@ export default function Browse() {
     const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
     const timeout = setTimeout(() => setGeoLoaded(true), 2000)
     fetch('https://ipwho.is/').then(r => r.json()).then(data => {
+      console.log('GEO RESPONSE:', data)
       const mapped = cityMap[(data.city || '').toLowerCase()]
+      console.log('MAPPED CITY:', mapped)
       if (mapped && covered.includes(mapped)) setCityFilter([mapped])
-    }).catch(() => {}).finally(() => {
+    }).catch((err) => {
+      console.log('GEO ERROR:', err)
+    }).finally(() => {
       clearTimeout(timeout)
       setGeoLoaded(true)
     })
