@@ -58,9 +58,9 @@ export default function Home() {
     async function detectAndFetch() {
       let city = 'Melbourne'
       try {
-        const res = await fetch('https://freeipapi.com/api/json')
+        const res = await fetch('https://ipwho.is/')
         const data = await res.json()
-        const mapped = cityMap[(data.cityName || '').toLowerCase()]
+        const mapped = cityMap[(data.city || '').toLowerCase()]
         if (mapped && covered.includes(mapped)) city = mapped
       } catch {}
       setUserCity(city)
