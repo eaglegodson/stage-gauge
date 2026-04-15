@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 import Header from '../components/Header'
 
 export default function AuthPage() {
-  const [mode, setMode] = useState('signup')
+  const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
