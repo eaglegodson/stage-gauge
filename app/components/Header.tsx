@@ -12,6 +12,14 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
     })
   }, [])
 
+  function handleSearch() {
+    if (onSearch) {
+      onSearch()
+    } else {
+      window.location.href = '/browse'
+    }
+  }
+
   return (
     <header style={{
       backgroundColor: '#0f0f1a',
@@ -34,12 +42,10 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
         <span style={{ fontSize: '10px', color: '#1D9E75', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: '600', whiteSpace: 'nowrap' }}>Beta</span>
       </a>
       <nav style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, overflow: 'hidden' }}>
-        {onSearch && (
-          <button onClick={onSearch} style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <span style={{ display: 'none' }}>Search</span>
-          </button>
-        )}
+        <button onClick={handleSearch} style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span style={{ display: 'none' }}>Search</span>
+        </button>
         <a href="/about" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>About</a>
         {user && (
           <>
