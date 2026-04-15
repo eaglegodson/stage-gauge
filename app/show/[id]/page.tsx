@@ -120,8 +120,10 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
     } else {
       await supabase.from('seen').insert({ production_id: id, user_id: user.id })
       setSeen(true)
+      // Remove from watchlist if present
+      await supabase.from('watchlist').delete().eq('production_id', id).eq('user_id', user.id)
+      setWatchlisted(false)
     }
-  }
 
   async function toggleWatchlist() {
     if (!user) return window.location.href = '/auth'
