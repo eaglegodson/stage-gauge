@@ -174,8 +174,8 @@ export default function Browse() {
     const cityMap: Record<string, string> = { 'melbourne': 'Melbourne', 'sydney': 'Sydney', 'brisbane': 'Brisbane', 'perth': 'Perth', 'adelaide': 'Adelaide', 'hobart': 'Hobart', 'geelong': 'Melbourne', 'gold coast': 'Brisbane', 'newcastle': 'Sydney', 'auckland': 'Auckland', 'wellington': 'Wellington', 'christchurch': 'Christchurch', 'london': 'London' }
     const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
     const timeout = setTimeout(() => setGeoLoaded(true), 2000)
-    fetch('https://freeipapi.com/api/json').then(r => r.json()).then(data => {
-      const mapped = cityMap[(data.cityName || '').toLowerCase()]
+    fetch('https://ipwho.is/').then(r => r.json()).then(data => {
+      const mapped = cityMap[(data.city || '').toLowerCase()]
       if (mapped && covered.includes(mapped)) setCityFilter([mapped])
     }).catch(() => {}).finally(() => {
       clearTimeout(timeout)
