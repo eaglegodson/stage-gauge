@@ -54,9 +54,15 @@ export default function Home() {
       'london': 'London',
     }
     const covered = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','Christchurch','London']
-    fetch('https://freeipapi.com/api/json').then(r => r.json()).then(data => {
-      const mapped = cityMap[(data.cityName || '').toLowerCase()]
-      if (mapped && covered.includes(mapped)) setCityFilter([mapped])
+
+    async function detectAndFetch() {
+      let city = 'Melbourne'
+      try {
+        const res = await fetch('https://freeipapi.com/api/json')
+        const data = await res.json()
+        const mapped = cityMap[(data.cityName || '').toLowerCase()]
+        if (mapped && covered.includes(mapped)) city = mapped
+      } catch {}
       setUserCity(city)
       const today = new Date().toISOString().split('T')[0]
       const { data: productions } = await supabase
@@ -68,7 +74,8 @@ export default function Home() {
         .order('combined_score', { ascending: false })
         .limit(8)
       if (productions && productions.length > 0) setShows(productions)
-    }).catch(() => {})
+    }
+    detectAndFetch()
   }, [])
 
   useEffect(() => {
