@@ -9,5 +9,85 @@ body {
   background: #ffffff;
   color: #171717;
   font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
+}
+
+/* ================================================
+   StageGauge — Light mode override
+   Applied by toggling class on document.body
+   ================================================ */
+
+body.light-mode {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+/* Page backgrounds */
+body.light-mode main,
+body.light-mode [style*="background-color: rgb(20, 20, 31)"],
+body.light-mode [style*="background-color: #14141f"] {
+  background-color: #f3f4f6 !important;
+}
+
+/* Cards */
+body.light-mode [style*="background-color: rgb(30, 30, 46)"],
+body.light-mode [style*="background-color: #1e1e2e"],
+body.light-mode [style*="background: #1e1e2e"],
+body.light-mode [style*="background-color: rgb(26, 26, 46)"],
+body.light-mode [style*="background-color: #1a1a2e"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* Filter bars and sticky bars */
+body.light-mode [style*="background-color: rgb(15, 15, 26)"],
+body.light-mode [style*="background-color: #0f0f1a"] {
+  background-color: #e5e7eb !important;
+}
+
+/* Borders */
+body.light-mode [style*="border-color: rgb(42, 42, 62)"],
+body.light-mode [style*="border: 1px solid #2a2a3e"],
+body.light-mode [style*="border-bottom: 1px solid #1e1e2e"] {
+  border-color: #d1d5db !important;
+}
+
+/* Primary text */
+body.light-mode [style*="color: rgb(241, 245, 249)"],
+body.light-mode [style*="color: #f1f5f9"] {
+  color: #111827 !important;
+}
+
+/* Secondary/muted text */
+body.light-mode [style*="color: rgb(156, 163, 175)"],
+body.light-mode [style*="color: #9ca3af"] {
+  color: #6b7280 !important;
+}
+
+body.light-mode [style*="color: rgb(107, 114, 128)"],
+body.light-mode [style*="color: #6b7280"] {
+  color: #9ca3af !important;
+}
+
+/* Search input */
+body.light-mode input[type="text"] {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+}
+
+/* Filter dropdown buttons */
+body.light-mode [style*="background: rgb(15, 15, 26)"],
+body.light-mode [style*="background: #0f0f1a"] {
+  background: #ffffff !important;
+}
+
+/* Divider lines */
+body.light-mode [style*="background-color: rgb(30, 30, 46)"][style*="height: 1px"],
+body.light-mode [style*="backgroundColor: #1e1e2e"][style*="height: 1px"] {
+  background-color: #e5e7eb !important;
+}
+
+/* Smooth transition on everything */
+body.light-mode * {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
