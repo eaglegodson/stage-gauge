@@ -15,48 +15,9 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
   concert:  { gradient: 'linear-gradient(160deg, #2d230f 0%, #b57d10 100%)', accent: '#FBBF24', emoji: '🎻' },
 }
 
-const ticketingUrls: Record<string, string> = {
-  'Melbourne Theatre Company': 'https://www.mtc.com.au/tickets',
-  'Sydney Theatre Company': 'https://www.sydneytheatre.com.au/whats-on',
-  'Belvoir St Theatre': 'https://belvoir.com.au/whats-on',
-  'Malthouse Theatre': 'https://malthousetheatre.com.au/whats-on',
-  'Griffin Theatre Company': 'https://griffintheatre.com.au/whats-on',
-  'Ensemble Theatre': 'https://ensembletheatre.com.au/whats-on',
-  'Queensland Theatre': 'https://queenslandtheatre.com.au/whats-on',
-  'Queensland Theatre Company': 'https://queenslandtheatre.com.au/whats-on',
-  'Opera Australia': 'https://opera.org.au/performances',
-  'Australian Ballet': 'https://australianballet.com.au/performances',
-  'Bangarra Dance Theatre': 'https://bangarra.com.au/performances',
-  'Australian Ballet and Bangarra Dance Theatre': 'https://australianballet.com.au/performances',
-  'Queensland Ballet': 'https://queenslandballet.com.au/performances',
-  'West Australian Ballet': 'https://waballet.com.au/performances',
-  'West Australian Opera': 'https://waopera.asn.au/performances',
-  'Victorian Opera': 'https://victorianopera.com.au/performances',
-  'Black Swan State Theatre Company': 'https://blackswantheatre.com.au/whats-on',
-  'State Theatre Company South Australia': 'https://statetheatrecompany.com.au/whats-on',
-  'State Opera South Australia': 'https://stateopera.com.au/performances',
-  'Opera Queensland': 'https://operaqld.com.au/performances',
-  'Bell Shakespeare': 'https://bellshakespeare.com.au/performances',
-  'Red Stitch Actors Theatre': 'https://redstitch.net/whats-on',
-  'La Mama Theatre': 'https://lamama.com.au/whats-on',
-  'Canberra Theatre Centre': 'https://canberratheatrecentre.com.au/whats-on',
-  'Marriner Theatres': 'https://www.ticketmaster.com.au',
-  'Michael Cassel Group': 'https://www.ticketmaster.com.au',
-  'Crossroads Live': 'https://www.ticketmaster.com.au',
-  'John Frost for Crossroads Live': 'https://www.ticketmaster.com.au',
-  'Disney Theatrical': 'https://www.ticketmaster.com.au',
-  'Disney Theatrical Productions': 'https://www.ticketmaster.com.au',
-  'QPAC': 'https://www.qpac.com.au/whats-on',
-  'BIG Live': 'https://www.ticketmaster.com.au',
-  'On Your Feet Australia': 'https://www.ticketmaster.com.au',
-  'Soho Theatre': 'https://sohotheatre.com',
-  'West End': 'https://www.ticketmaster.com.au',
-}
-
 function getTicketUrl(company: string, city: string, title: string, country: string): string {
   const t = encodeURIComponent(title)
 
-  // Company direct ticketing pages
   const companyDirect: Record<string, string> = {
     'Melbourne Theatre Company': 'https://www.mtc.com.au/whats-on/',
     'Malthouse Theatre': 'https://www.malthousetheatre.com.au/whats-on/',
@@ -94,23 +55,11 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     return companyDirect[company]
   }
 
-  // TodayTix city search for AU cities with good coverage
-  const todayTixCities: Record<string, string> = {
-    'Melbourne': 'melbourne',
-    'Sydney': 'sydney',
-    'Brisbane': 'brisbane',
-    'Adelaide': 'adelaide',
-    'Perth': 'perth',
-  }
-
   if (country === 'GB') {
     return 'https://www.todaytix.com/london/search?q=' + t
   }
   if (country === 'NZ') {
     return 'https://www.ticketmaster.co.nz/search?tm_link=tm_homeA_header_search&q=' + t
-  }
-  if (todayTixCities[city]) {
-    return `https://www.todaytix.com/${todayTixCities[city]}/search?q=${t}`
   }
 
   return 'https://www.ticketmaster.com.au/search?q=' + t
