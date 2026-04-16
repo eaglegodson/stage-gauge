@@ -156,11 +156,14 @@ export default function Home() {
             </a>
           )}
           {shows.length > 1 && (
-            <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginTop: '16px' }}>
-              {shows.map((_: any, i: number) => (
-                <div key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: i === currentShow ? '#1D9E75' : 'rgba(255,255,255,0.15)', transition: 'background 0.3s', cursor: 'pointer' }} onClick={() => setCurrentShow(i)} />
-              ))}
-            </div>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '40px' }}>
+            <a href="/browse" style={{ fontSize: '15px', fontWeight: '600', color: 'white', padding: '12px 28px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>Browse shows</a>
+            {!user && (
+              <a href="/auth" style={{ fontSize: '15px', fontWeight: '500', color: '#9ca3af', padding: '12px 28px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                Sign in
+              </a>
+            )}
+          </div>
           )}
         </div>
       </div>
