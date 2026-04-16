@@ -51,17 +51,9 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     "Shakespeare's Globe": 'https://www.shakespearesglobe.com/whats-on/',
   }
 
-  if (companyDirect[company]) {
-    return companyDirect[company]
-  }
-
-  if (country === 'GB') {
-    return 'https://www.todaytix.com/london/search?q=' + t
-  }
-  if (country === 'NZ') {
-    return 'https://www.ticketmaster.co.nz/search?tm_link=tm_homeA_header_search&q=' + t
-  }
-
+  if (companyDirect[company]) return companyDirect[company]
+  if (country === 'GB') return 'https://www.todaytix.com/london/search?q=' + t
+  if (country === 'NZ') return 'https://www.ticketmaster.co.nz/search?tm_link=tm_homeA_header_search&q=' + t
   return 'https://www.ticketmaster.com.au/search?q=' + t
 }
 
@@ -156,7 +148,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
 
       <div style={{ background: cfg.gradient, padding: '48px 24px 32px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>← All shows</a>
+          <a href="/browse" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>← All shows</a>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '28px' }}>
             <div style={{ width: '100px', height: '130px', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
               <span style={{ fontSize: '36px' }}>{cfg.emoji}</span>
