@@ -27,6 +27,13 @@ export default function Home() {
   const [visible, setVisible] = useState(true)
   const [userCity, setUserCity] = useState('')
   const [stats, setStats] = useState({ productions: 0, reviews: 0, cities: 0 })
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+  }, [])
 
   useEffect(() => {
     async function fetchStats() {
@@ -124,7 +131,18 @@ export default function Home() {
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '40px' }}>
             <a href="/browse" style={{ fontSize: '15px', fontWeight: '600', color: 'white', padding: '12px 28px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>Browse shows</a>
-            <a href="/auth" style={{ fontSize: '15px', fontWeight: '500', color: '#9ca3af', padding: '12px 28px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', backgroundColor: 'rgba(255,255,255,0.05)' }}>Create account</a>
+            {user ? (
+              <button
+                onClick={async () => { await supabase.auth.signOut(); window.location.reload() }}
+                style={{ fontSize: '15px', fontWeight: '500', color: '#9ca3af', padding: '12px 28px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', cursor: 'pointer', textDecoration: 'none' }}
+              >
+                Sign out
+              </button>
+            ) : (
+              <a href="/auth" style={{ fontSize: '15px', fontWeight: '500', color: '#9ca3af', padding: '12px 28px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                Sign in
+              </a>
+            )}
           </div>
 
           {show && cfg && (
