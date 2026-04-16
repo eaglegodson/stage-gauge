@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -24,38 +24,84 @@ function StarDisplay({ score }: { score: number }) {
   )
 }
 
-const CITY_MAP: Record<string, string> = {
-  melbourne: 'Melbourne', sydney: 'Sydney', brisbane: 'Brisbane',
-  perth: 'Perth', adelaide: 'Adelaide', hobart: 'Hobart', canberra: 'Canberra',
-  auckland: 'Auckland', wellington: 'Wellington', london: 'London',
-}
 const COVERED = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','London']
+
+function FilterDropdown({ label, options, values, onChange, allKey = 'all' }: { label: string, options: string[], values: string[], onChange: (v: string[]) => void, allKey?: string }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+  const isAll = values.length === 0 || (values.length === 1 && values[0] === allKey)
+  const active = !isAll
+  function toggle(opt: string) {
+    if (opt === allKey) { onChange([allKey]); return }
+    const without = values.filter(v => v !== allKey)
+    if (without.includes(opt)) {
+      const next = without.filter(v => v !== opt)
+      onChange(next.length === 0 ? [allKey] : next)
+    } else {
+      onChange([...without, opt])
+    }
+  }
+  const displayLabel = active ? values.length === 1 ? values[0] : label + ' (' + values.length + ')' : label
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button onClick={() => setOpen(!open)} style={{ background: active ? '#0f2d1a' : '#0f0f1a', border: '1px solid ' + (active ? '#1D9E75' : '#2a2a3e'), borderRadius: '6px', padding: '7px 12px', fontSize: '12px', color: active ? '#1D9E75' : '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+        {displayLabel}<span style={{ fontSize: '9px', opacity: 0.6 }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '4px', background: '#1a1a2e', border: '1px solid #2a2a3e', borderRadius: '8px', overflow: 'hidden', zIndex: 100, minWidth: '200px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+          {options.map(opt => {
+            const selected = values.includes(opt)
+            return (
+              <button key={opt} onClick={() => toggle(opt)} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '12px', color: selected ? '#1D9E75' : '#9ca3af', background: selected ? '#0f2d1a' : 'transparent', border: 'none', cursor: 'pointer' }}
+                onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#1e1e2e' }}
+                onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+              >
+                <span style={{ width: '14px', height: '14px', border: '1px solid ' + (selected ? '#1D9E75' : '#4b5563'), borderRadius: '3px', background: selected ? '#1D9E75' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '9px', color: '#14141f' }}>{selected ? '✓' : ''}</span>
+                {opt === allKey ? 'All publications' : opt}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([])
   const [cityFilter, setCityFilter] = useState<string>('all')
-  const [geoLoaded, setGeoLoaded] = useState(false)
+  const [outletFilter, setOutletFilter] = useState<string[]>(['all'])
+  const [availableOutlets, setAvailableOutlets] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('https://ipapi.co/json/')
-      .then(r => r.json())
-      .then(data => {
-        const mapped = CITY_MAP[(data.city || '').toLowerCase()]
-        if (mapped && COVERED.includes(mapped)) setCityFilter(mapped)
-      })
-      .catch(() => {})
-      .finally(() => setGeoLoaded(true))
+    const timezoneToCity: Record<string, string> = {
+      'Australia/Melbourne': 'Melbourne', 'Australia/Sydney': 'Sydney',
+      'Australia/Brisbane': 'Brisbane', 'Australia/Perth': 'Perth',
+      'Australia/Adelaide': 'Adelaide', 'Australia/Hobart': 'Hobart',
+      'Australia/Darwin': 'Melbourne', 'Australia/ACT': 'Canberra',
+      'Australia/Canberra': 'Canberra', 'Pacific/Auckland': 'Auckland',
+      'Pacific/Wellington': 'Wellington', 'Europe/London': 'London',
+    }
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const city = timezoneToCity[timezone]
+    if (city) setCityFilter(city)
   }, [])
 
   useEffect(() => {
-    if (!geoLoaded) return
     fetchReviews()
-  }, [cityFilter, geoLoaded])
+  }, [cityFilter, outletFilter])
 
   async function fetchReviews() {
     setLoading(true)
-    let query = supabase
+    const { data, error } = await supabase
       .from('critic_reviews')
       .select(`
         id, outlet, reviewer, published_date, star_rating, pull_quote, source_url,
@@ -67,17 +113,27 @@ export default function ReviewsPage() {
       .eq('status', 'approved')
       .not('productions', 'is', null)
       .order('published_date', { ascending: false })
-      .limit(60)
+      .limit(200)
 
-    const { data, error } = await query
     if (error) { setLoading(false); return }
 
     let filtered = (data || []).filter(r => r.productions)
+
     if (cityFilter !== 'all') {
       filtered = filtered.filter(r => (r.productions as any)?.city === cityFilter)
     }
 
-    setReviews(filtered)
+    // Build available outlets from filtered-by-city results
+    const outlets = Array.from(new Set(filtered.map((r: any) => r.outlet).filter(Boolean))).sort() as string[]
+    setAvailableOutlets(outlets)
+
+    // Apply outlet filter
+    const activeOutlets = outletFilter.filter(o => o !== 'all')
+    if (activeOutlets.length > 0) {
+      filtered = filtered.filter(r => activeOutlets.includes(r.outlet))
+    }
+
+    setReviews(filtered.slice(0, 60))
     setLoading(false)
   }
 
@@ -91,7 +147,7 @@ export default function ReviewsPage() {
           {['all', ...COVERED].map(c => (
             <button
               key={c}
-              onClick={() => setCityFilter(c)}
+              onClick={() => { setCityFilter(c); setOutletFilter(['all']) }}
               style={{
                 fontSize: '12px',
                 fontWeight: cityFilter === c ? '600' : '400',
@@ -111,23 +167,28 @@ export default function ReviewsPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%' }}>
-        <div style={{ marginBottom: '24px' }}>
-          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0' }}>
-            Latest reviews
-          </h1>
-          <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
-            {cityFilter === 'all' ? 'All cities' : cityFilter} · critic reviews
-          </p>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0' }}>
+              Latest reviews
+            </h1>
+            <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+              {cityFilter === 'all' ? 'All cities' : cityFilter} · critic reviews
+            </p>
+          </div>
+          {availableOutlets.length > 0 && (
+            <FilterDropdown
+              label="Publication"
+              options={['all', ...availableOutlets]}
+              values={outletFilter}
+              onChange={setOutletFilter}
+            />
+          )}
         </div>
 
-        {loading && (
-          <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>
-        )}
-
-        {!loading && reviews.length === 0 && (
-          <p style={{ color: '#4b5563', fontSize: '14px' }}>No reviews found for this city yet.</p>
-        )}
+        {loading && <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>}
+        {!loading && reviews.length === 0 && <p style={{ color: '#4b5563', fontSize: '14px' }}>No reviews found.</p>}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {reviews.map(review => {
@@ -137,11 +198,8 @@ export default function ReviewsPage() {
             return (
               <div key={review.id} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', overflow: 'hidden' }}>
                 <div style={{ display: 'flex', gap: '0' }}>
-                  {/* Colour stripe */}
                   <div style={{ width: '6px', background: cfg.accent, flexShrink: 0 }} />
-
                   <div style={{ padding: '16px 18px', flex: 1, minWidth: 0 }}>
-                    {/* Show title + city */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
                       <a href={'/show/' + prod?.id} style={{ textDecoration: 'none' }}>
                         <span style={{ fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#f1f5f9', lineHeight: '1.3' }}>
@@ -152,8 +210,6 @@ export default function ReviewsPage() {
                         {prod?.city}
                       </span>
                     </div>
-
-                    {/* Outlet + reviewer + date */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: review.pull_quote ? '10px' : '0', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '12px', fontWeight: '600', color: '#9ca3af' }}>{review.outlet}</span>
                       {review.reviewer && (
@@ -177,15 +233,11 @@ export default function ReviewsPage() {
                         </>
                       )}
                     </div>
-
-                    {/* Pull quote */}
                     {review.pull_quote && (
                       <p style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic', margin: '0 0 10px 0', lineHeight: '1.6' }}>
                         "{review.pull_quote}"
                       </p>
                     )}
-
-                    {/* Links */}
                     <div style={{ display: 'flex', gap: '12px' }}>
                       {review.source_url && (
                         <a href={review.source_url} target="_blank" rel="noopener noreferrer"
