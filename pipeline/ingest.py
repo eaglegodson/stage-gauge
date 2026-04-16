@@ -3,6 +3,7 @@ import json
 import feedparser
 import requests
 from datetime import datetime
+from email.utils import parsedate_to_datetime
 from supabase import create_client
 from anthropic import Anthropic
 from dotenv import load_dotenv
@@ -17,7 +18,6 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 claude = Anthropic(api_key=ANTHROPIC_API_KEY)
 
 FEEDS = [
-    # ANZ - dedicated arts feeds
     {"outlet": "ArtsHub", "url": "https://www.artshub.com.au/feed/", "city": None, "country": "AU"},
     {"outlet": "The Scoop", "url": "https://thescoop.au/feed", "city": None, "country": "AU"},
     {"outlet": "Limelight", "url": "https://limelight-arts.com.au/live-reviews/feed", "city": None, "country": "AU"},
@@ -27,13 +27,10 @@ FEEDS = [
     {"outlet": "Suzy Goes See", "url": "http://www.suzygoessee.com/feed", "city": "Sydney", "country": "AU"},
     {"outlet": "Theatre Matters", "url": "https://theatrematters.com.au/feed", "city": None, "country": "AU"},
     {"outlet": "Man in Chair", "url": "https://simonparrismaninchair.com/feed/", "city": None, "country": "AU"},
-    # ANZ - general (arts section filtered by AI)
     {"outlet": "The Age", "url": "https://www.theage.com.au/rss/feed.xml", "city": "Melbourne", "country": "AU"},
     {"outlet": "Sydney Morning Herald", "url": "https://www.smh.com.au/rss/feed.xml", "city": "Sydney", "country": "AU"},
     {"outlet": "Brisbane Times", "url": "https://www.brisbanetimes.com.au/rss/feed.xml", "city": "Brisbane", "country": "AU"},
-    # NZ
     {"outlet": "Theatreview", "url": "https://theatreview.org.nz/feed", "city": None, "country": "NZ"},
-    # London - dedicated theatre feeds
     {"outlet": "The Guardian", "url": "https://www.theguardian.com/stage/rss", "city": "London", "country": "GB"},
     {"outlet": "X-Press Magazine", "url": "https://xpressmag.com.au/category/arts-lifestyle/arts-lifestyle-reviews/feed/", "city": "Perth", "country": "AU"},
     {"outlet": "Theatre Reviews Perth", "url": "https://www.theatrereviewsperth.com.au/feed/", "city": "Perth", "country": "AU"},
@@ -85,7 +82,6 @@ def get_existing_urls():
 
 
 def get_existing_reviewer_dates():
-    """Load existing production_id + reviewer + published_date combos to prevent duplicates."""
     result = supabase.table("critic_reviews").select("production_id, reviewer, published_date").execute()
     combos = set()
     for r in result.data:
@@ -96,13 +92,24 @@ def get_existing_reviewer_dates():
 
 
 def get_url_path(url):
-    """Extract the article path from a URL, stripping domain and query params."""
     try:
         path = '/' + '/'.join(url.split('/')[3:])
         path = path.split('?')[0]
         return path
     except:
         return url
+
+
+def parse_date(raw_date):
+    if not raw_date:
+        return None
+    try:
+        return parsedate_to_datetime(raw_date).strftime("%Y-%m-%d")
+    except Exception:
+        try:
+            return datetime.strptime(raw_date[:10], "%Y-%m-%d").strftime("%Y-%m-%d")
+        except Exception:
+            return None
 
 
 def fetch_feed(url):
@@ -141,7 +148,6 @@ def title_match(search_title, db_title):
     search = search_title.lower().strip()
     db = db_title.lower().strip()
 
-    # Strip leading "the " so "Book of Mormon" matches "The Book of Mormon"
     if search.startswith("the "):
         search = search[4:]
     if db.startswith("the "):
@@ -208,7 +214,6 @@ def run_pipeline():
     existing_urls = get_existing_urls()
     existing_reviewer_dates = get_existing_reviewer_dates()
 
-    # Build a set of existing Nine article paths for deduplication
     existing_nine_paths = set()
     for url in existing_urls:
         if any(d in url for d in NINE_DOMAINS):
@@ -233,7 +238,6 @@ def run_pipeline():
                 skipped += 1
                 continue
 
-            # Deduplicate Nine mastheads by URL path
             if any(d in url for d in NINE_DOMAINS):
                 url_path = get_url_path(url)
                 if url_path in existing_nine_paths:
@@ -245,6 +249,9 @@ def run_pipeline():
             title = entry.get("title", "")
             summary = entry.get("summary", "")
             text = f"{title}\n\n{summary}"
+
+            raw_date = entry.get("published", "") or entry.get("updated", "") or ""
+            published_date = parse_date(raw_date)
 
             extracted = extract_review(text, known_shows)
             if not extracted:
@@ -259,11 +266,10 @@ def run_pipeline():
             production_id = find_production(extracted.get("show_title"), city, country, all_productions)
 
             if not production_id:
-                # Save to unmatched_reviews instead of dropping
                 unmatched = {
                     "outlet": feed["outlet"],
                     "reviewer": extracted.get("reviewer"),
-                    "published_date": entry.get("published", "")[:10] or None,
+                    "published_date": published_date,
                     "star_rating": extracted.get("star_rating"),
                     "pull_quote": extracted.get("pull_quote"),
                     "source_url": url,
@@ -281,9 +287,7 @@ def run_pipeline():
                     print(f"  No DB match: {extracted.get('show_title')} ({city})")
                 continue
 
-            # Also deduplicate by reviewer + production + date for named reviewers
             reviewer = extracted.get("reviewer")
-            published_date = entry.get("published", "")[:10]
             if reviewer and published_date and production_id:
                 dedup_key = f"{production_id}|{reviewer.strip().lower()}|{published_date}"
                 if dedup_key in existing_reviewer_dates:
@@ -299,7 +303,7 @@ def run_pipeline():
                 "production_id": production_id,
                 "outlet": feed["outlet"],
                 "reviewer": reviewer,
-                "published_date": published_date or None,
+                "published_date": published_date,
                 "star_rating": extracted.get("star_rating"),
                 "normalised_score": normalised,
                 "pull_quote": extracted.get("pull_quote"),
@@ -322,7 +326,6 @@ def run_pipeline():
 
 
 def run_guardian_pipeline():
-    """Fetch Guardian theatre reviews via the Content API which includes star ratings."""
     print("\nFetching Guardian API...")
 
     GUARDIAN_API_KEY = os.environ.get("GUARDIAN_API_KEY", "ad3eeb51-81df-49ca-ac81-8c195bee341e")
@@ -380,26 +383,26 @@ def run_guardian_pipeline():
         production_id = find_production(extracted.get("show_title"), city, country, all_productions)
 
         if not production_id:
-                unmatched = {
-                    "outlet": "The Guardian",
-                    "reviewer": fields.get("byline"),
-                    "published_date": item.get("webPublicationDate", "")[:10] or None,
-                    "star_rating": extracted.get("star_rating"),
-                    "pull_quote": extracted.get("pull_quote"),
-                    "source_url": article_url,
-                    "show_title": extracted.get("show_title"),
-                    "company": extracted.get("company"),
-                    "city": city,
-                    "country": country,
-                    "confidence": float(extracted.get("confidence", 0)),
-                    "status": "pending",
-                }
-                try:
-                    supabase.table("unmatched_reviews").insert(unmatched).execute()
-                    print(f"  ⚑ Saved unmatched: {extracted.get('show_title')} ({city})")
-                except Exception:
-                    print(f"  No DB match: {extracted.get('show_title')} ({city})")
-                continue
+            unmatched = {
+                "outlet": "The Guardian",
+                "reviewer": fields.get("byline"),
+                "published_date": item.get("webPublicationDate", "")[:10] or None,
+                "star_rating": extracted.get("star_rating"),
+                "pull_quote": extracted.get("pull_quote"),
+                "source_url": article_url,
+                "show_title": extracted.get("show_title"),
+                "company": extracted.get("company"),
+                "city": city,
+                "country": country,
+                "confidence": float(extracted.get("confidence", 0)),
+                "status": "pending",
+            }
+            try:
+                supabase.table("unmatched_reviews").insert(unmatched).execute()
+                print(f"  ⚑ Saved unmatched: {extracted.get('show_title')} ({city})")
+            except Exception:
+                print(f"  No DB match: {extracted.get('show_title')} ({city})")
+            continue
 
         normalised = normalise_score(extracted.get("star_rating"))
         status = "approved" if confidence >= 0.85 else "pending"
