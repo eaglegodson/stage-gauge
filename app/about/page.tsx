@@ -7,7 +7,7 @@ export default function About() {
     <main style={{ minHeight: '100vh', backgroundColor: '#14141f' }}>
       <Header />
 
-      <div style={{ borderBottom: '1px solid #1e1e2e', padding: '80px 24px 64px' }}>
+      <div style={{ borderBottom: '1px solid #1e1e2e', padding: '80px 24px 48px' }}>
         <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', background: 'rgba(29,158,117,0.15)', border: '1px solid rgba(29,158,117,0.3)', borderRadius: '20px', padding: '6px 16px', fontSize: '12px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '24px' }}>
             About StageGauge
@@ -21,11 +21,11 @@ export default function About() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '64px 24px' }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '40px 24px' }}>
 
-        <section style={{ marginBottom: '56px' }}>
-          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 16px 0' }}>What StageGauge does</h2>
-          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 16px 0' }}>
+        <section style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 12px 0' }}>What StageGauge does</h2>
+          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 12px 0' }}>
             Every night, StageGauge pulls reviews from leading arts publications across Australia, New Zealand and London. We extract the star rating, pull a representative quote, and attach the review to the right production in our database.
           </p>
           <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: 0 }}>
@@ -33,11 +33,9 @@ export default function About() {
           </p>
         </section>
 
-        <div style={{ height: '1px', backgroundColor: '#1e1e2e', marginBottom: '56px' }} />
-
-        <section style={{ marginBottom: '56px' }}>
-          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 16px 0' }}>How the score works</h2>
-          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 16px 0' }}>
+        <section style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 12px 0' }}>How the score works</h2>
+          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 12px 0' }}>
             The StageGauge score is a straight average of explicit star ratings — from critics and audience members combined. We only count ratings that are explicitly stated. We do not infer scores from sentiment or language.
           </p>
           <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: 0 }}>
@@ -45,11 +43,9 @@ export default function About() {
           </p>
         </section>
 
-        <div style={{ height: '1px', backgroundColor: '#1e1e2e', marginBottom: '56px' }} />
-
-        <section style={{ marginBottom: '56px' }}>
-          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 16px 0' }}>Where we cover</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginTop: '24px' }}>
+        <section style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 12px 0' }}>Where we cover</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px', marginTop: '16px' }}>
             {[
               { city: 'Melbourne', flag: 'AU' },
               { city: 'Sydney', flag: 'AU' },
@@ -62,7 +58,7 @@ export default function About() {
               { city: 'Wellington', flag: 'NZ' },
               { city: 'London', flag: 'GB' },
             ].map((c, i) => (
-              <div key={i} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div key={i} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563' }}>{c.flag}</span>
                 <span style={{ fontSize: '14px', color: '#f1f5f9', fontWeight: '500' }}>{c.city}</span>
               </div>
@@ -70,11 +66,9 @@ export default function About() {
           </div>
         </section>
 
-        <div style={{ height: '1px', backgroundColor: '#1e1e2e', marginBottom: '56px' }} />
-
-        <section style={{ marginBottom: '56px' }}>
-          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 16px 0' }}>We are in beta</h2>
-          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 16px 0' }}>
+        <section style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 12px 0' }}>We are in beta</h2>
+          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 12px 0' }}>
             StageGauge is new. The pipeline runs every night and the database grows daily — but there will be gaps, missing shows, and the occasional matching error. We are working on it.
           </p>
           <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: 0 }}>
@@ -82,11 +76,9 @@ export default function About() {
           </p>
         </section>
 
-        <div style={{ height: '1px', backgroundColor: '#1e1e2e', marginBottom: '56px' }} />
-
-        <section style={{ marginBottom: '56px' }}>
-          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 16px 0' }}>Get in touch</h2>
-          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 24px 0' }}>
+        <section style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 12px 0' }}>Get in touch</h2>
+          <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 20px 0' }}>
             StageGauge is built and maintained by a small team in Melbourne. We would love to hear from you — whether it is feedback, a bug report, or just to say hello.
           </p>
           <a href="mailto:hello@stagegauge.com" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: 'white', padding: '12px 24px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>
@@ -94,9 +86,9 @@ export default function About() {
           </a>
         </section>
 
-        <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '12px', padding: '40px', textAlign: 'center' }}>
-          <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 12px 0' }}>Ready to explore?</h3>
-          <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 24px 0', lineHeight: '1.6' }}>Browse 485+ productions across 10 cities and see what the critics are saying.</p>
+        <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '12px', padding: '32px', textAlign: 'center' }}>
+          <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '20px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 10px 0' }}>Ready to explore?</h3>
+          <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 20px 0', lineHeight: '1.6' }}>Browse 485+ productions across 10 cities and see what the critics are saying.</p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/browse" style={{ fontSize: '14px', fontWeight: '600', color: 'white', padding: '10px 24px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>Browse shows</a>
             <a href="/auth" style={{ fontSize: '14px', fontWeight: '500', color: '#9ca3af', padding: '10px 24px', borderRadius: '8px', border: '1px solid #2a2a3e', textDecoration: 'none' }}>Create account</a>
