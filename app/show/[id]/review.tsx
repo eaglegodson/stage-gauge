@@ -30,6 +30,8 @@ export default function ReviewForm({ productionId, user, onClose }: { production
     setLoading(false)
   }
 
+  const today = new Date().toISOString().split('T')[0]
+
   return (
     <div style={{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '24px'}}>
       <div style={{backgroundColor: 'white', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '480px'}}>
@@ -52,6 +54,7 @@ export default function ReviewForm({ productionId, user, onClose }: { production
           <input
             type="date"
             value={dateAttended}
+            max={today}
             onChange={(e) => setDateAttended(e.target.value)}
             style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#111827', backgroundColor: '#fff', boxSizing: 'border-box'}}
           />
