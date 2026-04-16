@@ -28,33 +28,32 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
 
   if (featured) {
     return (
-      <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-        <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ background: cfg.gradient, height: '160px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '48px' }}>{cfg.emoji}</span>
-            <div style={{ width: '32px', height: '3px', borderRadius: '2px', background: cfg.accent }}></div>
+      <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block' }}>
+        <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
+          <div style={{ background: cfg.gradient, width: '80px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '36px' }}>{cfg.emoji}</span>
           </div>
-          <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '10px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.accent }}>{p.type}</span>
                 <span style={{ color: '#4b5563', fontSize: '10px' }}>·</span>
                 <span style={{ fontSize: '10px', color: '#6b7280' }}>{p.city}</span>
+                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.05em' }}>★ TOP RATED</span>
               </div>
-              <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 8px 0', lineHeight: '1.2' }}>{p.title}</h2>
-              <p style={{ fontSize: '14px', color: '#9ca3af', margin: '0 0 4px 0' }}>{p.company}</p>
+              <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0', lineHeight: '1.2' }}>{p.title}</h2>
+              <p style={{ fontSize: '14px', color: '#9ca3af', margin: '0 0 2px 0' }}>{p.company}</p>
               <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>{p.venue}</p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
+            <div style={{ marginTop: '12px' }}>
               {stars ? (
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ color: '#1D9E75', fontSize: '16px', letterSpacing: '1px' }}>{stars.join('')}</span>
-                  <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>{reviewCount} review{reviewCount !== 1 ? 's' : ''}</span>
+                  <span style={{ fontSize: '12px', color: '#6b7280' }}>{reviewCount} review{reviewCount !== 1 ? 's' : ''}</span>
                 </div>
               ) : (
                 <span style={{ fontSize: '12px', color: '#4b5563' }}>No reviews yet</span>
               )}
-              <span style={{ fontSize: '11px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.05em' }}>★ TOP RATED</span>
             </div>
           </div>
         </div>
