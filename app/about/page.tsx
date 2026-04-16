@@ -81,8 +81,8 @@ export default function About() {
           <p style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.8', margin: '0 0 20px 0' }}>
             StageGauge is built and maintained by a small team in Melbourne. We would love to hear from you — whether it is feedback, a bug report, or just to say hello.
           </p>
-          <a href="mailto:hello@stagegauge.com" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: 'white', padding: '12px 24px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>
-            hello@stagegauge.com
+          <a href="mailto:hello@stage-gauge.com" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: 'white', padding: '12px 24px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>
+            hello@stage-gauge.com
           </a>
         </section>
 

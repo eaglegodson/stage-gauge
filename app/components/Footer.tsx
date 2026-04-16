@@ -11,7 +11,7 @@ export default function Footer() {
         <span style={{ margin: '0 10px', color: '#2a2a3e' }}>·</span>
         <a href="/about" style={{ color: '#4b5563', textDecoration: 'none' }}>About</a>
         <span style={{ margin: '0 10px', color: '#2a2a3e' }}>·</span>
-        <a href="mailto:hello@stagegauge.com" style={{ color: '#4b5563', textDecoration: 'none' }}>Feedback</a>
+        <a href="mailto:hello@stage-gauge.com" style={{ color: '#4b5563', textDecoration: 'none' }}>Feedback</a>
       </p>
     </footer>
   )
