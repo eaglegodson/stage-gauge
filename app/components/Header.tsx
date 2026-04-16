@@ -41,7 +41,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
         <span style={{ fontFamily: 'Georgia, serif', fontSize: '20px', fontWeight: '600', color: '#f1f5f9', letterSpacing: '-0.3px', whiteSpace: 'nowrap' }}>StageGauge</span>
         <span style={{ fontSize: '10px', color: '#1D9E75', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: '600', whiteSpace: 'nowrap' }}>Beta</span>
       </a>
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, overflow: 'hidden' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden' }}>
         <button onClick={handleSearch} style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <span style={{ display: 'none' }}>Search</span>
@@ -56,12 +56,12 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
         {user ? (
           <button
             onClick={async () => { await supabase.auth.signOut(); window.location.reload() }}
-            style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+            style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
           >
             Sign out
           </button>
         ) : (
-          <a href="/auth" style={{ fontSize: '13px', color: 'white', padding: '6px 14px', borderRadius: '6px', backgroundColor: '#1D9E75', textDecoration: 'none', fontWeight: '500', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <a href="/auth" style={{ fontSize: '13px', color: 'white', padding: '6px 12px', borderRadius: '6px', backgroundColor: '#1D9E75', textDecoration: 'none', fontWeight: '500', whiteSpace: 'nowrap', flexShrink: 0 }}>
             Sign in
           </a>
         )}
