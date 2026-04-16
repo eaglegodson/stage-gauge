@@ -11,6 +11,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+button, input, select, textarea {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 /* ================================================
    StageGauge — Light mode override
    Applied by toggling class on document.body
