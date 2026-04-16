@@ -64,18 +64,19 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
 
   return (
     <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', transition: 'transform 0.15s, border-color 0.15s', height: '100%', display: 'flex', flexDirection: 'column' }}
+      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', transition: 'transform 0.15s, border-color 0.15s', height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.borderColor = cfg.accent + '66' }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.borderColor = '#2a2a3e' }}
       >
-        <div style={{ background: cfg.gradient, height: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '32px' }}>{cfg.emoji}</span>
-          <div style={{ width: '24px', height: '2px', borderRadius: '1px', background: cfg.accent }}></div>
+        <div style={{ background: cfg.gradient, width: '48px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '22px' }}>{cfg.emoji}</span>
         </div>
-        <div style={{ padding: '10px 12px 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <p style={{ fontSize: '11px', color: cfg.accent, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 4px 0' }}>{p.type}</p>
-          <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 3px 0', lineHeight: '1.3' }}>{p.title}</h3>
-          <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.city}</p>
+        <div style={{ padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
+          <div>
+            <p style={{ fontSize: '10px', color: cfg.accent, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 3px 0' }}>{p.type}</p>
+            <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 2px 0', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</h3>
+            <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.city}</p>
+          </div>
           {stars ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ color: '#1D9E75', fontSize: '11px' }}>{stars.join('')}</span>
@@ -285,7 +286,7 @@ export default function Browse() {
               <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563' }}>All productions</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }}></div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px', alignItems: 'stretch' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', alignItems: 'stretch' }}>
               {rest.map(p => <ShowCard key={p.production_id} p={p} />)}
             </div>
           </>
