@@ -91,6 +91,16 @@ def get_existing_reviewer_dates():
     return combos
 
 
+def get_existing_unmatched():
+    """Load existing unmatched show+outlet+city combos to prevent re-inserting."""
+    result = supabase.table("unmatched_reviews").select("show_title, outlet, city").execute()
+    return {
+        f"{r['show_title']}|{r['outlet']}|{r.get('city', '') or ''}"
+        for r in result.data
+        if r.get('show_title') and r.get('outlet')
+    }
+
+
 def get_url_path(url):
     try:
         path = '/' + '/'.join(url.split('/')[3:])
@@ -213,6 +223,7 @@ def run_pipeline():
     print(f"Loaded {len(known_shows)} shows, {len(all_productions)} productions")
     existing_urls = get_existing_urls()
     existing_reviewer_dates = get_existing_reviewer_dates()
+    existing_unmatched = get_existing_unmatched()
 
     existing_nine_paths = set()
     for url in existing_urls:
@@ -266,6 +277,10 @@ def run_pipeline():
             production_id = find_production(extracted.get("show_title"), city, country, all_productions)
 
             if not production_id:
+                unmatched_key = f"{extracted.get('show_title')}|{feed['outlet']}|{city or ''}"
+                if unmatched_key in existing_unmatched:
+                    skipped += 1
+                    continue
                 unmatched = {
                     "outlet": feed["outlet"],
                     "reviewer": extracted.get("reviewer"),
@@ -282,6 +297,7 @@ def run_pipeline():
                 }
                 try:
                     supabase.table("unmatched_reviews").insert(unmatched).execute()
+                    existing_unmatched.add(unmatched_key)
                     print(f"  ⚑ Saved unmatched: {extracted.get('show_title')} ({city})")
                 except Exception as e:
                     print(f"  No DB match: {extracted.get('show_title')} ({city})")
@@ -333,6 +349,7 @@ def run_guardian_pipeline():
     known_shows = get_known_shows()
     all_productions = get_all_productions()
     existing_urls = get_existing_urls()
+    existing_unmatched = get_existing_unmatched()
 
     url = "https://content.guardianapis.com/search"
     params = {
@@ -383,6 +400,9 @@ def run_guardian_pipeline():
         production_id = find_production(extracted.get("show_title"), city, country, all_productions)
 
         if not production_id:
+            unmatched_key = f"{extracted.get('show_title')}|The Guardian|{city or ''}"
+            if unmatched_key in existing_unmatched:
+                continue
             unmatched = {
                 "outlet": "The Guardian",
                 "reviewer": fields.get("byline"),
@@ -399,6 +419,7 @@ def run_guardian_pipeline():
             }
             try:
                 supabase.table("unmatched_reviews").insert(unmatched).execute()
+                existing_unmatched.add(unmatched_key)
                 print(f"  ⚑ Saved unmatched: {extracted.get('show_title')} ({city})")
             except Exception:
                 print(f"  No DB match: {extracted.get('show_title')} ({city})")
