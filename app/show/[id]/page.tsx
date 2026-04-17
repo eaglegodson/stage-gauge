@@ -141,6 +141,8 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const show = production.shows
   const cfg = typeConfig[show?.type] || typeConfig.theatre
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
+  const reportSubject = encodeURIComponent(`Issue report: ${show?.title}`)
+  const reportBody = encodeURIComponent(`Show: ${show?.title}\nCompany: ${show?.company}\nCity: ${production.city}\nProduction ID: ${id}\n\nPlease describe the issue:\n`)
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
@@ -264,6 +266,15 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
               {!user && <a href="/auth" style={{ fontSize: '13px', color: '#1D9E75', textDecoration: 'underline' }}>Sign in to write a review</a>}
             </div>
           )}
+        </div>
+
+        <div style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid #1e1e2e', textAlign: 'center' }}>
+          
+            href={`mailto:hello@stage-gauge.com?subject=${reportSubject}&body=${reportBody}`}
+            style={{ fontSize: '12px', color: '#374151', textDecoration: 'none' }}
+          >
+            Report an issue with this page
+          </a>
         </div>
       </div>
 
