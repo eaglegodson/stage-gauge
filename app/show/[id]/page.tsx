@@ -143,6 +143,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
   const reportSubject = encodeURIComponent(`Issue report: ${show?.title}`)
   const reportBody = encodeURIComponent(`Show: ${show?.title}\nCompany: ${show?.company}\nCity: ${production.city}\nProduction ID: ${id}\n\nPlease describe the issue:\n`)
+  const reportHref = 'mailto:hello@stage-gauge.com?subject=' + reportSubject + '&body=' + reportBody
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
@@ -269,10 +270,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
         <div style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid #1e1e2e', textAlign: 'center' }}>
-          
-            href={`mailto:hello@stage-gauge.com?subject=${reportSubject}&body=${reportBody}`}
-            style={{ fontSize: '12px', color: '#374151', textDecoration: 'none' }}
-          >
+          <a href={reportHref} style={{ fontSize: '12px', color: '#374151', textDecoration: 'none' }}>
             Report an issue with this page
           </a>
         </div>
