@@ -48,7 +48,9 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
         {user && (
           <>
             <a href="/watchlist" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Watchlist</a>
-            <a href="/admin" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Mod</a>
+            {user.email === 'hadimaz@gmail.com' && (
+              <a href="/admin" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Mod</a>
+            )}
           </>
         )}
         {user ? (
