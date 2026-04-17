@@ -46,12 +46,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
         </button>
         <a href="/about" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>About</a>
         {user && (
-          <>
-            <a href="/watchlist" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Watchlist</a>
-            {user.email === 'hadimaz@gmail.com' && (
-              <a href="/admin" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Mod</a>
-            )}
-          </>
+          <a href="/watchlist" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Watchlist</a>
         )}
         {user ? (
           <button

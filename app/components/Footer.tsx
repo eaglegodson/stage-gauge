@@ -12,6 +12,8 @@ export default function Footer() {
         <a href="/about" style={{ color: '#4b5563', textDecoration: 'none' }}>About</a>
         <span style={{ margin: '0 10px', color: '#2a2a3e' }}>·</span>
         <a href="mailto:hello@stage-gauge.com" style={{ color: '#4b5563', textDecoration: 'none' }}>Feedback</a>
+        <span style={{ margin: '0 10px', color: '#2a2a3e' }}>·</span>
+        <a href="/admin" style={{ color: '#2a2a3e', textDecoration: 'none' }}>Mod</a>
       </p>
     </footer>
   )
