@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import { supabase } from '../lib/supabase'
@@ -28,6 +28,10 @@ export default function Home() {
   const [userCity, setUserCity] = useState('')
   const [stats, setStats] = useState({ productions: 0, reviews: 0, cities: 0 })
   const [user, setUser] = useState<any>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -98,12 +102,72 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [shows])
 
+  useEffect(() => {
+    if (searchOpen && searchRef.current) {
+      searchRef.current.focus()
+    }
+  }, [searchOpen])
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      return
+    }
+    const timeout = setTimeout(async () => {
+      const { data } = await supabase
+        .from('production_listing')
+        .select('*')
+        .ilike('title', '%' + searchQuery + '%')
+        .limit(6)
+      setSearchResults(data || [])
+    }, 300)
+    return () => clearTimeout(timeout)
+  }, [searchQuery])
+
+  function handleSearchToggle() {
+    setSearchOpen(prev => !prev)
+    setSearchQuery('')
+    setSearchResults([])
+  }
+
   const show = shows[currentShow]
   const cfg = show ? (typeConfig[show.type] || typeConfig.theatre) : null
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
-      <Header />
+      <Header onSearch={handleSearchToggle} />
+
+      {searchOpen && (
+        <div style={{ backgroundColor: '#0f0f1a', borderBottom: '1px solid #1e1e2e', padding: '12px 24px' }}>
+          <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative' }}>
+            <input
+              ref={searchRef}
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search shows, companies, venues..."
+              style={{ width: '100%', backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px', padding: '10px 16px', fontSize: '14px', color: '#f1f5f9', outline: 'none', boxSizing: 'border-box' }}
+            />
+            {searchResults.length > 0 && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px', marginTop: '4px', zIndex: 200, overflow: 'hidden' }}>
+                {searchResults.map((result: any) => (
+                  <a key={result.production_id} href={'/show/' + result.production_id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', textDecoration: 'none', borderBottom: '1px solid #2a2a3e' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.backgroundColor = '#2a2a3e'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'}
+                  >
+                    <span style={{ fontSize: '16px' }}>{(typeConfig[result.type] || typeConfig.theatre).emoji}</span>
+                    <div>
+                      <div style={{ fontSize: '14px', color: '#f1f5f9', fontWeight: '500' }}>{result.title}</div>
+                      <div style={{ fontSize: '12px', color: '#6b7280' }}>{result.company} · {result.city}</div>
+                    </div>
+                    {result.combined_score && <span style={{ marginLeft: 'auto', color: '#1D9E75', fontSize: '12px' }}>{'★'.repeat(Math.round(result.combined_score))}</span>}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div style={{ position: 'relative', overflow: 'hidden', minHeight: '520px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {shows.map((s: any, i: number) => {
