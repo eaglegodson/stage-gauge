@@ -75,7 +75,9 @@ function FilterDropdown({ label, options, values, onChange, allKey = 'all' }: { 
 }
 
 export default function ReviewsPage() {
+  const [reviewType, setReviewType] = useState<'critic' | 'audience'>('critic')
   const [reviews, setReviews] = useState<any[]>([])
+  const [audienceReviews, setAudienceReviews] = useState<any[]>([])
   const [cityFilter, setCityFilter] = useState<string>('all')
   const [outletFilter, setOutletFilter] = useState<string[]>(['all'])
   const [availableOutlets, setAvailableOutlets] = useState<string[]>([])
@@ -96,10 +98,14 @@ export default function ReviewsPage() {
   }, [])
 
   useEffect(() => {
-    fetchReviews()
+    fetchCriticReviews()
   }, [cityFilter, outletFilter])
 
-  async function fetchReviews() {
+  useEffect(() => {
+    fetchAudienceReviews()
+  }, [cityFilter])
+
+  async function fetchCriticReviews() {
     setLoading(true)
     const { data, error } = await supabase
       .from('critic_reviews')
@@ -123,11 +129,9 @@ export default function ReviewsPage() {
       filtered = filtered.filter(r => (r.productions as any)?.city === cityFilter)
     }
 
-    // Build available outlets from filtered-by-city results
     const outlets = Array.from(new Set(filtered.map((r: any) => r.outlet).filter(Boolean))).sort() as string[]
     setAvailableOutlets(outlets)
 
-    // Apply outlet filter
     const activeOutlets = outletFilter.filter(o => o !== 'all')
     if (activeOutlets.length > 0) {
       filtered = filtered.filter(r => activeOutlets.includes(r.outlet))
@@ -136,6 +140,33 @@ export default function ReviewsPage() {
     setReviews(filtered.slice(0, 60))
     setLoading(false)
   }
+
+  async function fetchAudienceReviews() {
+    const { data, error } = await supabase
+      .from('audience_reviews')
+      .select(`
+        id, star_rating, review_text, created_at,
+        productions (
+          id, city,
+          shows ( title, type, company )
+        )
+      `)
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .limit(60)
+
+    if (error) return
+
+    let filtered = (data || []).filter(r => r.productions)
+
+    if (cityFilter !== 'all') {
+      filtered = filtered.filter(r => (r.productions as any)?.city === cityFilter)
+    }
+
+    setAudienceReviews(filtered)
+  }
+
+  const isLoadingCurrent = loading && reviewType === 'critic'
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
@@ -168,16 +199,39 @@ export default function ReviewsPage() {
       </div>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
+
+        {/* Critic / Audience toggle */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+          {(['critic', 'audience'] as const).map(type => (
+            <button
+              key={type}
+              onClick={() => setReviewType(type)}
+              style={{
+                padding: '8px 20px',
+                borderRadius: '6px',
+                border: reviewType === type ? 'none' : '1px solid #2a2a3e',
+                background: reviewType === type ? '#1D9E75' : '#1e1e2e',
+                color: reviewType === type ? '#fff' : '#9ca3af',
+                fontWeight: reviewType === type ? 600 : 400,
+                cursor: 'pointer',
+                fontSize: '14px',
+              }}
+            >
+              {type === 'critic' ? 'Critic reviews' : 'Audience reviews'}
+            </button>
+          ))}
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
           <div>
             <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '28px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0' }}>
               Latest reviews
             </h1>
             <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
-              {cityFilter === 'all' ? 'All cities' : cityFilter} · critic reviews
+              {cityFilter === 'all' ? 'All cities' : cityFilter} · {reviewType === 'critic' ? 'critic reviews' : 'audience reviews'}
             </p>
           </div>
-          {availableOutlets.length > 0 && (
+          {reviewType === 'critic' && availableOutlets.length > 0 && (
             <FilterDropdown
               label="Publication"
               options={['all', ...availableOutlets]}
@@ -187,75 +241,145 @@ export default function ReviewsPage() {
           )}
         </div>
 
-        {loading && <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>}
-        {!loading && reviews.length === 0 && <p style={{ color: '#4b5563', fontSize: '14px' }}>No reviews found.</p>}
+        {isLoadingCurrent && <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {reviews.map(review => {
-            const prod = review.productions as any
-            const show = prod?.shows
-            const cfg = TYPE_CONFIG[show?.type] || TYPE_CONFIG.theatre
-            return (
-              <div key={review.id} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', gap: '0' }}>
-                  <div style={{ width: '6px', background: cfg.accent, flexShrink: 0 }} />
-                  <div style={{ padding: '16px 18px', flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
-                      <a href={'/show/' + prod?.id} style={{ textDecoration: 'none' }}>
-                        <span style={{ fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#f1f5f9', lineHeight: '1.3' }}>
-                          {show?.title}
-                        </span>
-                      </a>
-                      <span style={{ fontSize: '11px', color: '#4b5563', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                        {prod?.city}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: review.pull_quote ? '10px' : '0', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#9ca3af' }}>{review.outlet}</span>
-                      {review.reviewer && (
-                        <>
-                          <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
-                          <span style={{ fontSize: '12px', color: '#6b7280' }}>{review.reviewer}</span>
-                        </>
-                      )}
-                      {review.star_rating && (
-                        <>
-                          <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
-                          <StarDisplay score={review.star_rating} />
-                        </>
-                      )}
-                      {review.published_date && (
-                        <>
-                          <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
-                          <span style={{ fontSize: '11px', color: '#4b5563' }}>
-                            {new Date(review.published_date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+        {/* Critic reviews */}
+        {reviewType === 'critic' && !loading && (
+          <>
+            {reviews.length === 0 && <p style={{ color: '#4b5563', fontSize: '14px' }}>No reviews found.</p>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {reviews.map(review => {
+                const prod = review.productions as any
+                const show = prod?.shows
+                const cfg = TYPE_CONFIG[show?.type] || TYPE_CONFIG.theatre
+                return (
+                  <div key={review.id} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', gap: '0' }}>
+                      <div style={{ width: '6px', background: cfg.accent, flexShrink: 0 }} />
+                      <div style={{ padding: '16px 18px', flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
+                          <a href={'/show/' + prod?.id} style={{ textDecoration: 'none' }}>
+                            <span style={{ fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#f1f5f9', lineHeight: '1.3' }}>
+                              {show?.title}
+                            </span>
+                          </a>
+                          <span style={{ fontSize: '11px', color: '#4b5563', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                            {prod?.city}
                           </span>
-                        </>
-                      )}
-                    </div>
-                    {review.pull_quote && (
-                      <p style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic', margin: '0 0 10px 0', lineHeight: '1.6' }}>
-                        "{review.pull_quote}"
-                      </p>
-                    )}
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      {review.source_url && (
-                        <a href={review.source_url} target="_blank" rel="noopener noreferrer"
-                          style={{ fontSize: '12px', color: '#1D9E75', textDecoration: 'none', fontWeight: '500' }}>
-                          Read full review →
-                        </a>
-                      )}
-                      <a href={'/show/' + prod?.id}
-                        style={{ fontSize: '12px', color: '#4b5563', textDecoration: 'none' }}>
-                        Show page
-                      </a>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: review.pull_quote ? '10px' : '0', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#9ca3af' }}>{review.outlet}</span>
+                          {review.reviewer && (
+                            <>
+                              <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
+                              <span style={{ fontSize: '12px', color: '#6b7280' }}>{review.reviewer}</span>
+                            </>
+                          )}
+                          {review.star_rating && (
+                            <>
+                              <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
+                              <StarDisplay score={review.star_rating} />
+                            </>
+                          )}
+                          {review.published_date && (
+                            <>
+                              <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
+                              <span style={{ fontSize: '11px', color: '#4b5563' }}>
+                                {new Date(review.published_date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        {review.pull_quote && (
+                          <p style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic', margin: '0 0 10px 0', lineHeight: '1.6' }}>
+                            "{review.pull_quote}"
+                          </p>
+                        )}
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          {review.source_url && (
+                            <a href={review.source_url} target="_blank" rel="noopener noreferrer"
+                              style={{ fontSize: '12px', color: '#1D9E75', textDecoration: 'none', fontWeight: '500' }}>
+                              Read full review →
+                            </a>
+                          )}
+                          <a href={'/show/' + prod?.id}
+                            style={{ fontSize: '12px', color: '#4b5563', textDecoration: 'none' }}>
+                            Show page
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+
+        {/* Audience reviews */}
+        {reviewType === 'audience' && (
+          <>
+            {audienceReviews.length === 0 && (
+              <p style={{ color: '#4b5563', fontSize: '14px' }}>
+                No audience reviews yet{cityFilter !== 'all' ? ` for ${cityFilter}` : ''}.{' '}
+                <a href="/browse" style={{ color: '#1D9E75', textDecoration: 'none' }}>Browse shows</a> and be the first.
+              </p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {audienceReviews.map(review => {
+                const prod = review.productions as any
+                const show = prod?.shows
+                const cfg = TYPE_CONFIG[show?.type] || TYPE_CONFIG.theatre
+                return (
+                  <div key={review.id} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex' }}>
+                      <div style={{ width: '6px', background: cfg.accent, flexShrink: 0 }} />
+                      <div style={{ padding: '16px 18px', flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
+                          <a href={'/show/' + prod?.id} style={{ textDecoration: 'none' }}>
+                            <span style={{ fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#f1f5f9', lineHeight: '1.3' }}>
+                              {show?.title}
+                            </span>
+                          </a>
+                          <span style={{ fontSize: '11px', color: '#4b5563', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                            {prod?.city}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: review.review_text ? '10px' : '0', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '12px', color: '#6b7280' }}>{show?.company}</span>
+                          {review.star_rating && (
+                            <>
+                              <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
+                              <StarDisplay score={review.star_rating} />
+                            </>
+                          )}
+                          {review.created_at && (
+                            <>
+                              <span style={{ fontSize: '11px', color: '#2a2a3e' }}>·</span>
+                              <span style={{ fontSize: '11px', color: '#4b5563' }}>
+                                {new Date(review.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        {review.review_text && (
+                          <p style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic', margin: '0 0 10px 0', lineHeight: '1.6' }}>
+                            "{review.review_text}"
+                          </p>
+                        )}
+                        <a href={'/show/' + prod?.id}
+                          style={{ fontSize: '12px', color: '#4b5563', textDecoration: 'none' }}>
+                          Show page
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+
       </div>
 
       <Footer />
