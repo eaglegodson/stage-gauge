@@ -184,9 +184,6 @@ export default function Home() {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #14141f 0%, rgba(20,20,31,0.6) 40%, rgba(20,20,31,0.85) 80%, #14141f 100%)' }} />
 
         <div style={{ position: 'relative', maxWidth: '900px', margin: '0 auto', padding: '80px 24px 48px', textAlign: 'center', width: '100%', boxSizing: 'border-box' }}>
-          <div style={{ display: 'inline-block', background: 'rgba(29,158,117,0.15)', border: '1px solid rgba(29,158,117,0.3)', borderRadius: '20px', padding: '6px 16px', fontSize: '12px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '24px' }}>
-            Now in Beta
-          </div>
           <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '52px', fontWeight: '600', color: '#f1f5f9', lineHeight: '1.15', margin: '0 0 20px 0', letterSpacing: '-1px' }}>
             You care about what you see.<br />So do we.
           </h1>
