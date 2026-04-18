@@ -13,11 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StageGauge",
-  description: "Live performance reviews — theatre, opera, ballet, dance and more.",
+  title: "StageGauge — Live Performance Reviews",
+  description: "Aggregated critic and audience reviews for theatre, opera, ballet, musicals and dance across Australia, New Zealand and London.",
   openGraph: {
-    title: "StageGauge",
-    description: "You care about what you see. So do we.",
+    title: "StageGauge — Live Performance Reviews",
+    description: "Aggregated critic and audience reviews for theatre, opera, ballet, musicals and dance across Australia, New Zealand and London.",
     url: "https://stage-gauge.com",
     siteName: "StageGauge",
     images: [
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
         url: "https://stage-gauge.com/og-image.png",
         width: 1200,
         height: 630,
-        alt: "StageGauge — live performance reviews",
+        alt: "StageGauge — live performance reviews for theatre, opera, ballet and more",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "StageGauge",
-    description: "You care about what you see. So do we.",
+    title: "StageGauge — Live Performance Reviews",
+    description: "Aggregated critic and audience reviews for theatre, opera, ballet, musicals and dance across Australia, New Zealand and London.",
     images: ["https://stage-gauge.com/og-image.png"],
   },
 };
