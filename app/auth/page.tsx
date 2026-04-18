@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import Header from '../components/Header'
+import posthog from 'posthog-js'
 
 export default function AuthPage() {
   const [mode, setMode] = useState('signin')
@@ -53,9 +54,11 @@ export default function AuthPage() {
     })
     setLoading(false)
     if (error) {
+      posthog.captureException(error)
       setMessage(error.message)
       setMessageType('error')
     } else {
+      posthog.capture('user_signed_up', { display_name: displayName })
       setMessage('Account created! You can now sign in.')
       setMessageType('success')
       setMode('signin')
@@ -64,12 +67,15 @@ export default function AuthPage() {
 
   async function handleSignIn() {
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (error) {
+      posthog.captureException(error)
       setMessage(error.message)
       setMessageType('error')
     } else {
+      posthog.identify(data.user.id, { email: data.user.email, display_name: data.user.user_metadata?.display_name })
+      posthog.capture('user_signed_in', { email: data.user.email })
       window.location.href = '/browse'
     }
   }

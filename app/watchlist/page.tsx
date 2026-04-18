@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import posthog from 'posthog-js'
 
 export default function WatchlistPage() {
   const [watchlist, setWatchlist] = useState<any[]>([])
@@ -30,8 +31,16 @@ export default function WatchlistPage() {
   }
 
   async function removeFromWatchlist(id: string) {
+    const item = watchlist.find(w => w.id === id)
+    const show = item?.productions?.shows
     await supabase.from('watchlist').delete().eq('id', id)
     setWatchlist(watchlist.filter(w => w.id !== id))
+    posthog.capture('show_removed_from_watchlist', {
+      production_id: item?.productions?.id,
+      show_title: show?.title,
+      show_type: show?.type,
+      city: item?.productions?.city,
+    })
   }
 
   return (

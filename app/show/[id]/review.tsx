@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '../../../lib/supabase'
+import posthog from 'posthog-js'
 
 export default function ReviewForm({ productionId, user, onClose }: { productionId: string, user: any, onClose: () => void }) {
   const [rating, setRating] = useState(0)
@@ -23,8 +24,15 @@ export default function ReviewForm({ productionId, user, onClose }: { production
       status: 'pending'
     })
     if (error) {
+      posthog.captureException(error)
       setMessage(error.message)
     } else {
+      posthog.capture('review_submitted', {
+        production_id: productionId,
+        star_rating: rating,
+        has_review_text: reviewText.length > 0,
+        has_date_attended: !!dateAttended,
+      })
       setMessage('Review submitted! It will appear after moderation.')
     }
     setLoading(false)

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import posthog from 'posthog-js'
 
 export default function SearchPage() {
   const [query, setQuery] = useState('')
@@ -19,6 +20,7 @@ export default function SearchPage() {
       .or(`title.ilike.%${query}%,company.ilike.%${query}%,venue.ilike.%${query}%`)
       .order('combined_score', { ascending: false, nullsFirst: false })
     setResults(data || [])
+    posthog.capture('search_performed', { query: query.trim(), result_count: (data || []).length })
     setLoading(false)
   }
 

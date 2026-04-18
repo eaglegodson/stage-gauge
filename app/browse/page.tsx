@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import posthog from 'posthog-js'
 
 const typeConfig: Record<string, { gradient: string, accent: string, emoji: string }> = {
   theatre:  { gradient: 'linear-gradient(160deg, #0f2744 0%, #1a6bb5 100%)', accent: '#4A90D9', emoji: '🎭' },
@@ -244,10 +245,10 @@ export default function Browse() {
       <Header onSearch={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }} />
       <div style={{ position: 'sticky', top: '56px', zIndex: 90, backgroundColor: '#0f0f1a', borderBottom: '1px solid #1e1e2e', padding: '10px 24px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <FilterDropdown label="City" options={availableCities} values={cityFilter} onChange={v => { setCityFilter(v); setCompanyFilter(['all']) }} />
-          {availableCompanies.length > 0 && <FilterDropdown label="Company" options={['all', ...availableCompanies]} values={companyFilter} onChange={setCompanyFilter} />}
-          <FilterDropdown label="Type" options={availableTypes} values={typeFilter} onChange={setTypeFilter} />
-          <FilterDropdown label="Timing" options={['all', 'now', 'soon', 'later', 'past']} values={timingFilter} onChange={setTimingFilter} />
+          <FilterDropdown label="City" options={availableCities} values={cityFilter} onChange={v => { setCityFilter(v); setCompanyFilter(['all']); posthog.capture('browse_filter_applied', { filter: 'city', values: v }) }} />
+          {availableCompanies.length > 0 && <FilterDropdown label="Company" options={['all', ...availableCompanies]} values={companyFilter} onChange={v => { setCompanyFilter(v); posthog.capture('browse_filter_applied', { filter: 'company', values: v }) }} />}
+          <FilterDropdown label="Type" options={availableTypes} values={typeFilter} onChange={v => { setTypeFilter(v); posthog.capture('browse_filter_applied', { filter: 'type', values: v }) }} />
+          <FilterDropdown label="Timing" options={['all', 'now', 'soon', 'later', 'past']} values={timingFilter} onChange={v => { setTimingFilter(v); posthog.capture('browse_filter_applied', { filter: 'timing', values: v }) }} />
         </div>
       </div>
       {searchOpen && (

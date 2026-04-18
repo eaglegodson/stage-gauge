@@ -5,6 +5,7 @@ import { supabase } from '../../../lib/supabase'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import ReviewForm from './review'
+import posthog from 'posthog-js'
 
 const typeConfig: Record<string, { gradient: string, accent: string, emoji: string }> = {
   theatre:  { gradient: 'linear-gradient(160deg, #0f2744 0%, #1a6bb5 100%)', accent: '#4A90D9', emoji: '🎭' },
@@ -88,7 +89,19 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   useEffect(() => {
     if (!id) return
     supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null))
-    supabase.from('productions').select('*, shows(*)').eq('id', id).single().then(({ data }) => setProduction(data))
+    supabase.from('productions').select('*, shows(*)').eq('id', id).single().then(({ data }) => {
+      setProduction(data)
+      if (data) {
+        posthog.capture('show_page_viewed', {
+          production_id: id,
+          show_title: data.shows?.title,
+          show_type: data.shows?.type,
+          company: data.shows?.company,
+          city: data.city,
+          venue: data.venue,
+        })
+      }
+    })
     supabase.from('show_scores').select('*').eq('production_id', id).single().then(({ data }) => setScores(data))
     supabase.from('critic_reviews').select('*').eq('production_id', id).eq('status', 'approved')
       .order('published_date', { ascending: false }).then(({ data }) => setCriticReviews(data || []))
@@ -106,12 +119,15 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
 
   async function toggleSeen() {
     if (!user) return window.location.href = '/auth'
+    const show = production?.shows
     if (seen) {
       await supabase.from('seen').delete().eq('production_id', id).eq('user_id', user.id)
       setSeen(false)
+      posthog.capture('show_unmarked_seen', { production_id: id, show_title: show?.title, show_type: show?.type, city: production?.city })
     } else {
       await supabase.from('seen').insert({ production_id: id, user_id: user.id })
       setSeen(true)
+      posthog.capture('show_marked_seen', { production_id: id, show_title: show?.title, show_type: show?.type, city: production?.city })
       await supabase.from('watchlist').delete().eq('production_id', id).eq('user_id', user.id)
       setWatchlisted(false)
     }
@@ -119,12 +135,14 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
 
   async function toggleWatchlist() {
     if (!user) return window.location.href = '/auth'
+    const show = production?.shows
     if (watchlisted) {
       await supabase.from('watchlist').delete().eq('production_id', id).eq('user_id', user.id)
       setWatchlisted(false)
     } else {
       await supabase.from('watchlist').insert({ production_id: id, user_id: user.id })
       setWatchlisted(true)
+      posthog.capture('show_watchlisted', { production_id: id, show_title: show?.title, show_type: show?.type, city: production?.city })
     }
   }
 
@@ -185,7 +203,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
             )}
           </div>
           <div style={{ marginTop: '24px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <a href={production.ticket_url || getTicketUrl(show?.company, production.city, show?.title, production.country)} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', backgroundColor: '#1D9E75', color: 'white', textDecoration: 'none', fontWeight: '600', display: 'inline-block' }}>Buy tickets</a>
+            <a href={production.ticket_url || getTicketUrl(show?.company, production.city, show?.title, production.country)} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture('tickets_link_clicked', { production_id: id, show_title: show?.title, company: show?.company, city: production.city })} style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', backgroundColor: '#1D9E75', color: 'white', textDecoration: 'none', fontWeight: '600', display: 'inline-block' }}>Buy tickets</a>
             <button
               onClick={toggleWatchlist}
               style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.2)'}`, backgroundColor: watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}
