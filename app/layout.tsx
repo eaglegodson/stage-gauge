@@ -15,6 +15,27 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "StageGauge",
   description: "Live performance reviews — theatre, opera, ballet, dance and more.",
+  openGraph: {
+    title: "StageGauge",
+    description: "You care about what you see. So do we.",
+    url: "https://stage-gauge.com",
+    siteName: "StageGauge",
+    images: [
+      {
+        url: "https://stage-gauge.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "StageGauge — live performance reviews",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StageGauge",
+    description: "You care about what you see. So do we.",
+    images: ["https://stage-gauge.com/og-image.png"],
+  },
 };
 
 export default function RootLayout({

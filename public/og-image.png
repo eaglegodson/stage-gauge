@@ -1,0 +1,58 @@
+<svg width="100%" viewBox="0 0 1210 640" role="img" xmlns="http://www.w3.org/2000/svg" style="">
+<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">StageGauge — You care about what you see. So do we.</title>
+<desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Open Graph image for StageGauge, a live performance review aggregator</desc>
+
+<rect width="1200" height="630" fill="#14141f" style="fill:rgb(20, 20, 31);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+<!-- Subtle grid texture -->
+<defs>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e1e2e" stroke-width="1"/>
+  </pattern>
+</defs>
+<rect width="1200" height="630" fill="url(#grid)" opacity="0.6" style="stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.6;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+<!-- Accent glow behind logo area -->
+<ellipse cx="600" cy="280" rx="320" ry="180" fill="#1D9E75" opacity="0.06" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.06;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+<!-- Top accent line -->
+<rect x="0" y="0" width="1200" height="3" fill="#1D9E75" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+<!-- Star rating dots — decorative -->
+<circle cx="480" cy="180" r="5" fill="#1D9E75" opacity="0.5" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.5;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<circle cx="508" cy="180" r="5" fill="#1D9E75" opacity="0.5" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.5;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<circle cx="536" cy="180" r="5" fill="#1D9E75" opacity="0.5" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.5;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<circle cx="564" cy="180" r="5" fill="#1D9E75" opacity="0.5" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.5;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<circle cx="592" cy="180" r="5" fill="#1D9E75" opacity="0.2" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.2;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+<!-- Main title -->
+<text x="600" y="300" text-anchor="middle" font-family="Georgia, serif" font-size="96" font-weight="600" fill="#f1f5f9" letter-spacing="-2" style="fill:rgb(241, 245, 249);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:96px;font-weight:600;text-anchor:middle;dominant-baseline:auto">StageGauge</text>
+
+<!-- Divider -->
+<rect x="500" y="328" width="200" height="2" rx="1" fill="#1D9E75" opacity="0.6" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.6;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+<!-- Tagline -->
+<text x="600" y="380" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#9ca3af" letter-spacing="0.5" style="fill:rgb(156, 163, 175);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:28px;font-weight:400;text-anchor:middle;dominant-baseline:auto">You care about what you see. So do we.</text>
+
+<!-- City pills -->
+<rect x="280" y="430" width="120" height="36" rx="18" fill="#1e1e2e" stroke="#2a2a3e" stroke-width="1" style="fill:rgb(30, 30, 46);stroke:rgb(42, 42, 62);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="340" y="453" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="16" fill="#6b7280" style="fill:rgb(107, 114, 128);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:-apple-system, sans-serif;font-size:16px;font-weight:400;text-anchor:middle;dominant-baseline:auto">Melbourne</text>
+
+<rect x="418" y="430" width="90" height="36" rx="18" fill="#1e1e2e" stroke="#2a2a3e" stroke-width="1" style="fill:rgb(30, 30, 46);stroke:rgb(42, 42, 62);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="463" y="453" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="16" fill="#6b7280" style="fill:rgb(107, 114, 128);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:-apple-system, sans-serif;font-size:16px;font-weight:400;text-anchor:middle;dominant-baseline:auto">Sydney</text>
+
+<rect x="526" y="430" width="90" height="36" rx="18" fill="#1e1e2e" stroke="#2a2a3e" stroke-width="1" style="fill:rgb(30, 30, 46);stroke:rgb(42, 42, 62);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="571" y="453" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="16" fill="#6b7280" style="fill:rgb(107, 114, 128);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:-apple-system, sans-serif;font-size:16px;font-weight:400;text-anchor:middle;dominant-baseline:auto">London</text>
+
+<rect x="634" y="430" width="90" height="36" rx="18" fill="#1e1e2e" stroke="#2a2a3e" stroke-width="1" style="fill:rgb(30, 30, 46);stroke:rgb(42, 42, 62);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="679" y="453" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="16" fill="#6b7280" style="fill:rgb(107, 114, 128);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:-apple-system, sans-serif;font-size:16px;font-weight:400;text-anchor:middle;dominant-baseline:auto">Auckland</text>
+
+<rect x="742" y="430" width="90" height="36" rx="18" fill="#1e1e2e" stroke="#2a2a3e" stroke-width="1" style="fill:rgb(30, 30, 46);stroke:rgb(42, 42, 62);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="787" y="453" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="16" fill="#6b7280" style="fill:rgb(107, 114, 128);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:-apple-system, sans-serif;font-size:16px;font-weight:400;text-anchor:middle;dominant-baseline:auto">+ more</text>
+
+<!-- Bottom domain -->
+<text x="600" y="560" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="20" fill="#374151" letter-spacing="1" style="fill:rgb(55, 65, 81);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:-apple-system, sans-serif;font-size:20px;font-weight:400;text-anchor:middle;dominant-baseline:auto">stage-gauge.com</text>
+
+<!-- Bottom accent line -->
+<rect x="0" y="627" width="1200" height="3" fill="#1D9E75" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+</svg>
