@@ -159,9 +159,9 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const show = production.shows
   const cfg = typeConfig[show?.type] || typeConfig.theatre
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
-  const reportSubject = encodeURIComponent(`Issue report: ${show?.title}`)
-  const reportBody = encodeURIComponent(`Show: ${show?.title}\nCompany: ${show?.company}\nCity: ${production.city}\nProduction ID: ${id}\n\nPlease describe the issue:\n`)
-  const reportHref = 'mailto:hello@stage-gauge.com?subject=' + reportSubject + '&body=' + reportBody
+  
+  
+  const reportHref = `/feedback?show=${encodeURIComponent(show?.title || '')}&company=${encodeURIComponent(show?.company || '')}&city=${encodeURIComponent(production.city || '')}&production_id=${id}`
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>

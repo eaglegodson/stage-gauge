@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
@@ -9,6 +10,17 @@ export default function FeedbackPage() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const show = searchParams.get('show')
+    const company = searchParams.get('company')
+    const city = searchParams.get('city')
+    const production_id = searchParams.get('production_id')
+    if (show) {
+      setMessage(`Issue report\nShow: ${show}\nCompany: ${company || ''}\nCity: ${city || ''}\nProduction ID: ${production_id || ''}\n\nPlease describe the issue:\n`)
+    }
+  }, [])
 
   const handleSubmit = async () => {
     if (!name || !email || !message) return
