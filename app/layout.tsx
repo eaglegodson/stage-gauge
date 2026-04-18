@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CookieBanner from "./components/CookieBanner";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -52,7 +53,7 @@ export default function RootLayout({
       <head>
         <meta name="fo-verify" content="46efc777-01f5-424a-9c1e-1b356c52a311" />
       </head>
-      <body className="min-h-full flex flex-col">{children}<CookieBanner /></body>
+      <body className="min-h-full flex flex-col">{children}<CookieBanner /><Analytics /></body>
     </html>
   );
 }
