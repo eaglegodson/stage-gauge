@@ -105,7 +105,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
     supabase.from('show_scores').select('*').eq('production_id', id).single().then(({ data }) => setScores(data))
     supabase.from('critic_reviews').select('*').eq('production_id', id).eq('status', 'approved')
       .order('published_date', { ascending: false }).then(({ data }) => setCriticReviews(data || []))
-    supabase.from('audience_reviews').select('*, profiles(display_name)').eq('production_id', id)
+    supabase.from('audience_reviews').select('*').eq('production_id', id)
       .eq('status', 'approved').order('created_at', { ascending: false }).then(({ data }) => setAudienceReviews(data || []))
   }, [id])
 
@@ -159,8 +159,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const show = production.shows
   const cfg = typeConfig[show?.type] || typeConfig.theatre
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
-  
-  
+
   const reportHref = `/feedback?show=${encodeURIComponent(show?.title || '')}&company=${encodeURIComponent(show?.company || '')}&city=${encodeURIComponent(production.city || '')}&production_id=${id}`
 
   return (
@@ -272,7 +271,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
               {audienceReviews.map(review => (
                 <div key={review.id} style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: '600', color: '#f1f5f9' }}>{review.profiles?.display_name || 'Anonymous'}</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: '#f1f5f9' }}>Anonymous</span>
                     <StarDisplay score={review.star_rating} />
                   </div>
                   {review.review_text && <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: '1.6' }}>{review.review_text}</p>}
