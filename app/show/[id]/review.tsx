@@ -8,6 +8,7 @@ export default function ReviewForm({ productionId, user, onClose }: { production
   const [rating, setRating] = useState(0)
   const [reviewText, setReviewText] = useState('')
   const [dateAttended, setDateAttended] = useState('')
+  const [reviewerName, setReviewerName] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -19,6 +20,7 @@ export default function ReviewForm({ productionId, user, onClose }: { production
       user_id: user.id,
       star_rating: rating,
       review_text: reviewText,
+      reviewer_name: reviewerName || null,
       date_attended: dateAttended || null,
       city_attended: null,
       status: 'pending'
@@ -58,7 +60,22 @@ export default function ReviewForm({ productionId, user, onClose }: { production
         </div>
 
         <div style={{marginBottom: '20px'}}>
-          <label style={{fontSize: '12px', fontWeight: '500', color: '#374151', display: 'block', marginBottom: '8px'}}>Date attended (optional)</label>
+          <label style={{fontSize: '12px', fontWeight: '500', color: '#374151', display: 'block', marginBottom: '8px'}}>
+            Your name <span style={{color: '#9ca3af', fontWeight: '400'}}>(optional)</span>
+          </label>
+          <input
+            type="text"
+            value={reviewerName}
+            onChange={(e) => setReviewerName(e.target.value)}
+            placeholder="e.g. Sarah M."
+            style={{width: '100%', border: '1px solid #d1d5db', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', color: '#111827', backgroundColor: '#fff', boxSizing: 'border-box'}}
+          />
+        </div>
+
+        <div style={{marginBottom: '20px'}}>
+          <label style={{fontSize: '12px', fontWeight: '500', color: '#374151', display: 'block', marginBottom: '8px'}}>
+            Date attended <span style={{color: '#9ca3af', fontWeight: '400'}}>(optional)</span>
+          </label>
           <input
             type="date"
             value={dateAttended}
@@ -69,7 +86,9 @@ export default function ReviewForm({ productionId, user, onClose }: { production
         </div>
 
         <div style={{marginBottom: '24px'}}>
-          <label style={{fontSize: '12px', fontWeight: '500', color: '#374151', display: 'block', marginBottom: '8px'}}>Your review (optional)</label>
+          <label style={{fontSize: '12px', fontWeight: '500', color: '#374151', display: 'block', marginBottom: '8px'}}>
+            Your review <span style={{color: '#9ca3af', fontWeight: '400'}}>(optional)</span>
+          </label>
           <textarea
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
