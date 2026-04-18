@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "StageGauge",
     images: [
       {
-        url: "https://stage-gauge.com/og-image.png",
+        url: "https://stage-gauge.com/social-preview.png",
         width: 1200,
         height: 630,
         alt: "StageGauge — live performance reviews for theatre, opera, ballet and more",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "StageGauge — Reviews for Theatre, Opera and Ballet",
     description: "Aggregated critic and audience reviews for theatre, opera, ballet, musicals and dance across Australia, New Zealand and London.",
-    images: ["https://stage-gauge.com/og-image.png"],
+    images: ["https://stage-gauge.com/social-preview.png"],
   },
 };
 
