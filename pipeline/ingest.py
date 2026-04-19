@@ -37,6 +37,20 @@ FEEDS = [
     {"outlet": "West End Wilma", "url": "https://westendwilma.com/feed", "city": "London", "country": "GB"},
     {"outlet": "Everything Theatre", "url": "https://everything-theatre.co.uk/feed", "city": "London", "country": "GB"},
     {"outlet": "Exeunt Magazine", "url": "https://exeuntmagazine.com/feed/", "city": "London", "country": "GB"},
+    {"outlet": "Keith Gow", "url": "http://www.keithgow.com/feeds/posts/default", "city": "Melbourne", "country": "AU"},
+    {"outlet": "Melbourne Critique", "url": "https://melbournecritique.com.au/feed/", "city": "Melbourne", "country": "AU"},
+    {"outlet": "Australian Stage", "url": "https://www.australianstage.com.au/reviews/melbourne/feed/rss/", "city": "Melbourne", "country": "AU"},
+    {"outlet": "Australian Stage", "url": "https://www.australianstage.com.au/reviews/sydney/feed/rss/", "city": "Sydney", "country": "AU"},
+    {"outlet": "Australian Stage", "url": "https://www.australianstage.com.au/reviews/brisbane/feed/rss/", "city": "Brisbane", "country": "AU"},
+    {"outlet": "Australian Stage", "url": "https://www.australianstage.com.au/reviews/perth/feed/rss/", "city": "Perth", "country": "AU"},
+    {"outlet": "Australian Stage", "url": "https://www.australianstage.com.au/reviews/adelaide/feed/rss/", "city": "Adelaide", "country": "AU"},
+    {"outlet": "Australian Stage", "url": "https://www.australianstage.com.au/reviews/canberra/feed/rss/", "city": "Canberra", "country": "AU"},
+    {"outlet": "Broadway World", "url": "https://www.broadwayworld.com/australia-melbourne/newsroom.rss", "city": "Melbourne", "country": "AU"},
+    {"outlet": "Broadway World", "url": "https://www.broadwayworld.com/sydney/newsroom.rss", "city": "Sydney", "country": "AU"},
+    {"outlet": "Broadway World", "url": "https://www.broadwayworld.com/brisbane/newsroom.rss", "city": "Brisbane", "country": "AU"},
+    {"outlet": "Broadway World", "url": "https://www.broadwayworld.com/perth/newsroom.rss", "city": "Perth", "country": "AU"},
+    {"outlet": "Broadway World", "url": "https://www.broadwayworld.com/adelaide/newsroom.rss", "city": "Adelaide", "country": "AU"},
+    {"outlet": "Broadway World", "url": "https://www.broadwayworld.com/new-zealand/newsroom.rss", "city": None, "country": "NZ"},
 ]
 
 NINE_DOMAINS = ['theage.com.au', 'smh.com.au', 'brisbanetimes.com.au']
