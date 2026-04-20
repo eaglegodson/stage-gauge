@@ -34,9 +34,9 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
           <div style={{ background: cfg.gradient, width: '80px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontSize: '36px' }}>{cfg.emoji}</span>
           </div>
-          <div style={{ padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '10px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.accent }}>{p.type}</span>
                 <span style={{ color: '#4b5563', fontSize: '10px' }}>·</span>
                 <span style={{ fontSize: '10px', color: '#6b7280' }}>{p.city}</span>
@@ -48,9 +48,9 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
             </div>
             <div style={{ marginTop: '12px' }}>
               {stars ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ color: '#1D9E75', fontSize: '16px', letterSpacing: '1px' }}>{stars.join('')}</span>
-                  <span style={{ fontSize: '12px', color: '#6b7280' }}>{reviewCount} review{reviewCount !== 1 ? 's' : ''}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden' }}>
+                  <span style={{ color: '#1D9E75', fontSize: '16px', letterSpacing: '1px', flexShrink: 0 }}>{stars.join('')}</span>
+                  <span style={{ fontSize: '12px', color: '#6b7280', flexShrink: 0 }}>{reviewCount} review{reviewCount !== 1 ? 's' : ''}</span>
                 </div>
               ) : (
                 <span style={{ fontSize: '12px', color: '#4b5563' }}>No reviews yet</span>
@@ -78,9 +78,9 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
             <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.city}</p>
           </div>
           {stars ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ color: '#1D9E75', fontSize: '11px' }}>{stars.join('')}</span>
-              <span style={{ fontSize: '10px', color: '#4b5563' }}>{reviewCount}r</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: 0, overflow: 'hidden' }}>
+              <span style={{ color: '#1D9E75', fontSize: '11px', flexShrink: 0 }}>{stars.join('')}</span>
+              <span style={{ fontSize: '10px', color: '#4b5563', flexShrink: 0 }}>{reviewCount}r</span>
             </div>
           ) : (
             <span style={{ fontSize: '10px', color: '#374151' }}>No reviews</span>
@@ -241,7 +241,7 @@ export default function Browse() {
   const rest = productions.slice(1)
 
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
+    <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       <Header onSearch={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }} />
       <div style={{ position: 'sticky', top: '56px', zIndex: 90, backgroundColor: '#0f0f1a', borderBottom: '1px solid #1e1e2e', padding: '10px 24px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -264,11 +264,11 @@ export default function Browse() {
                   return (
                     <a key={p.production_id} href={'/show/' + p.production_id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: '#0f0f1a', borderRadius: '8px', border: '1px solid #2a2a3e', textDecoration: 'none' }}>
                       <div style={{ width: '40px', height: '52px', borderRadius: '6px', background: cfg.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>{cfg.emoji}</div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600' }}>{p.title}</div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>{p.venue || p.company} · {p.city}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</div>
+                        <div style={{ fontSize: '12px', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.venue || p.company} · {p.city}</div>
                       </div>
-                      {p.combined_score && <span style={{ color: '#1D9E75', fontSize: '13px' }}>{'★'.repeat(Math.round(p.combined_score))}</span>}
+                      {p.combined_score && <span style={{ color: '#1D9E75', fontSize: '13px', flexShrink: 0 }}>{('★'.repeat(Math.round(p.combined_score)))}</span>}
                     </a>
                   )
                 })}
@@ -286,7 +286,7 @@ export default function Browse() {
               <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563' }}>All productions</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }}></div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', alignItems: 'stretch' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(220px, 100%), 1fr))', gap: '12px', alignItems: 'stretch' }}>
               {rest.map(p => <ShowCard key={p.production_id} p={p} />)}
             </div>
           </>
