@@ -165,8 +165,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
 
       <div style={{ background: cfg.gradient, padding: '40px 16px 28px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <a href="/browse" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '20px' }}>← All shows</a>
-
+        <button onClick={() => window.history.back()} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '20px', padding: 0 }}>← Back</button>
           {/* Top row: poster + text */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
             <div style={{ width: '72px', height: '96px', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
