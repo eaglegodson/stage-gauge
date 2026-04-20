@@ -31,25 +31,25 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
     return (
       <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block' }}>
         <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
-          <div style={{ background: cfg.gradient, width: '80px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '36px' }}>{cfg.emoji}</span>
+          <div style={{ background: cfg.gradient, width: '72px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '32px' }}>{cfg.emoji}</span>
           </div>
-          <div style={{ padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
+          <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                 <span style={{ fontSize: '10px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.accent }}>{p.type}</span>
                 <span style={{ color: '#4b5563', fontSize: '10px' }}>·</span>
                 <span style={{ fontSize: '10px', color: '#6b7280' }}>{p.city}</span>
-                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.05em' }}>★ TOP RATED</span>
               </div>
-              <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 6px 0', lineHeight: '1.2' }}>{p.title}</h2>
-              <p style={{ fontSize: '14px', color: '#9ca3af', margin: '0 0 2px 0' }}>{p.company}</p>
-              <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>{p.venue}</p>
+              <div style={{ fontSize: '10px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.05em', marginBottom: '6px' }}>★ TOP RATED</div>
+              <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 4px 0', lineHeight: '1.2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</h2>
+              <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 2px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.company}</p>
+              <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.venue}</p>
             </div>
-            <div style={{ marginTop: '12px' }}>
+            <div style={{ marginTop: '10px' }}>
               {stars ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden' }}>
-                  <span style={{ color: '#1D9E75', fontSize: '16px', letterSpacing: '1px', flexShrink: 0 }}>{stars.join('')}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#1D9E75', fontSize: '15px', letterSpacing: '1px', flexShrink: 0 }}>{stars.join('')}</span>
                   <span style={{ fontSize: '12px', color: '#6b7280', flexShrink: 0 }}>{reviewCount} review{reviewCount !== 1 ? 's' : ''}</span>
                 </div>
               ) : (
@@ -243,7 +243,7 @@ export default function Browse() {
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       <Header onSearch={() => { setSearchOpen(!searchOpen); setSearchQuery(''); setSearchResults([]) }} />
-      <div style={{ position: 'sticky', top: '56px', zIndex: 90, backgroundColor: '#0f0f1a', borderBottom: '1px solid #1e1e2e', padding: '10px 24px' }}>
+      <div style={{ position: 'sticky', top: '56px', zIndex: 90, backgroundColor: '#0f0f1a', borderBottom: '1px solid #1e1e2e', padding: '10px 16px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
           <FilterDropdown label="City" options={availableCities} values={cityFilter} onChange={v => { setCityFilter(v); setCompanyFilter(['all']); posthog.capture('browse_filter_applied', { filter: 'city', values: v }) }} />
           {availableCompanies.length > 0 && <FilterDropdown label="Company" options={['all', ...availableCompanies]} values={companyFilter} onChange={v => { setCompanyFilter(v); posthog.capture('browse_filter_applied', { filter: 'company', values: v }) }} />}
@@ -252,7 +252,7 @@ export default function Browse() {
         </div>
       </div>
       {searchOpen && (
-        <div style={{ backgroundColor: '#1a1a2e', borderBottom: '1px solid #2a2a3e', padding: '16px 24px' }}>
+        <div style={{ backgroundColor: '#1a1a2e', borderBottom: '1px solid #2a2a3e', padding: '16px 16px' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <input ref={searchRef} type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search shows, companies, venues..." style={{ width: '100%', background: '#0f0f1a', border: '1px solid #2a2a3e', borderRadius: '8px', padding: '12px 16px', fontSize: '15px', color: '#f1f5f9', outline: 'none', boxSizing: 'border-box' }} />
             {searchQuery && (
@@ -277,9 +277,9 @@ export default function Browse() {
           </div>
         </div>
       )}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 16px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
         {!geoLoaded && <p style={{ textAlign: 'center', color: '#4b5563', fontSize: '14px', paddingTop: '60px' }}>Detecting your location...</p>}
-        {geoLoaded && featured && <div style={{ marginBottom: '32px' }}><ShowCard p={featured} featured /></div>}
+        {geoLoaded && featured && <div style={{ marginBottom: '24px' }}><ShowCard p={featured} featured /></div>}
         {geoLoaded && rest.length > 0 && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
