@@ -18,7 +18,6 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
 
 function getTicketUrl(company: string, city: string, title: string, country: string): string {
   const t = encodeURIComponent(title)
-
   const companyDirect: Record<string, string> = {
     'Melbourne Theatre Company': 'https://www.mtc.com.au/whats-on/',
     'Malthouse Theatre': 'https://www.malthousetheatre.com.au/whats-on/',
@@ -51,7 +50,6 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Royal Court Theatre': 'https://royalcourttheatre.com/whats-on/',
     "Shakespeare's Globe": 'https://www.shakespearesglobe.com/whats-on/',
   }
-
   if (companyDirect[company]) return companyDirect[company]
   if (country === 'GB') return 'https://www.todaytix.com/london/search?q=' + t
   if (country === 'NZ') return 'https://www.ticketmaster.co.nz/search?tm_link=tm_homeA_header_search&q=' + t
@@ -64,7 +62,7 @@ function StarDisplay({ score, size = 'sm' }: { score: number, size?: 'sm' | 'lg'
   const hasHalf = score - fullStars >= 0.25 && score - fullStars < 0.75
   const roundedUp = score - fullStars >= 0.75
   const total = roundedUp ? fullStars + 1 : fullStars
-  const fontSize = size === 'lg' ? '28px' : '16px'
+  const fontSize = size === 'lg' ? '24px' : '16px'
   for (let i = 1; i <= 5; i++) {
     if (i <= total) stars.push(<span key={i} style={{ color: '#1D9E75', fontSize }}>★</span>)
     else if (i === fullStars + 1 && hasHalf) stars.push(<span key={i} style={{ color: '#1D9E75', fontSize }}>½</span>)
@@ -159,67 +157,66 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const show = production.shows
   const cfg = typeConfig[show?.type] || typeConfig.theatre
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
-
   const reportHref = `/feedback?show=${encodeURIComponent(show?.title || '')}&company=${encodeURIComponent(show?.company || '')}&city=${encodeURIComponent(production.city || '')}&production_id=${id}`
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       <Header />
 
-      <div style={{ background: cfg.gradient, padding: '48px 24px 32px' }}>
+      <div style={{ background: cfg.gradient, padding: '40px 16px 28px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <a href="/browse" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>← All shows</a>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '28px' }}>
-            <div style={{ width: '100px', height: '130px', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
-              <span style={{ fontSize: '36px' }}>{cfg.emoji}</span>
-              <div style={{ width: '24px', height: '2px', borderRadius: '1px', background: cfg.accent }}></div>
+          <a href="/browse" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '20px' }}>← All shows</a>
+
+          {/* Top row: poster + text */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+            <div style={{ width: '72px', height: '96px', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <span style={{ fontSize: '28px' }}>{cfg.emoji}</span>
+              <div style={{ width: '20px', height: '2px', borderRadius: '1px', background: cfg.accent }}></div>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.accent }}>{show?.type}</span>
                 <span style={{ color: 'rgba(255,255,255,0.3)' }}>·</span>
                 <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>{production.city}</span>
-                {production.season_start && (
-                  <>
-                    <span style={{ color: 'rgba(255,255,255,0.3)' }}>·</span>
-                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>{fmt(production.season_start)}{production.season_end ? ` – ${fmt(production.season_end)}` : ''}</span>
-                  </>
-                )}
               </div>
-              <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '36px', fontWeight: '600', color: '#ffffff', lineHeight: '1.2', margin: '0 0 8px 0' }}>{show?.title}</h1>
-              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.7)', margin: '0 0 4px 0', fontWeight: '500' }}>{show?.company}</p>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>{production.venue}</p>
+              <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(20px, 5vw, 34px)', fontWeight: '600', color: '#ffffff', lineHeight: '1.2', margin: '0 0 6px 0' }}>{show?.title}</h1>
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', margin: '0 0 2px 0', fontWeight: '500' }}>{show?.company}</p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: '0 0 4px 0' }}>{production.venue}</p>
+              {production.season_start && (
+                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+                  {fmt(production.season_start)}{production.season_end ? ` – ${fmt(production.season_end)}` : ''}
+                </p>
+              )}
             </div>
-            {scores?.combined_score && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                <StarDisplay score={scores.combined_score} size="lg" />
-                <div style={{ fontSize: '15px', fontWeight: '600', color: '#1D9E75' }}>{Number(scores.combined_score).toFixed(1)} / 5</div>
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textAlign: 'center' }}>
-                  {scores.critic_count > 0 && <div>{scores.critic_count} critic{scores.critic_count !== 1 ? 's' : ''}</div>}
-                  {scores.audience_count > 0 && <div>{scores.audience_count} audience</div>}
-                </div>
-              </div>
-            )}
           </div>
-          <div style={{ marginTop: '24px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+
+          {/* Score row — sits below on all screens */}
+          {scores?.combined_score && (
+            <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <StarDisplay score={scores.combined_score} size="lg" />
+              <div style={{ fontSize: '15px', fontWeight: '600', color: '#1D9E75' }}>{Number(scores.combined_score).toFixed(1)} / 5</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
+                {scores.critic_count > 0 && <span>{scores.critic_count} critic{scores.critic_count !== 1 ? 's' : ''}</span>}
+                {scores.critic_count > 0 && scores.audience_count > 0 && <span> · </span>}
+                {scores.audience_count > 0 && <span>{scores.audience_count} audience</span>}
+              </div>
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <a href={production.ticket_url || getTicketUrl(show?.company, production.city, show?.title, production.country)} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture('tickets_link_clicked', { production_id: id, show_title: show?.title, company: show?.company, city: production.city })} style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', backgroundColor: '#1D9E75', color: 'white', textDecoration: 'none', fontWeight: '600', display: 'inline-block' }}>Buy tickets</a>
-            <button
-              onClick={toggleWatchlist}
-              style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.2)'}`, backgroundColor: watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}
-            >
+            <button onClick={toggleWatchlist} style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.2)'}`, backgroundColor: watchlisted ? '#1D9E75' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}>
               {watchlisted ? '✓ Watchlisted' : '+ Watchlist'}
             </button>
-            <button
-              onClick={toggleSeen}
-              style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${seen ? '#f1f5f9' : 'rgba(255,255,255,0.2)'}`, backgroundColor: seen ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}
-            >
+            <button onClick={toggleSeen} style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${seen ? '#f1f5f9' : 'rgba(255,255,255,0.2)'}`, backgroundColor: seen ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}>
               {seen ? '✓ Seen this' : '👁 I saw this'}
             </button>
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 16px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
 
         <div style={{ marginBottom: '32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
@@ -229,9 +226,9 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
           {criticReviews.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {criticReviews.map(review => (
-                <div key={review.id} style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-                    <div style={{ flex: 1 }}>
+                <div key={review.id} style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
                         <span style={{ fontSize: '14px', fontWeight: '600', color: '#f1f5f9' }}>{review.outlet}</span>
                         {review.reviewer && <span style={{ fontSize: '13px', color: '#6b7280' }}>{review.reviewer}</span>}
@@ -240,7 +237,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
                       {review.pull_quote && <p style={{ fontSize: '14px', color: '#9ca3af', fontStyle: 'italic', margin: '0 0 10px 0', lineHeight: '1.6' }}>"{review.pull_quote}"</p>}
                       {review.source_url && <a href={review.source_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#1D9E75', textDecoration: 'none' }}>Read full review →</a>}
                     </div>
-                    {review.star_rating && <StarDisplay score={review.star_rating} />}
+                    {review.star_rating && <div style={{ flexShrink: 0 }}><StarDisplay score={review.star_rating} /></div>}
                   </div>
                 </div>
               ))}
@@ -254,11 +251,11 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
 
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-              <h2 style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563', margin: 0 }}>Audience reviews · {audienceReviews.length}</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: 0 }}>
+              <h2 style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563', margin: 0, whiteSpace: 'nowrap' }}>Audience reviews · {audienceReviews.length}</h2>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }}></div>
             </div>
-            <div style={{ marginLeft: '16px' }}>
+            <div style={{ marginLeft: '16px', flexShrink: 0 }}>
               {user ? (
                 <button onClick={() => setShowReviewForm(true)} style={{ fontSize: '13px', color: 'white', padding: '7px 16px', borderRadius: '6px', backgroundColor: '#1D9E75', border: 'none', cursor: 'pointer' }}>Write a review</button>
               ) : (
@@ -269,7 +266,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
           {audienceReviews.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {audienceReviews.map(review => (
-                <div key={review.id} style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '20px' }}>
+                <div key={review.id} style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <span style={{ fontSize: '14px', fontWeight: '600', color: '#f1f5f9' }}>Anonymous</span>
                     <StarDisplay score={review.star_rating} />
@@ -287,9 +284,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
         <div style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid #1e1e2e', textAlign: 'center' }}>
-          <a href={reportHref} style={{ fontSize: '12px', color: '#374151', textDecoration: 'none' }}>
-            Report an issue with this page
-          </a>
+          <a href={reportHref} style={{ fontSize: '12px', color: '#374151', textDecoration: 'none' }}>Report an issue with this page</a>
         </div>
       </div>
 
