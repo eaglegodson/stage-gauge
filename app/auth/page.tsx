@@ -106,15 +106,12 @@ export default function AuthPage() {
 
           <div style={{ marginBottom: mode === 'signup' ? '16px' : '24px' }}>
             <label style={labelStyle}>Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={inputStyle} />
-          </div>
+            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleSignUp() }} placeholder="••••••••" style={inputStyle} />          </div>
 
           {mode === 'signup' && (
             <div style={{ marginBottom: '24px' }}>
               <label style={labelStyle}>Confirm password</label>
-              <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" style={inputStyle} />
-            </div>
-          )}
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && mode === 'signin') handleSignIn() }} placeholder="••••••••" style={inputStyle} />          )}
 
           {message && (
             <p style={{ fontSize: '13px', color: messageType === 'error' ? '#f87171' : '#1D9E75', marginBottom: '16px', marginTop: 0, fontWeight: '500' }}>{message}</p>

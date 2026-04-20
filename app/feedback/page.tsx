@@ -72,7 +72,7 @@ function FeedbackForm() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                style={{ width: '100%', padding: '10px 14px', backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px', color: '#f9fafb', fontSize: '1rem', boxSizing: 'border-box' }}
+                onKeyDown={e => { if (e.key === 'Enter') handleSubmit() }}                style={{ width: '100%', padding: '10px 14px', backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px', color: '#f9fafb', fontSize: '1rem', boxSizing: 'border-box' }}
               />
             </div>
             <div>
