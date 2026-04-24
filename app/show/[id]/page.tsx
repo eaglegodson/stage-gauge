@@ -87,6 +87,7 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Roleystone Theatre': 'https://www.roleystonetheatre.com.au/',
     'Free Rain Theatre Co': 'https://www.freeraintheatre.com/',
     'Canberra Philharmonic Society': 'https://www.philo.org.au/',
+    'GRADS Theatre Company': 'https://www.grads.org.au/',
     'Canberra Repertory Society': 'https://canberrarep.org.au/',
   }
   if (companyDirect[company]) return companyDirect[company]
