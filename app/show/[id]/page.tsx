@@ -92,6 +92,13 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Hills Musical Company': 'https://hillsmusical.org.au/',
     'Adelaide University Theatre Guild': 'https://adelaide.edu.au/partners-and-community/theatre-guild/',
     'Canberra Repertory Society': 'https://canberrarep.org.au/',
+    'Mordialloc Theatre Company': 'https://mordialloctheatre.com.au/',
+    'Peridot Theatre': 'https://www.peridot.com.au/',
+    'Williamstown Little Theatre': 'https://www.wlt.org.au/',
+    'Mountain District Musical Society': 'https://mdms.org.au/',
+    'Babirra Music Theatre': 'https://babirra.org.au/',
+    'The Mount Players': 'https://www.themountplayers.com/',
+    'Windmill Theatre Company': 'https://www.windmilltheatre.com.au/',
   }
   if (companyDirect[company]) return companyDirect[company]
   if (country === 'GB') return 'https://www.todaytix.com/london/search?q=' + t
