@@ -53,7 +53,7 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'PLOS Musical Productions': 'https://www.plos.asn.au/',
     'Williamstown Musical Theatre Company': 'https://www.wmtc.org.au/',
     'Upstage Theatre Company': 'https://www.upstagetheatrecompany.com/',
-    'Heidelberg Theatre Co': 'https://heidelbergtheatre.com.au/',
+    'Heidelberg Theatre Co': 'https://htc.org.au/',
     'Essendon Theatre Company': 'https://essendontheatrecompany.com.au/',
     'Brighton Theatre Company': 'https://brightontheatre.com.au/',
     'Malvern Theatre Company': 'https://malverntheatrecompany.org.au/',
