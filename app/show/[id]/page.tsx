@@ -73,7 +73,7 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Strathfield Musical Society': 'https://strathfieldmusicalsociety.com.au/',
     'Hunters Hill Theatre': 'http://huntershilltheatre.com.au/',
     'Inner West Theatre Co': 'https://innerwesttheatre.com.au/',
-    'Berowra Musical Society': 'https://berowramusicalsociety.com.au/',
+    'Berowra Musical Society': 'https://www.bmsi.org.au/',
     'South Australian Light Opera Society': 'https://salos.com.au/',
     'Adelaide Repertory Theatre': 'https://adelrep.com.au/',
     'Tea Tree Players': 'https://teatreeplayers.com.au/',
