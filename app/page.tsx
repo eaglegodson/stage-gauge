@@ -219,8 +219,7 @@ export default function Home() {
       </div>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px', width: '100%', boxSizing: 'border-box' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-          {tiles.map((tile, i) => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>          {tiles.map((tile, i) => (
             <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
               <div
                 style={{ borderRadius: '10px', border: '1px solid #2a2a3e', background: '#1e1e2e', transition: 'transform 0.15s, border-color 0.15s', cursor: 'pointer', height: '100%', padding: '20px' }}
