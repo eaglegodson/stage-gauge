@@ -86,6 +86,7 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Koorliny Arts Centre': 'https://www.koorliny.com.au/',
     'Roleystone Theatre': 'https://www.roleystonetheatre.com.au/',
     'Free Rain Theatre Co': 'https://www.freeraintheatre.com/',
+    'Canberra Philharmonic Society': 'https://www.philo.org.au/',
     'Canberra Repertory Society': 'https://canberrarep.org.au/',
   }
   if (companyDirect[company]) return companyDirect[company]
