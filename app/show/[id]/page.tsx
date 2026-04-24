@@ -88,6 +88,7 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Free Rain Theatre Co': 'https://www.freeraintheatre.com/',
     'Canberra Philharmonic Society': 'https://www.philo.org.au/',
     'GRADS Theatre Company': 'https://www.grads.org.au/',
+    'Bel Canto Performing Arts': 'https://www.belcantoperformingarts.com.au/',
     'Canberra Repertory Society': 'https://canberrarep.org.au/',
   }
   if (companyDirect[company]) return companyDirect[company]
