@@ -44,6 +44,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
         <button onClick={handleSearch} style={{ fontSize: '13px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </button>
+        <a href="/community" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Community</a>
         <a href="/about" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>About</a>
         {user && (
           <a href="/watchlist" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Watchlist</a>
