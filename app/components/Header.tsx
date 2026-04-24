@@ -23,6 +23,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
   }
 
   const isCommunity = pathname === '/community'
+  const isProfessional = pathname === '/browse' || pathname === '/reviews' || pathname.startsWith('/show/')
 
   return (
     <div style={{ position: 'sticky', top: 0, zIndex: 100, width: '100%' }}>
@@ -65,7 +66,7 @@ export default function Header({ onSearch }: { onSearch?: () => void }) {
         </nav>
       </header>
       <div style={{ backgroundColor: '#0a0a14', borderBottom: '1px solid #2a2a3e', display: 'flex', alignItems: 'center', height: '36px', paddingLeft: '16px' }}>
-        <a href="/browse" style={{ fontSize: '12px', fontWeight: isCommunity ? '400' : '600', color: isCommunity ? '#6b7280' : '#f1f5f9', textDecoration: 'none', padding: '0 16px', height: '100%', display: 'flex', alignItems: 'center', borderBottom: isCommunity ? '2px solid transparent' : '2px solid #1D9E75', whiteSpace: 'nowrap' }}>
+        <a href="/browse" style={{ fontSize: '12px', fontWeight: isProfessional ? '600' : '400', color: isProfessional ? '#f1f5f9' : '#6b7280', textDecoration: 'none', padding: '0 16px', height: '100%', display: 'flex', alignItems: 'center', borderBottom: isProfessional ? '2px solid #1D9E75' : '2px solid transparent', whiteSpace: 'nowrap' }}>
           Professional Shows
         </a>
         <a href="/community" style={{ fontSize: '12px', fontWeight: isCommunity ? '600' : '400', color: isCommunity ? '#a78bfa' : '#6b7280', textDecoration: 'none', padding: '0 16px', height: '100%', display: 'flex', alignItems: 'center', borderBottom: isCommunity ? '2px solid #a78bfa' : '2px solid transparent', whiteSpace: 'nowrap' }}>
