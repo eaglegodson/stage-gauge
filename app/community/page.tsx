@@ -281,6 +281,10 @@ export default function CommunityPage() {
               )}
             </div>
 
+            <a href="/community/submit" style={{ marginLeft: 'auto', padding: '7px 14px', fontSize: '13px', fontWeight: '600', background: '#a78bfa', color: '#0f0f1a', borderRadius: '6px', textDecoration: 'none', whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
+              + List your show
+            </a>
+
             {/* Active filter pills */}
             {selectedCities.map(c => (
               <span key={c} style={{ padding: '6px 10px', fontSize: '12px', background: '#1a1530', border: '1px solid #a78bfa44', borderRadius: '6px', color: '#a78bfa', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -314,7 +318,7 @@ export default function CommunityPage() {
               <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} right now.</p>
               <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
                 Running auditions?{' '}
-                <a href="mailto:hello@stage-gauge.com?subject=Audition listing" style={{ color: '#a78bfa', textDecoration: 'none' }}>Email us to list them free →</a>
+                <a href="/community/submit" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your audition free →</a>
               </p>
             </div>
           )}
@@ -340,7 +344,7 @@ export default function CommunityPage() {
               <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No community productions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} yet.</p>
               <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
                 Got a show coming up?{' '}
-                <a href="mailto:hello@stage-gauge.com?subject=Community production listing" style={{ color: '#a78bfa', textDecoration: 'none' }}>Email us to add it →</a>
+                <a href="/community/submit" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your show free →</a>
               </p>
             </div>
           )}
