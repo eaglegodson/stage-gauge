@@ -17,9 +17,8 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
 const tiles = [
   { title: "Discover what's on near you", desc: 'Browse professional productions — theatre, opera, ballet, musicals and dance — in your city and beyond.', href: '/browse', accent: '#4A90D9' },
   { title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/reviews', accent: '#C084FC' },
-  { title: 'Community theatre & auditions', desc: 'Find out what community theatre companies are staging near you — and which shows are currently auditioning.', href: '/community', accent: '#a78bfa' },
-  { title: `Rate and review shows you've seen`, desc: 'Write your own reviews and help build the most comprehensive guide to live performance in Australia and New Zealand.', href: '/seen', accent: '#34D399' },
-  { title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.', href: '/watchlist', accent: '#FBBF24' },
+  { title: 'Community theatre & auditions', desc: 'Find out what community companies are staging near you — and which shows are currently auditioning.', href: '/community', accent: '#a78bfa' },
+  { title: 'Your shows', desc: 'Save shows to your watchlist and log the ones you\'ve seen.', href: '/watchlist', accent: '#FBBF24' },
 ]
 
 export default function Home() {
@@ -219,8 +218,7 @@ export default function Home() {
       </div>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px', width: '100%', boxSizing: 'border-box' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>          {tiles.map((tile, i) => (
-            <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>            <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
               <div
                 style={{ borderRadius: '10px', border: '1px solid #2a2a3e', background: '#1e1e2e', transition: 'transform 0.15s, border-color 0.15s', cursor: 'pointer', height: '100%', padding: '20px' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.borderColor = tile.accent + '66' }}
