@@ -59,7 +59,7 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Malvern Theatre Company': 'https://malverntheatrecompany.org.au/',
     'The 1812 Theatre': 'http://www.1812theatre.com.au/',
     'Frankston Theatre Group': 'https://frankstontheatregroup.org.au/',
-    'Strathmore Theatre Arts Group': 'https://stag.org.au/',
+    'Strathmore Theatre Arts Group': 'https://www.stagtheatre.org/',
     'BATS Theatre Company': 'https://www.batstheatre.org.au/',
     'CPP Community Theatre': 'https://cppcommunitytheatre.com.au/',
     'Lilydale Athenaeum Theatre': 'https://www.lilydaleatc.com/',
