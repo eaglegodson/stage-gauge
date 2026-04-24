@@ -132,6 +132,7 @@ function ProductionCard({ p }: { p: any }) {
 
 export default function CommunityPage() {
   const [city, setCity] = useState<string>('all')
+  const [geoLoaded, setGeoLoaded] = useState(false)
   const [auditions, setAuditions] = useState<any[]>([])
   const [productions, setProductions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -153,9 +154,11 @@ export default function CommunityPage() {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
     const detected = timezoneToCity[tz]
     if (detected) setCity(detected)
+    setGeoLoaded(true)
   }, [])
 
   useEffect(() => {
+    if (!geoLoaded) return
     async function fetchData() {
       setLoading(true)
       const today = new Date().toISOString().split('T')[0]
@@ -184,7 +187,7 @@ export default function CommunityPage() {
       setLoading(false)
     }
     fetchData()
-  }, [city])
+  }, [city, geoLoaded])
 
   const cityBarStyle = (c: string) => ({
     padding: '7px 14px',
