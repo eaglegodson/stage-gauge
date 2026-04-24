@@ -62,6 +62,62 @@ Do NOT include if:
 Return JSON only."""
 
 
+def extract_json_from_response(content_blocks):
+    """
+    Extract JSON from Claude's response content blocks.
+    Handles cases where the model uses web search tools before responding,
+    which produces tool_use/tool_result blocks alongside the final text block.
+    Falls back to scanning all text content if the primary text block is empty.
+    """
+    # First pass: collect all text from text blocks
+    raw = ""
+    for block in content_blocks:
+        if hasattr(block, 'text') and block.text:
+            raw += block.text
+
+    if raw.strip():
+        return raw.strip()
+
+    # Second pass: check tool_result blocks for any embedded text
+    for block in content_blocks:
+        block_type = getattr(block, 'type', None)
+        if block_type == 'tool_result':
+            content = getattr(block, 'content', None)
+            if isinstance(content, list):
+                for item in content:
+                    if hasattr(item, 'text') and item.text:
+                        raw += item.text
+            elif isinstance(content, str):
+                raw += content
+
+    return raw.strip()
+
+
+def parse_decision(raw):
+    """
+    Parse JSON decision from Claude's raw text response.
+    Handles markdown code fences and leading/trailing whitespace.
+    Returns parsed dict or raises ValueError if no valid JSON found.
+    """
+    if not raw:
+        raise ValueError("Empty response from Claude")
+
+    # Strip markdown code fences if present
+    if "```" in raw:
+        start = raw.find("{")
+        end = raw.rfind("}") + 1
+        if start != -1 and end > start:
+            raw = raw[start:end]
+
+    # Find the JSON object boundaries in case there's surrounding text
+    start = raw.find("{")
+    end = raw.rfind("}") + 1
+    if start != -1 and end > start:
+        raw = raw[start:end]
+
+    return json.loads(raw)
+
+
 def get_or_create_show(title, company, show_type):
     existing = supabase.table("shows").select("id").ilike("title", title).eq("company", company).execute()
     if existing.data and len(existing.data) > 0:
@@ -109,6 +165,7 @@ def process_unmatched():
 
     included = 0
     dismissed = 0
+    skipped = 0
     errors = 0
 
     for i, item in enumerate(items):
@@ -120,12 +177,20 @@ def process_unmatched():
 
         print(f"[{i+1}/{len(items)}] {title} ({city}) — {outlet}")
 
+        # Skip unknown titles — leave as pending for manual review in admin UI
+        if title == "Unknown":
+            print(f"  -> Skipped: title unknown — left as pending for manual review")
+            skipped += 1
+            continue
+
+        # Dismiss out-of-scope cities immediately (but not Unknown city — let Claude decide)
         if city and city not in COVERED_CITIES and city != "Unknown":
             print(f"  -> Dismissed: city '{city}' not covered")
             supabase.table("unmatched_reviews").update({"status": "dismissed"}).eq("id", item["id"]).execute()
             dismissed += 1
             continue
 
+        # Dismiss out-of-scope countries immediately (but not Unknown — let Claude decide)
         if country and country not in COVERED_COUNTRIES and country != "Unknown":
             print(f"  -> Dismissed: country '{country}' not covered")
             supabase.table("unmatched_reviews").update({"status": "dismissed"}).eq("id", item["id"]).execute()
@@ -151,22 +216,21 @@ def process_unmatched():
                 messages=[{"role": "user", "content": prompt}]
             )
 
-            raw = ""
-            for block in response.content:
-                if hasattr(block, 'text'):
-                    raw += block.text
+            raw = extract_json_from_response(response.content)
 
-            if not raw.strip():
-                print(f"  -> Error: no text response from Claude")
-                errors += 1
+            if not raw:
+                # Empty response — leave as pending, do not count as hard error
+                print(f"  -> No response from Claude — left as pending, will retry next run")
+                skipped += 1
                 continue
 
-            if raw.strip().startswith("```"):
-                raw = raw[raw.find("{"):]
-                raw = raw[:raw.rfind("}")+1]
+            decision = parse_decision(raw)
 
-            decision = json.loads(raw.strip())
-
+        except (ValueError, json.JSONDecodeError) as e:
+            # Parsing failed — leave as pending for retry
+            print(f"  -> Could not parse response — left as pending, will retry next run ({e})")
+            skipped += 1
+            continue
         except Exception as e:
             print(f"  -> Error processing: {e}")
             errors += 1
@@ -196,7 +260,6 @@ def process_unmatched():
                 decision.get("season_end")
             )
 
-            # Skip review insert if URL already exists
             if not review_url_exists(item.get("source_url")):
                 supabase.table("critic_reviews").insert({
                     "production_id": prod_id,
@@ -224,7 +287,7 @@ def process_unmatched():
             errors += 1
 
     print(f"\n{'='*50}")
-    print(f"Done. Included: {included}, Dismissed: {dismissed}, Errors: {errors}")
+    print(f"Done. Included: {included}, Dismissed: {dismissed}, Skipped (pending): {skipped}, Errors: {errors}")
     print(f"\nNow run this in Supabase SQL editor:")
     print(f"SELECT recalculate_all_scores();")
 
