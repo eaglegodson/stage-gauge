@@ -131,10 +131,14 @@ function ProductionCard({ p }: { p: any }) {
 }
 
 export default function CommunityPage() {
-  const [city, setCity] = useState<string>('all')
+  const [selectedCities, setSelectedCities] = useState<string[]>([])
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([])
+  const [cityOpen, setCityOpen] = useState(false)
+  const [companyOpen, setCompanyOpen] = useState(false)
   const [geoLoaded, setGeoLoaded] = useState(false)
   const [auditions, setAuditions] = useState<any[]>([])
   const [productions, setProductions] = useState<any[]>([])
+  const [allCompanies, setAllCompanies] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -153,7 +157,7 @@ export default function CommunityPage() {
     }
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
     const detected = timezoneToCity[tz]
-    if (detected) setCity(detected)
+    if (detected) setSelectedCities([detected])
     setGeoLoaded(true)
   }, [])
 
@@ -170,7 +174,7 @@ export default function CommunityPage() {
         .or('audition_date.is.null,audition_date.gte.' + today)
         .order('audition_date', { ascending: true, nullsFirst: false })
 
-      if (city !== 'all') audQ = audQ.eq('city', city)
+      if (selectedCities.length > 0) audQ = audQ.in('city', selectedCities)
 
       let prodQ = supabase
         .from('production_listing')
@@ -179,28 +183,47 @@ export default function CommunityPage() {
         .or('season_end.is.null,season_end.gte.' + today)
         .order('combined_score', { ascending: false, nullsFirst: false })
 
-      if (city !== 'all') prodQ = prodQ.eq('city', city)
+      if (selectedCities.length > 0) prodQ = prodQ.in('city', selectedCities)
+      if (selectedCompanies.length > 0) prodQ = prodQ.in('company', selectedCompanies)
 
       const [{ data: aud }, { data: prod }] = await Promise.all([audQ, prodQ])
       setAuditions(aud || [])
-      setProductions(prod || [])
+      const prods = prod || []
+      setProductions(prods)
+      // Build company list from all productions (unfiltered by company)
+      const allProdsQ = await supabase
+        .from('production_listing')
+        .select('company')
+        .eq('type', 'community')
+        .or('season_end.is.null,season_end.gte.' + today)
+      const companies = [...new Set((allProdsQ.data || []).map((r: any) => r.company).filter(Boolean))].sort()
+      setAllCompanies(companies)
       setLoading(false)
     }
     fetchData()
-  }, [city, geoLoaded])
+  }, [selectedCities, selectedCompanies, geoLoaded])
 
-  const cityBarStyle = (c: string) => ({
-    padding: '7px 14px',
-    fontSize: '12px',
-    fontWeight: city === c ? '600' : '400',
-    color: city === c ? '#f1f5f9' : '#6b7280',
-    background: city === c ? '#1D9E75' : 'transparent',
-    border: '1px solid ' + (city === c ? '#1D9E75' : '#2a2a3e'),
-    borderRadius: '6px',
-    cursor: 'pointer',
+  const toggleCity = (c: string) => {
+    setSelectedCities(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c])
+  }
+  const toggleCompany = (c: string) => {
+    setSelectedCompanies(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c])
+  }
+  const dropdownBase: React.CSSProperties = {
+    position: 'relative', display: 'inline-block',
+  }
+  const dropdownBtn: React.CSSProperties = {
+    padding: '7px 12px', fontSize: '13px', background: '#1e1e2e',
+    border: '1px solid #2a2a3e', borderRadius: '6px', color: '#9ca3af',
+    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
     whiteSpace: 'nowrap' as const,
-    flexShrink: 0,
-  })
+  }
+  const dropdownMenu: React.CSSProperties = {
+    position: 'absolute', top: '100%', left: 0, marginTop: '4px',
+    background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px',
+    padding: '6px', zIndex: 100, minWidth: '180px', maxHeight: '280px',
+    overflowY: 'auto' as const, boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+  }
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
@@ -210,10 +233,64 @@ export default function CommunityPage() {
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '26px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 4px 0' }}>Community Theatre</h1>
           <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 20px 0' }}>Auditions and productions from community theatre companies across Australia and New Zealand</p>
-          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '1px' }}>
-            <button style={cityBarStyle('all')} onClick={() => setCity('all')}>All cities</button>
-            {CITIES.map(c => (
-              <button key={c} style={cityBarStyle(c)} onClick={() => setCity(c)}>{c}</button>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' as const, paddingBottom: '1px' }}>
+
+            {/* City dropdown */}
+            <div style={dropdownBase}>
+              <button style={{ ...dropdownBtn, borderColor: selectedCities.length > 0 ? '#a78bfa' : '#2a2a3e', color: selectedCities.length > 0 ? '#a78bfa' : '#9ca3af' }}
+                onClick={() => { setCityOpen(o => !o); setCompanyOpen(false) }}>
+                {selectedCities.length === 0 ? 'All cities' : selectedCities.length === 1 ? selectedCities[0] : selectedCities.length + ' cities'}
+                <span style={{ fontSize: '10px' }}>▾</span>
+              </button>
+              {cityOpen && (
+                <div style={dropdownMenu}>
+                  <div style={{ padding: '4px 8px', fontSize: '11px', color: '#4b5563', marginBottom: '4px' }}>Select cities</div>
+                  {CITIES.map(c => (
+                    <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', background: selectedCities.includes(c) ? '#2a2a3e' : 'transparent' }}>
+                      <input type="checkbox" checked={selectedCities.includes(c)} onChange={() => toggleCity(c)} style={{ accentColor: '#a78bfa' }} />
+                      <span style={{ fontSize: '13px', color: selectedCities.includes(c) ? '#f1f5f9' : '#9ca3af' }}>{c}</span>
+                    </label>
+                  ))}
+                  {selectedCities.length > 0 && (
+                    <button onClick={() => setSelectedCities([])} style={{ width: '100%', marginTop: '6px', padding: '5px', fontSize: '11px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '4px', cursor: 'pointer' }}>Clear</button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Company dropdown */}
+            <div style={dropdownBase}>
+              <button style={{ ...dropdownBtn, borderColor: selectedCompanies.length > 0 ? '#a78bfa' : '#2a2a3e', color: selectedCompanies.length > 0 ? '#a78bfa' : '#9ca3af' }}
+                onClick={() => { setCompanyOpen(o => !o); setCityOpen(false) }}>
+                {selectedCompanies.length === 0 ? 'All companies' : selectedCompanies.length === 1 ? selectedCompanies[0] : selectedCompanies.length + ' companies'}
+                <span style={{ fontSize: '10px' }}>▾</span>
+              </button>
+              {companyOpen && (
+                <div style={dropdownMenu}>
+                  <div style={{ padding: '4px 8px', fontSize: '11px', color: '#4b5563', marginBottom: '4px' }}>Select companies</div>
+                  {allCompanies.map(c => (
+                    <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', background: selectedCompanies.includes(c) ? '#2a2a3e' : 'transparent' }}>
+                      <input type="checkbox" checked={selectedCompanies.includes(c)} onChange={() => toggleCompany(c)} style={{ accentColor: '#a78bfa' }} />
+                      <span style={{ fontSize: '13px', color: selectedCompanies.includes(c) ? '#f1f5f9' : '#9ca3af' }}>{c}</span>
+                    </label>
+                  ))}
+                  {selectedCompanies.length > 0 && (
+                    <button onClick={() => setSelectedCompanies([])} style={{ width: '100%', marginTop: '6px', padding: '5px', fontSize: '11px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '4px', cursor: 'pointer' }}>Clear</button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Active filter pills */}
+            {selectedCities.map(c => (
+              <span key={c} style={{ padding: '6px 10px', fontSize: '12px', background: '#1a1530', border: '1px solid #a78bfa44', borderRadius: '6px', color: '#a78bfa', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {c} <button onClick={() => toggleCity(c)} style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer', padding: 0, fontSize: '12px', lineHeight: 1 }}>×</button>
+              </span>
+            ))}
+            {selectedCompanies.map(c => (
+              <span key={c} style={{ padding: '6px 10px', fontSize: '12px', background: '#1a1530', border: '1px solid #a78bfa44', borderRadius: '6px', color: '#a78bfa', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {c} <button onClick={() => toggleCompany(c)} style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer', padding: 0, fontSize: '12px', lineHeight: 1 }}>×</button>
+              </span>
             ))}
           </div>
         </div>
@@ -234,7 +311,7 @@ export default function CommunityPage() {
 
           {!loading && auditions.length === 0 && (
             <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
-              <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{city !== 'all' ? ' in ' + city : ''} right now.</p>
+              <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} right now.</p>
               <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
                 Running auditions?{' '}
                 <a href="mailto:hello@stage-gauge.com?subject=Audition listing" style={{ color: '#a78bfa', textDecoration: 'none' }}>Email us to list them free →</a>
@@ -260,7 +337,7 @@ export default function CommunityPage() {
 
           {!loading && productions.length === 0 && (
             <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
-              <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No community productions listed{city !== 'all' ? ' in ' + city : ''} yet.</p>
+              <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No community productions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} yet.</p>
               <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
                 Got a show coming up?{' '}
                 <a href="mailto:hello@stage-gauge.com?subject=Community production listing" style={{ color: '#a78bfa', textDecoration: 'none' }}>Email us to add it →</a>
