@@ -89,6 +89,8 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Canberra Philharmonic Society': 'https://www.philo.org.au/',
     'GRADS Theatre Company': 'https://www.grads.org.au/',
     'Bel Canto Performing Arts': 'https://www.belcantoperformingarts.com.au/',
+    'Hills Musical Company': 'https://hillsmusical.org.au/',
+    'Adelaide University Theatre Guild': 'https://adelaide.edu.au/partners-and-community/theatre-guild/',
     'Canberra Repertory Society': 'https://canberrarep.org.au/',
   }
   if (companyDirect[company]) return companyDirect[company]
