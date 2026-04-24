@@ -56,7 +56,7 @@ function getTicketUrl(company: string, city: string, title: string, country: str
     'Heidelberg Theatre Co': 'https://htc.org.au/',
     'Essendon Theatre Company': 'https://essendontheatrecompany.com.au/',
     'Brighton Theatre Company': 'https://brightontheatre.com.au/',
-    'Malvern Theatre Company': 'https://malverntheatrecompany.org.au/',
+    'Malvern Theatre Company': 'https://malverntheatre.com.au/',
     'The 1812 Theatre': 'http://www.1812theatre.com.au/',
     'Frankston Theatre Group': 'https://frankstontheatregroup.org.au/',
     'Strathmore Theatre Arts Group': 'https://www.stagtheatre.org/',
