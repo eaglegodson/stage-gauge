@@ -15,9 +15,10 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
 }
 
 const tiles = [
-  { title: "Discover what's on near you", desc: 'Browse current and upcoming productions in your city and beyond.', href: '/browse', accent: '#4A90D9' },
+  { title: "Discover what's on near you", desc: 'Browse professional productions — theatre, opera, ballet, musicals and dance — in your city and beyond.', href: '/browse', accent: '#4A90D9' },
   { title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/reviews', accent: '#C084FC' },
-  { title: "Rate and review shows you've seen", desc: 'Share your take and contribute to the StageGauge score.', href: '/seen', accent: '#34D399' },
+  { title: 'Community theatre & auditions', desc: 'Find out what community theatre companies are staging near you — and which shows are currently auditioning.', href: '/community', accent: '#a78bfa' },
+  { title: 'Rate and review shows you've seen', desc: 'Write your own reviews and help build the most comprehensive guide to live performance in Australia and New Zealand.', href: '/seen', accent: '#34D399' },
   { title: 'Save shows to your watchlist', desc: 'Keep track of shows you want to see and never miss an opening.', href: '/watchlist', accent: '#FBBF24' },
 ]
 
