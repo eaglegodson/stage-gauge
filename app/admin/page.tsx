@@ -46,6 +46,38 @@ export default function AdminPage() {
     setCreating(null)
   }
 
+  async function approveCommunity(item: any) {
+    if (item.submission_type === 'audition') {
+      await supabase.from('auditions').insert({
+        show_title: item.show_title, company: item.company, city: item.city,
+        country: item.country, venue: item.venue || null,
+        audition_date: item.audition_date || null, audition_date_end: item.audition_date_end || null,
+        show_date_start: item.show_date_start || null, show_date_end: item.show_date_end || null,
+        roles: item.roles || null, contact_url: item.contact_url || item.website_url || null,
+        contact_email: item.contact_email || null, description: item.description || null,
+        status: 'active',
+      })
+    } else {
+      const { data: showData } = await supabase.from('shows').insert({
+        title: item.show_title, company: item.company, type: item.show_type || 'community',
+      }).select().single()
+      if (showData) {
+        await supabase.from('productions').insert({
+          show_id: showData.id, venue: item.venue || null, city: item.city, country: item.country,
+          season_start: item.season_start || null, season_end: item.season_end || null,
+          ticket_url: item.ticket_url || item.website_url || null,
+        })
+      }
+    }
+    await supabase.from('community_submissions').update({ status: 'approved' }).eq('id', item.id)
+    setCommunitySubmissions(communitySubmissions.filter(r => r.id !== item.id))
+  }
+
+  async function dismissCommunity(id: string) {
+    await supabase.from('community_submissions').update({ status: 'dismissed' }).eq('id', id)
+    setCommunitySubmissions(communitySubmissions.filter(r => r.id !== id))
+  }
+
   function startCreate(item: any) {
     setCreating(item.id)
     setForm({
