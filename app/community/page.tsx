@@ -87,7 +87,7 @@ function AuditionCard({ a }: { a: any }) {
 }
 
 function ProductionCard({ p }: { p: any }) {
-  const cfg = typeConfig[p.type] || typeConfig.community
+  const cfg = typeConfig[p.type] || typeConfig.theatre
   const score = p.combined_score
   const reviewCount = (p.critic_count || 0) + (p.audience_count || 0)
   const stars = score ? Array.from({ length: 5 }, (_, i) => {

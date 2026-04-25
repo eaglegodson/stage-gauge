@@ -36,7 +36,7 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                 <span style={{ fontSize: '20px', lineHeight: '1' }}>{cfg.emoji}</span>
-                <span style={{ fontSize: '10px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.accent }}>{p.type}</span>
+                <span style={{ fontSize: '10px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#1D9E75' }}>{p.type}</span>
                 <span style={{ color: '#4b5563', fontSize: '10px' }}>·</span>
                 <span style={{ fontSize: '10px', color: '#6b7280' }}>{p.city}</span>
               </div>
@@ -72,7 +72,7 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px' }}>
               <span style={{ fontSize: '16px', lineHeight: '1' }}>{cfg.emoji}</span>
-              <p style={{ fontSize: '10px', color: cfg.accent, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>{p.type}</p>
+              <p style={{ fontSize: '10px', color: '#1D9E75', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>{p.type}</p>
             </div>
             <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 2px 0', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</h3>
             <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.city}</p>
