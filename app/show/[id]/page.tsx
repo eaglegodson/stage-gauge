@@ -222,24 +222,36 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
     setEditSaving(true)
     setEditMessage('')
     const s = production?.shows
-    const { error: showErr } = await supabase.from('shows').update({
-      title: editForm.title,
-      company: editForm.company,
-      type: editForm.type,
-      subtype: editForm.subtype || null,
-      composer_or_playwright: editForm.composer_or_playwright || null,
-    }).eq('id', s?.id)
-    if (showErr) { setEditMessage('Error: ' + showErr.message); setEditSaving(false); return }
-    const { error: prodErr } = await supabase.from('productions').update({
-      venue: editForm.venue || null,
-      city: editForm.city,
-      country: editForm.country,
-      season_start: editForm.season_start || null,
-      season_end: editForm.season_end || null,
-      ticket_url: editForm.ticket_url || null,
-    }).eq('id', id)
-    if (prodErr) { setEditMessage('Error: ' + prodErr.message); setEditSaving(false); return }
-    setEditMessage('✓ Saved — reload to see changes')
+    const res = await fetch('/api/admin/edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        show_id: s?.id,
+        production_id: id,
+        userEmail: user?.email,
+        showData: {
+          title: editForm.title,
+          company: editForm.company,
+          type: editForm.type,
+          subtype: editForm.subtype || null,
+          composer_or_playwright: editForm.composer_or_playwright || null,
+        },
+        productionData: {
+          venue: editForm.venue || null,
+          city: editForm.city,
+          country: editForm.country,
+          season_start: editForm.season_start || null,
+          season_end: editForm.season_end || null,
+          ticket_url: editForm.ticket_url || null,
+        },
+      }),
+    })
+    const data = await res.json()
+    if (data.error) {
+      setEditMessage('Error: ' + data.error)
+    } else {
+      setEditMessage('✓ Saved — reload to see changes')
+    }
     setEditSaving(false)
   }
 
