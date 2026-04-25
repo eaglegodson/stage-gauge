@@ -132,6 +132,10 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const [seen, setSeen] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [authPrompt, setAuthPrompt] = useState<string | null>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editForm, setEditForm] = useState<any>({})
+  const [editSaving, setEditSaving] = useState(false)
+  const [editMessage, setEditMessage] = useState('')
 
   useEffect(() => { params.then(({ id }) => setId(id)) }, [params])
 
@@ -193,6 +197,50 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
       setWatchlisted(true)
       posthog.capture('show_watchlisted', { production_id: id, show_title: show?.title, show_type: show?.type, city: production?.city })
     }
+  }
+
+  function openEdit() {
+    const s = production?.shows
+    setEditForm({
+      title: s?.title || '',
+      company: s?.company || '',
+      type: s?.type || 'theatre',
+      subtype: s?.subtype || '',
+      composer_or_playwright: s?.composer_or_playwright || '',
+      venue: production?.venue || '',
+      city: production?.city || '',
+      country: production?.country || '',
+      season_start: production?.season_start || '',
+      season_end: production?.season_end || '',
+      ticket_url: production?.ticket_url || '',
+    })
+    setEditMessage('')
+    setShowEditModal(true)
+  }
+
+  async function saveEdit() {
+    setEditSaving(true)
+    setEditMessage('')
+    const s = production?.shows
+    const { error: showErr } = await supabase.from('shows').update({
+      title: editForm.title,
+      company: editForm.company,
+      type: editForm.type,
+      subtype: editForm.subtype || null,
+      composer_or_playwright: editForm.composer_or_playwright || null,
+    }).eq('id', s?.id)
+    if (showErr) { setEditMessage('Error: ' + showErr.message); setEditSaving(false); return }
+    const { error: prodErr } = await supabase.from('productions').update({
+      venue: editForm.venue || null,
+      city: editForm.city,
+      country: editForm.country,
+      season_start: editForm.season_start || null,
+      season_end: editForm.season_end || null,
+      ticket_url: editForm.ticket_url || null,
+    }).eq('id', id)
+    if (prodErr) { setEditMessage('Error: ' + prodErr.message); setEditSaving(false); return }
+    setEditMessage('✓ Saved — reload to see changes')
+    setEditSaving(false)
   }
 
   if (!production) return (
@@ -262,6 +310,11 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
             <button onClick={toggleSeen} style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: `1px solid ${seen ? '#f1f5f9' : 'rgba(255,255,255,0.2)'}`, backgroundColor: seen ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}>
               {seen ? '✓ Seen this' : '👁 I saw this'}
             </button>
+            {user?.email === 'hadimaz@gmail.com' && (
+              <button onClick={openEdit} style={{ fontSize: '13px', padding: '8px 18px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: '500' }}>
+                ✏️ Edit
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -339,6 +392,70 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
       </div>
 
 
+
+      {showEditModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', overflowY: 'auto' }} onClick={() => setShowEditModal(false)}>
+          <div style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '12px', padding: '28px', maxWidth: '560px', width: '100%' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', color: '#f1f5f9', margin: 0 }}>Edit show</h3>
+              <button onClick={() => setShowEditModal(false)} style={{ background: 'none', border: '1px solid #2a2a3e', color: '#6b7280', borderRadius: '6px', padding: '5px 12px', fontSize: '12px', cursor: 'pointer' }}>Close</button>
+            </div>
+            <p style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 10px 0' }}>Show details</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+              {[
+                { label: 'Title', key: 'title' },
+                { label: 'Company', key: 'company' },
+                { label: 'Composer / Playwright', key: 'composer_or_playwright' },
+              ].map((f: any) => (
+                <div key={f.key}>
+                  <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>{f.label}</label>
+                  <input value={editForm[f.key] || ''} onChange={e => setEditForm({ ...editForm, [f.key]: e.target.value })}
+                    style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9', boxSizing: 'border-box' as const }} />
+                </div>
+              ))}
+              <div>
+                <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>Type</label>
+                <select value={editForm.type || 'theatre'} onChange={e => setEditForm({ ...editForm, type: e.target.value })}
+                  style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9' }}>
+                  {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert', 'community'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>Subtype</label>
+                <select value={editForm.subtype || ''} onChange={e => setEditForm({ ...editForm, subtype: e.target.value })}
+                  style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9' }}>
+                  <option value=''>None</option>
+                  {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <p style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 10px 0' }}>Production details</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+              {[
+                { label: 'Venue', key: 'venue' },
+                { label: 'City', key: 'city' },
+                { label: 'Country (AU/GB/NZ)', key: 'country' },
+                { label: 'Season start (YYYY-MM-DD)', key: 'season_start' },
+                { label: 'Season end (YYYY-MM-DD)', key: 'season_end' },
+                { label: 'Ticket URL', key: 'ticket_url' },
+              ].map((f: any) => (
+                <div key={f.key}>
+                  <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>{f.label}</label>
+                  <input value={editForm[f.key] || ''} onChange={e => setEditForm({ ...editForm, [f.key]: e.target.value })}
+                    style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9', boxSizing: 'border-box' as const }} />
+                </div>
+              ))}
+            </div>
+            {editMessage && (
+              <p style={{ fontSize: '13px', color: editMessage.startsWith('✓') ? '#1D9E75' : '#f87171', margin: '0 0 12px 0' }}>{editMessage}</p>
+            )}
+            <button onClick={saveEdit} disabled={editSaving}
+              style={{ width: '100%', background: '#1D9E75', color: 'white', border: 'none', borderRadius: '6px', padding: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', opacity: editSaving ? 0.7 : 1 }}>
+              {editSaving ? 'Saving...' : '✓ Save changes'}
+            </button>
+          </div>
+        </div>
+      )}
       {authPrompt && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setAuthPrompt(null)}>
           <div style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '12px', padding: '32px', maxWidth: '380px', width: '100%', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
