@@ -30,13 +30,12 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
   if (featured) {
     return (
       <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block' }}>
-        <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
-          <div style={{ background: cfg.gradient, width: '72px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '32px' }}>{cfg.emoji}</span>
-          </div>
+        <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e' }}>
+
           <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                <span style={{ fontSize: '20px', lineHeight: '1' }}>{cfg.emoji}</span>
                 <span style={{ fontSize: '10px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.accent }}>{p.type}</span>
                 <span style={{ color: '#4b5563', fontSize: '10px' }}>·</span>
                 <span style={{ fontSize: '10px', color: '#6b7280' }}>{p.city}</span>
@@ -64,16 +63,17 @@ function ShowCard({ p, featured = false }: { p: any, featured?: boolean }) {
 
   return (
     <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', transition: 'transform 0.15s, border-color 0.15s', height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}
+      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', transition: 'transform 0.15s, border-color 0.15s', height: '100%', display: 'flex', flexDirection: 'column' }}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.borderColor = cfg.accent + '66' }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.borderColor = '#2a2a3e' }}
       >
-        <div style={{ background: cfg.gradient, width: '48px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: '22px' }}>{cfg.emoji}</span>
-        </div>
+
         <div style={{ padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
           <div>
-            <p style={{ fontSize: '10px', color: cfg.accent, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 3px 0' }}>{p.type}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px' }}>
+              <span style={{ fontSize: '16px', lineHeight: '1' }}>{cfg.emoji}</span>
+              <p style={{ fontSize: '10px', color: cfg.accent, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>{p.type}</p>
+            </div>
             <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 2px 0', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</h3>
             <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.city}</p>
           </div>
