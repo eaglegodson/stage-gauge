@@ -207,7 +207,7 @@ export default function Browse() {
     if (!geoLoaded) return
     const today = new Date().toISOString().split('T')[0]
     async function fetchProductions() {
-      let query = supabase.from('production_listing').select('*').or(timingFilter.includes('past') && timingFilter.length === 1 ? 'season_end.lt.' + today : 'season_end.is.null,season_end.gte.' + today).order('combined_score', { ascending: false, nullsFirst: false })
+      let query = supabase.from('production_listing').select('*').neq('type', 'community').or(timingFilter.includes('past') && timingFilter.length === 1 ? 'season_end.lt.' + today : 'season_end.is.null,season_end.gte.' + today).order('combined_score', { ascending: false, nullsFirst: false })
       const activeCities = cityFilter.filter(c => c !== 'all')
       if (activeCities.length > 0) query = query.in('city', activeCities)
       const activeTypes = typeFilter.filter(t => t !== 'all')
