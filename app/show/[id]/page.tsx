@@ -131,6 +131,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const [watchlisted, setWatchlisted] = useState(false)
   const [seen, setSeen] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
+  const [authPrompt, setAuthPrompt] = useState<string | null>(null)
 
   useEffect(() => { params.then(({ id }) => setId(id)) }, [params])
 
@@ -166,7 +167,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   }, [user, id])
 
   async function toggleSeen() {
-    if (!user) return window.location.href = '/auth'
+    if (!user) return setAuthPrompt('seen')
     const show = production?.shows
     if (seen) {
       await supabase.from('seen').delete().eq('production_id', id).eq('user_id', user.id)
@@ -182,7 +183,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   }
 
   async function toggleWatchlist() {
-    if (!user) return window.location.href = '/auth'
+    if (!user) return setAuthPrompt('watchlist')
     const show = production?.shows
     if (watchlisted) {
       await supabase.from('watchlist').delete().eq('production_id', id).eq('user_id', user.id)
@@ -308,7 +309,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
               {user ? (
                 <button onClick={() => setShowReviewForm(true)} style={{ fontSize: '13px', color: 'white', padding: '7px 16px', borderRadius: '6px', backgroundColor: '#1D9E75', border: 'none', cursor: 'pointer' }}>Write a review</button>
               ) : (
-                <a href="/auth" style={{ fontSize: '13px', color: '#1D9E75', textDecoration: 'underline' }}>Sign in to review</a>
+                <button onClick={() => setAuthPrompt('review')} style={{ fontSize: '13px', color: 'white', padding: '7px 16px', borderRadius: '6px', backgroundColor: '#1D9E75', border: 'none', cursor: 'pointer' }}>Write a review</button>
               )}
             </div>
           </div>
@@ -337,6 +338,26 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         </div>
       </div>
 
+
+      {authPrompt && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setAuthPrompt(null)}>
+          <div style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '12px', padding: '32px', maxWidth: '380px', width: '100%', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: '32px', marginBottom: '16px' }}>
+              {authPrompt === 'watchlist' ? '🔖' : authPrompt === 'seen' ? '👁' : '✍️'}
+            </div>
+            <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', color: '#f1f5f9', margin: '0 0 10px 0' }}>
+              {authPrompt === 'watchlist' ? 'Save to your watchlist' : authPrompt === 'seen' ? 'Mark as seen' : 'Write a review'}
+            </h3>
+            <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 24px 0', lineHeight: '1.6' }}>
+              {authPrompt === 'watchlist' ? 'Sign in to save shows to your watchlist and get notified when reviews come in.' : authPrompt === 'seen' ? 'Sign in to track the shows you have seen.' : 'Sign in to share your experience with this show.'}
+            </p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <a href="/auth" style={{ fontSize: '14px', fontWeight: '600', color: 'white', padding: '10px 24px', borderRadius: '7px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>Sign in</a>
+              <button onClick={() => setAuthPrompt(null)} style={{ fontSize: '14px', color: '#6b7280', padding: '10px 24px', borderRadius: '7px', border: '1px solid #2a2a3e', backgroundColor: 'transparent', cursor: 'pointer' }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showReviewForm && user && (
         <ReviewForm productionId={id} user={user} onClose={() => setShowReviewForm(false)} />
       )}
