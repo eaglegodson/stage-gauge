@@ -31,7 +31,15 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isMobile, setIsMobile] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -219,7 +227,7 @@ export default function Home() {
       </div>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px', width: '100%', boxSizing: 'border-box' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '12px' }}>
           {tiles.map((tile, i) => (
             <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
               <div
