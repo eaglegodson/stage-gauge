@@ -16,8 +16,8 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
 
 const tiles = [
   { title: "Discover what's on near you", desc: 'Browse professional productions — theatre, opera, ballet, musicals and dance — in your city and beyond.', href: '/browse', accent: '#4A90D9' },
-  { title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/reviews', accent: '#C084FC' },
   { title: 'Community theatre & auditions', desc: 'Find out what community companies are staging near you — and which shows are currently auditioning.', href: '/community', accent: '#a78bfa' },
+  { title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/reviews', accent: '#C084FC' },
   { title: 'Your shows', desc: `Save shows to your watchlist and review the ones you've seen.`, href: '/watchlist', accent: '#FBBF24' },
 ]
 
