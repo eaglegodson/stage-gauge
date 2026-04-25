@@ -196,26 +196,37 @@ export default function AdminPage() {
     if (!editSelected) return
     setEditSaving(true)
     setEditMessage('')
-    try {
-      await supabase.from('shows').update({
-        title: editForm.title,
-        company: editForm.company,
-        type: editForm.type,
-        subtype: editForm.subtype || null,
-        composer_or_playwright: editForm.composer_or_playwright || null,
-      }).eq('id', editSelected.show_id)
-      await supabase.from('productions').update({
-        venue: editForm.venue || null,
-        city: editForm.city,
-        country: editForm.country,
-        season_start: editForm.season_start || null,
-        season_end: editForm.season_end || null,
-        ticket_url: editForm.ticket_url || null,
-      }).eq('id', editSelected.production_id)
-      setEditMessage('✓ Saved successfully')
-    } catch (err: any) {
-      setEditMessage('Error: ' + err.message)
+
+    const { error: showErr } = await supabase.from('shows').update({
+      title: editForm.title,
+      company: editForm.company,
+      type: editForm.type,
+      subtype: editForm.subtype || null,
+      composer_or_playwright: editForm.composer_or_playwright || null,
+    }).eq('id', editSelected.show_id)
+
+    if (showErr) {
+      setEditMessage('Error updating show: ' + showErr.message)
+      setEditSaving(false)
+      return
     }
+
+    const { error: prodErr } = await supabase.from('productions').update({
+      venue: editForm.venue || null,
+      city: editForm.city,
+      country: editForm.country,
+      season_start: editForm.season_start || null,
+      season_end: editForm.season_end || null,
+      ticket_url: editForm.ticket_url || null,
+    }).eq('id', editSelected.production_id)
+
+    if (prodErr) {
+      setEditMessage('Error updating production: ' + prodErr.message)
+      setEditSaving(false)
+      return
+    }
+
+    setEditMessage('✓ Saved successfully')
     setEditSaving(false)
   }
 
