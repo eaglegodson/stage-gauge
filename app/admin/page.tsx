@@ -6,7 +6,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<'unmatched' | 'unknown' | 'community' | 'audience'>('unmatched')
+  const [tab, setTab] = useState<'unmatched' | 'unknown' | 'community' | 'audience' | 'edit'>('unmatched')
   const [communitySubmissions, setCommunitySubmissions] = useState<any[]>([])
   const [audienceReviews, setAudienceReviews] = useState<any[]>([])
   const [unmatched, setUnmatched] = useState<any[]>([])
@@ -17,6 +17,12 @@ export default function AdminPage() {
   const [form, setForm] = useState({ title: '', company: '', venue: '', city: '', country: '', type: 'theatre', season_start: '', season_end: '' })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [editSearch, setEditSearch] = useState('')
+  const [editResults, setEditResults] = useState<any[]>([])
+  const [editSelected, setEditSelected] = useState<any>(null)
+  const [editForm, setEditForm] = useState<any>({})
+  const [editSaving, setEditSaving] = useState(false)
+  const [editMessage, setEditMessage] = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -156,6 +162,61 @@ export default function AdminPage() {
       setMessage(err.message)
     }
     setSaving(false)
+  }
+
+  async function searchProductions() {
+    if (!editSearch.trim()) return
+    const { data } = await supabase
+      .from('production_listing')
+      .select('*')
+      .or('title.ilike.%' + editSearch + '%,company.ilike.%' + editSearch + '%')
+      .limit(10)
+    setEditResults(data || [])
+  }
+
+  function selectProduction(p: any) {
+    setEditSelected(p)
+    setEditForm({
+      title: p.title || '',
+      company: p.company || '',
+      type: p.type || 'theatre',
+      subtype: p.subtype || '',
+      composer_or_playwright: p.composer_or_playwright || '',
+      venue: p.venue || '',
+      city: p.city || '',
+      country: p.country || '',
+      season_start: p.season_start || '',
+      season_end: p.season_end || '',
+      ticket_url: p.ticket_url || '',
+    })
+    setEditMessage('')
+  }
+
+  async function saveEdit() {
+    if (!editSelected) return
+    setEditSaving(true)
+    setEditMessage('')
+    try {
+      await supabase.from('shows').update({
+        title: editForm.title,
+        company: editForm.company,
+        type: editForm.type,
+        subtype: editForm.subtype || null,
+        composer_or_playwright: editForm.composer_or_playwright || null,
+      }).eq('id', editSelected.show_id)
+      await supabase.from('productions').update({
+        venue: editForm.venue || null,
+        city: editForm.city,
+        country: editForm.country,
+        season_start: editForm.season_start || null,
+        season_end: editForm.season_end || null,
+        ticket_url: editForm.ticket_url || null,
+      }).eq('id', editSelected.production_id)
+      setEditMessage('✓ Saved successfully')
+    } catch (err: any) {
+      setEditMessage('Error: ' + err.message)
+    }
+    setEditSaving(false)
   }
 
   const tabStyle = (t: string) => ({
@@ -302,6 +363,9 @@ export default function AdminPage() {
           <button style={tabStyle('audience')} onClick={() => setTab('audience')}>
             Audience queue <Badge count={audienceReviews.length} muted />
           </button>
+          <button style={tabStyle('edit')} onClick={() => setTab('edit')}>
+            Edit shows
+          </button>
         </div>
 
         {loading && <p style={{ color: '#4b5563' }}>Loading...</p>}
@@ -413,6 +477,107 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+        {!loading && tab === 'edit' && (
+          <div>
+            <p style={{ fontSize: '13px', color: '#4b5563', margin: '0 0 16px 0' }}>
+              Search for a production to edit its details.
+            </p>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <input
+                value={editSearch}
+                onChange={e => setEditSearch(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && searchProductions()}
+                placeholder="Search by show title or company..."
+                style={{ flex: 1, background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '9px 12px', fontSize: '13px', color: '#f1f5f9', outline: 'none' }}
+              />
+              <button onClick={searchProductions}
+                style={{ padding: '9px 18px', background: '#1D9E75', color: 'white', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+                Search
+              </button>
+            </div>
+            {editResults.length > 0 && !editSelected && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+                {editResults.map(p => (
+                  <button key={p.production_id} onClick={() => selectProduction(p)}
+                    style={{ textAlign: 'left', background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '8px', padding: '12px 14px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '14px', color: '#f1f5f9', fontWeight: '600' }}>{p.title}</div>
+                      <div style={{ fontSize: '12px', color: '#6b7280' }}>{p.company} · {p.city} · {p.season_start}</div>
+                    </div>
+                    <span style={{ fontSize: '12px', color: '#1D9E75' }}>Edit →</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {editSelected && (
+              <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '16px', color: '#f1f5f9', margin: 0 }}>
+                    Editing: {editSelected.title} · {editSelected.city}
+                  </h3>
+                  <button onClick={() => { setEditSelected(null); setEditResults([]); setEditSearch(''); setEditMessage('') }}
+                    style={{ background: 'none', border: '1px solid #2a2a3e', color: '#6b7280', borderRadius: '6px', padding: '5px 12px', fontSize: '12px', cursor: 'pointer' }}>
+                    ← Back
+                  </button>
+                </div>
+                <p style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 10px 0' }}>Show details</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+                  {[
+                    { label: 'Title', key: 'title' },
+                    { label: 'Company', key: 'company' },
+                    { label: 'Composer / Playwright', key: 'composer_or_playwright' },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>{f.label}</label>
+                      <input value={editForm[f.key] || ''} onChange={e => setEditForm({ ...editForm, [f.key]: e.target.value })}
+                        style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9', boxSizing: 'border-box' as const }} />
+                    </div>
+                  ))}
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>Type</label>
+                    <select value={editForm.type || 'theatre'} onChange={e => setEditForm({ ...editForm, type: e.target.value })}
+                      style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9' }}>
+                      {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert', 'community'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>Subtype (for community shows)</label>
+                    <select value={editForm.subtype || ''} onChange={e => setEditForm({ ...editForm, subtype: e.target.value })}
+                      style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9' }}>
+                      <option value=''>None</option>
+                      {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <p style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 10px 0' }}>Production details</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+                  {[
+                    { label: 'Venue', key: 'venue' },
+                    { label: 'City', key: 'city' },
+                    { label: 'Country (AU/GB/NZ)', key: 'country' },
+                    { label: 'Season start (YYYY-MM-DD)', key: 'season_start' },
+                    { label: 'Season end (YYYY-MM-DD)', key: 'season_end' },
+                    { label: 'Ticket URL', key: 'ticket_url' },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>{f.label}</label>
+                      <input value={editForm[f.key] || ''} onChange={e => setEditForm({ ...editForm, [f.key]: e.target.value })}
+                        style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9', boxSizing: 'border-box' as const }} />
+                    </div>
+                  ))}
+                </div>
+                {editMessage && (
+                  <p style={{ fontSize: '13px', color: editMessage.startsWith('✓') ? '#1D9E75' : '#f87171', margin: '0 0 12px 0' }}>{editMessage}</p>
+                )}
+                <button onClick={saveEdit} disabled={editSaving}
+                  style={{ width: '100%', background: '#1D9E75', color: 'white', border: 'none', borderRadius: '6px', padding: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', opacity: editSaving ? 0.7 : 1 }}>
+                  {editSaving ? 'Saving...' : '✓ Save changes'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
 
       <Footer />
