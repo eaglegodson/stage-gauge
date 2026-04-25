@@ -14,11 +14,12 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
   concert:  { gradient: 'linear-gradient(160deg, #2d230f 0%, #b57d10 100%)', accent: '#FBBF24', emoji: '🎻' },
 }
 
-const tiles = [
+const allTiles = [
   { title: "Discover what's on near you", desc: 'Browse professional productions — theatre, opera, ballet, musicals and dance — in your city and beyond.', href: '/browse', accent: '#4A90D9' },
   { title: 'Community theatre & auditions', desc: 'Find out what community companies are staging near you — and which shows are currently auditioning.', href: '/community', accent: '#a78bfa' },
+  { title: 'Sign in', desc: 'Create a free account to save shows to your watchlist, track what you have seen, and write reviews.', href: '/auth', accent: '#1D9E75', authOnly: true },
   { title: 'Read critic and audience reviews', desc: 'Aggregated reviews from leading outlets alongside real audience voices.', href: '/reviews', accent: '#C084FC' },
-  { title: 'Your shows', desc: `Save shows to your watchlist and review the ones you've seen.`, href: '/watchlist', accent: '#FBBF24' },
+  { title: 'Your shows', desc: `Save shows to your watchlist and review the ones you've seen.`, href: '/watchlist', accent: '#FBBF24', signedInOnly: true },
 ]
 
 export default function Home() {
@@ -201,9 +202,6 @@ export default function Home() {
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '40px' }}>
             <a href="/browse" style={{ fontSize: '15px', fontWeight: '600', color: 'white', padding: '12px 28px', borderRadius: '8px', backgroundColor: '#1D9E75', textDecoration: 'none' }}>Professional shows</a>
             <a href="/community" style={{ fontSize: '15px', fontWeight: '600', color: '#0f0f1a', padding: '12px 28px', borderRadius: '8px', backgroundColor: '#a78bfa', textDecoration: 'none' }}>Community theatre</a>
-            {!user && (
-              <a href="/auth" style={{ fontSize: '15px', fontWeight: '500', color: '#9ca3af', padding: '12px 28px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', backgroundColor: 'rgba(255,255,255,0.05)' }}>Sign in</a>
-            )}
           </div>
 
           {show && cfg && (
@@ -228,7 +226,7 @@ export default function Home() {
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px', width: '100%', boxSizing: 'border-box' }}>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '12px' }}>
-          {tiles.map((tile, i) => (
+          {allTiles.filter(t => !t.authOnly || !user).filter(t => !t.signedInOnly || user).map((tile, i) => (
             <a key={i} href={tile.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
               <div
                 style={{ borderRadius: '10px', border: '1px solid #2a2a3e', background: '#1e1e2e', transition: 'transform 0.15s, border-color 0.15s', cursor: 'pointer', height: '100%', padding: '20px' }}
