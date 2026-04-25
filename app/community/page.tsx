@@ -100,18 +100,17 @@ function ProductionCard({ p }: { p: any }) {
 
   return (
     <a href={'/show/' + p.production_id} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}
+      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#1e1e2e', border: '1px solid #2a2a3e', height: '100%', display: 'flex', flexDirection: 'column' }}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#a78bfa66' }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#2a2a3e' }}
       >
-        <div style={{ background: cfg.gradient, width: '48px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: '22px' }}>{cfg.emoji}</span>
-        </div>
+
         <div style={{ padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
           <div>
-            <p style={{ fontSize: '10px', color: '#a78bfa', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 3px 0' }}>
-              {p.type || 'community'}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px' }}>
+              <span style={{ fontSize: '16px', lineHeight: '1' }}>{cfg.emoji}</span>
+              <p style={{ fontSize: '10px', color: '#a78bfa', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>{p.type || 'community'}</p>
+            </div>
             <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '13px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 2px 0', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</h3>
             <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 2px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.company}</p>
             <p style={{ fontSize: '11px', color: '#4b5563', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.city}</p>
