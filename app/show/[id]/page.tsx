@@ -268,6 +268,17 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const show = production.shows
   const cfg = typeConfig[show?.type] || typeConfig.theatre
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!confirm('Delete your review? This cannot be undone.')) return
+    const { error } = await supabase
+      .from('audience_reviews')
+      .delete()
+      .eq('id', reviewId)
+    if (!error) {
+      setAudienceReviews(prev => prev.filter(r => r.id !== reviewId))
+    }
+  }
+
   const reportHref = `/feedback?show=${encodeURIComponent(show?.title || '')}&company=${encodeURIComponent(show?.company || '')}&city=${encodeURIComponent(production.city || '')}&production_id=${id}`
 
   return (
