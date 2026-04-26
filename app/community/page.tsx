@@ -162,9 +162,9 @@ export default function CommunityPage() {
   const [productions, setProductions] = useState<any[]>([])
   const [allCompanies, setAllCompanies] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
-  const [view, setView] = useState<'auditions' | 'productions'>('auditions')
+  const [view, setView] = useState<string[]>(['auditions', 'productions'])
   const [viewOpen, setViewOpen] = useState(false)
-  const [timing, setTiming] = useState('now')
+  const [timing, setTiming] = useState<string[]>(['now'])
   const [timingOpen, setTimingOpen] = useState(false)
 
   useEffect(() => {
@@ -281,38 +281,46 @@ export default function CommunityPage() {
 
             {/* View dropdown */}
             <div style={dropdownBase}>
-              <button style={{ ...dropdownBtn, borderColor: '#a78bfa', color: '#a78bfa' }}
-                onClick={() => { setViewOpen(o => !o); setCityOpen(false); setCompanyOpen(false) }}>
-                {view === 'auditions' ? 'Auditions' : 'Productions'}
+              <button style={{ ...dropdownBtn, borderColor: view.length < 2 ? '#a78bfa' : '#2a2a3e', color: view.length < 2 ? '#a78bfa' : '#9ca3af' }}
+                onClick={() => { setViewOpen(o => !o); setTimingOpen(false); setCityOpen(false); setCompanyOpen(false) }}>
+                {view.length === 2 ? 'All types' : view.length === 1 ? (view[0] === 'auditions' ? 'Auditions' : 'Productions') : 'All types'}
                 <span style={{ fontSize: '10px' }}>▾</span>
               </button>
               {viewOpen && (
-                <div style={{ ...dropdownMenu, minWidth: '140px' }}>
-                  {(['auditions', 'productions'] as const).map(v => (
-                    <button key={v} onClick={() => { setView(v); setViewOpen(false) }}
-                      style={{ display: 'block', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '13px', color: view === v ? '#a78bfa' : '#9ca3af', background: view === v ? '#1a1530' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
-                      {v === 'auditions' ? 'Auditions' : 'Productions'}
-                    </button>
+                <div style={{ ...dropdownMenu, minWidth: '160px' }}>
+                  <div style={{ padding: '4px 8px', fontSize: '11px', color: '#4b5563', marginBottom: '4px' }}>Select type</div>
+                  {[['auditions', 'Auditions'], ['productions', 'Productions']].map(([v, label]) => (
+                    <label key={v} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', background: view.includes(v) ? '#2a2a3e' : 'transparent' }}>
+                      <input type="checkbox" checked={view.includes(v)} onChange={() => setView(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])} style={{ accentColor: '#a78bfa' }} />
+                      <span style={{ fontSize: '13px', color: view.includes(v) ? '#f1f5f9' : '#9ca3af' }}>{label}</span>
+                    </label>
                   ))}
+                  {view.length < 2 && (
+                    <button onClick={() => setView(['auditions', 'productions'])} style={{ width: '100%', marginTop: '6px', padding: '5px', fontSize: '11px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '4px', cursor: 'pointer' }}>Show all</button>
+                  )}
                 </div>
               )}
             </div>
 
             {/* Timing dropdown */}
             <div style={dropdownBase}>
-              <button style={{ ...dropdownBtn, borderColor: timing !== 'now' ? '#a78bfa' : '#2a2a3e', color: timing !== 'now' ? '#a78bfa' : '#9ca3af' }}
+              <button style={{ ...dropdownBtn, borderColor: !(timing.length === 1 && timing[0] === 'now') ? '#a78bfa' : '#2a2a3e', color: !(timing.length === 1 && timing[0] === 'now') ? '#a78bfa' : '#9ca3af' }}
                 onClick={() => { setTimingOpen(o => !o); setViewOpen(false); setCityOpen(false); setCompanyOpen(false) }}>
-                {timing === 'now' ? 'Now' : timing === 'soon' ? 'Soon' : timing === 'later' ? 'Later' : 'Past'}
+                {timing.length === 1 ? (timing[0] === 'now' ? 'Now' : timing[0] === 'soon' ? 'Soon' : timing[0] === 'later' ? 'Later' : 'Past') : timing.length === 4 ? 'All timing' : 'Timing (' + timing.length + ')'}
                 <span style={{ fontSize: '10px' }}>▾</span>
               </button>
               {timingOpen && (
-                <div style={{ ...dropdownMenu, minWidth: '120px' }}>
+                <div style={{ ...dropdownMenu, minWidth: '140px' }}>
+                  <div style={{ padding: '4px 8px', fontSize: '11px', color: '#4b5563', marginBottom: '4px' }}>Select timing</div>
                   {[['now', 'Now'], ['soon', 'Soon'], ['later', 'Later'], ['past', 'Past']].map(([v, label]) => (
-                    <button key={v} onClick={() => { setTiming(v); setTimingOpen(false) }}
-                      style={{ display: 'block', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '13px', color: timing === v ? '#a78bfa' : '#9ca3af', background: timing === v ? '#1a1530' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
-                      {label}
-                    </button>
+                    <label key={v} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', background: timing.includes(v) ? '#2a2a3e' : 'transparent' }}>
+                      <input type="checkbox" checked={timing.includes(v)} onChange={() => setTiming(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])} style={{ accentColor: '#a78bfa' }} />
+                      <span style={{ fontSize: '13px', color: timing.includes(v) ? '#f1f5f9' : '#9ca3af' }}>{label}</span>
+                    </label>
                   ))}
+                  {timing.length > 1 && (
+                    <button onClick={() => setTiming(['now'])} style={{ width: '100%', marginTop: '6px', padding: '5px', fontSize: '11px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '4px', cursor: 'pointer' }}>Reset</button>
+                  )}
                 </div>
               )}
             </div>
@@ -364,16 +372,16 @@ export default function CommunityPage() {
 
         {loading && <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>}
 
-        {!loading && view === 'auditions' && (
+        {!loading && view.includes('auditions') && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa' }}>Auditions</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
-              {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length > 0 && (
-                <span style={{ fontSize: '11px', color: '#4b5563' }}>{auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length} listing{auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length !== 1 ? 's' : ''}</span>
+              {auditions.filter(a => timing.some(t => getAuditionTiming(a.audition_date, t))).length > 0 && (
+                <span style={{ fontSize: '11px', color: '#4b5563' }}>{auditions.filter(a => timing.some(t => getAuditionTiming(a.audition_date, t))).length} listing{auditions.filter(a => timing.some(t => getAuditionTiming(a.audition_date, t))).length !== 1 ? 's' : ''}</span>
               )}
             </div>
-            {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length === 0 && (
+            {auditions.filter(a => timing.some(t => getAuditionTiming(a.audition_date, t))).length === 0 && (
               <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
                 <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} right now.</p>
                 <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
@@ -382,24 +390,24 @@ export default function CommunityPage() {
                 </p>
               </div>
             )}
-            {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length > 0 && (
+            {auditions.filter(a => timing.some(t => getAuditionTiming(a.audition_date, t))).length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))', gap: '12px' }}>
-                {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).map(a => <AuditionCard key={a.id} a={a} />)}
+                {auditions.filter(a => timing.some(t => getAuditionTiming(a.audition_date, t))).map(a => <AuditionCard key={a.id} a={a} />)}
               </div>
             )}
           </div>
         )}
 
-        {!loading && view === 'productions' && (
+        {!loading && view.includes('productions') && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563' }}>Productions</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
-              {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length > 0 && (
-                <span style={{ fontSize: '11px', color: '#4b5563' }}>{productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length} show{productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length !== 1 ? 's' : ''}</span>
+              {productions.filter(p => timing.some(t => getProductionTiming(p.season_start, p.season_end, t))).length > 0 && (
+                <span style={{ fontSize: '11px', color: '#4b5563' }}>{productions.filter(p => timing.some(t => getProductionTiming(p.season_start, p.season_end, t))).length} show{productions.filter(p => timing.some(t => getProductionTiming(p.season_start, p.season_end, t))).length !== 1 ? 's' : ''}</span>
               )}
             </div>
-            {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length === 0 && (
+            {productions.filter(p => timing.some(t => getProductionTiming(p.season_start, p.season_end, t))).length === 0 && (
               <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
                 <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No community productions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} yet.</p>
                 <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
@@ -408,9 +416,9 @@ export default function CommunityPage() {
                 </p>
               </div>
             )}
-            {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length > 0 && (
+            {productions.filter(p => timing.some(t => getProductionTiming(p.season_start, p.season_end, t))).length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(220px, 100%), 1fr))', gap: '12px' }}>
-                {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).map(p => <ProductionCard key={p.production_id} p={p} />)}
+                {productions.filter(p => timing.some(t => getProductionTiming(p.season_start, p.season_end, t))).map(p => <ProductionCard key={p.production_id} p={p} />)}
               </div>
             )}
           </div>
