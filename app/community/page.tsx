@@ -256,6 +256,28 @@ export default function CommunityPage() {
           <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '26px', fontWeight: '600', color: '#f1f5f9', margin: '0 0 4px 0' }}>Community Theatre</h1>
           <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 20px 0' }}>Auditions and productions from community theatre companies across Australia and New Zealand</p>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' as const, paddingBottom: '1px' }}>
+            {/* City dropdown */}
+            <div style={dropdownBase}>
+              <button style={{ ...dropdownBtn, borderColor: selectedCities.length > 0 ? '#a78bfa' : '#2a2a3e', color: selectedCities.length > 0 ? '#a78bfa' : '#9ca3af' }}
+                onClick={() => { setCityOpen(o => !o); setCompanyOpen(false) }}>
+                {selectedCities.length === 0 ? 'All cities' : selectedCities.length === 1 ? selectedCities[0] : selectedCities.length + ' cities'}
+                <span style={{ fontSize: '10px' }}>▾</span>
+              </button>
+              {cityOpen && (
+                <div style={dropdownMenu}>
+                  <div style={{ padding: '4px 8px', fontSize: '11px', color: '#4b5563', marginBottom: '4px' }}>Select cities</div>
+                  {CITIES.map(c => (
+                    <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', background: selectedCities.includes(c) ? '#2a2a3e' : 'transparent' }}>
+                      <input type="checkbox" checked={selectedCities.includes(c)} onChange={() => toggleCity(c)} style={{ accentColor: '#a78bfa' }} />
+                      <span style={{ fontSize: '13px', color: selectedCities.includes(c) ? '#f1f5f9' : '#9ca3af' }}>{c}</span>
+                    </label>
+                  ))}
+                  {selectedCities.length > 0 && (
+                    <button onClick={() => setSelectedCities([])} style={{ width: '100%', marginTop: '6px', padding: '5px', fontSize: '11px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '4px', cursor: 'pointer' }}>Clear</button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* View dropdown */}
             <div style={dropdownBase}>
@@ -291,29 +313,6 @@ export default function CommunityPage() {
                       {label}
                     </button>
                   ))}
-                </div>
-              )}
-            </div>
-
-            {/* City dropdown */}
-            <div style={dropdownBase}>
-              <button style={{ ...dropdownBtn, borderColor: selectedCities.length > 0 ? '#a78bfa' : '#2a2a3e', color: selectedCities.length > 0 ? '#a78bfa' : '#9ca3af' }}
-                onClick={() => { setCityOpen(o => !o); setCompanyOpen(false) }}>
-                {selectedCities.length === 0 ? 'All cities' : selectedCities.length === 1 ? selectedCities[0] : selectedCities.length + ' cities'}
-                <span style={{ fontSize: '10px' }}>▾</span>
-              </button>
-              {cityOpen && (
-                <div style={dropdownMenu}>
-                  <div style={{ padding: '4px 8px', fontSize: '11px', color: '#4b5563', marginBottom: '4px' }}>Select cities</div>
-                  {CITIES.map(c => (
-                    <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '4px', cursor: 'pointer', background: selectedCities.includes(c) ? '#2a2a3e' : 'transparent' }}>
-                      <input type="checkbox" checked={selectedCities.includes(c)} onChange={() => toggleCity(c)} style={{ accentColor: '#a78bfa' }} />
-                      <span style={{ fontSize: '13px', color: selectedCities.includes(c) ? '#f1f5f9' : '#9ca3af' }}>{c}</span>
-                    </label>
-                  ))}
-                  {selectedCities.length > 0 && (
-                    <button onClick={() => setSelectedCities([])} style={{ width: '100%', marginTop: '6px', padding: '5px', fontSize: '11px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '4px', cursor: 'pointer' }}>Clear</button>
-                  )}
                 </div>
               )}
             </div>
@@ -356,6 +355,7 @@ export default function CommunityPage() {
                 {c} <button onClick={() => toggleCompany(c)} style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer', padding: 0, fontSize: '12px', lineHeight: 1 }}>×</button>
               </span>
             ))}
+
           </div>
         </div>
       </div>
