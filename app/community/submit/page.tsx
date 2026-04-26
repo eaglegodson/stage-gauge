@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '../../../lib/supabase'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
@@ -8,13 +9,11 @@ import Footer from '../../components/Footer'
 const CITIES = ['Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Hobart', 'Canberra', 'Auckland', 'Wellington', 'London']
 const TYPES = ['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert']
 
-export default function CommunitySubmitPage() {
-  const [submissionType, setSubmissionType] = useState<'production' | 'audition'>('production')
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('type') === 'audition') setSubmissionType('audition')
-  }, [])
+function CommunitySubmitPageInner() {
+  const searchParams = useSearchParams()
+  const [submissionType, setSubmissionType] = useState<'production' | 'audition'>(
+    searchParams.get('type') === 'audition' ? 'audition' : 'production'
+  )
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -177,5 +176,13 @@ export default function CommunitySubmitPage() {
       </div>
       <Footer />
     </main>
+  )
+}
+
+export default function CommunitySubmitPage() {
+  return (
+    <Suspense fallback={null}>
+      <CommunitySubmitPageInner />
+    </Suspense>
   )
 }

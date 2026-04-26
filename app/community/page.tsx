@@ -348,7 +348,7 @@ export default function CommunityPage() {
               )}
             </div>
 
-            <a href="/community/submit" style={{ marginLeft: 'auto', padding: '7px 14px', fontSize: '13px', fontWeight: '600', background: '#a78bfa', color: '#0f0f1a', borderRadius: '6px', textDecoration: 'none', whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
+            <a href="/community/submit?type=production" style={{ marginLeft: 'auto', padding: '7px 14px', fontSize: '13px', fontWeight: '600', background: '#a78bfa', color: '#0f0f1a', borderRadius: '6px', textDecoration: 'none', whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
               + List your show
             </a>
 
