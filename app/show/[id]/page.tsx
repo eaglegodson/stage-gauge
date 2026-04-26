@@ -384,7 +384,12 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
                 <div key={review.id} style={{ backgroundColor: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <span style={{ fontSize: '14px', fontWeight: '600', color: '#f1f5f9' }}>Anonymous</span>
-                    <StarDisplay score={review.star_rating} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <StarDisplay score={review.star_rating} />
+                      {user && review.user_id === user.id && (
+                        <button onClick={() => handleDeleteReview(review.id)} title="Delete your review" style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '13px', padding: '0', lineHeight: '1' }}>✕</button>
+                      )}
+                    </div>
                   </div>
                   {review.review_text && <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: '1.6' }}>{review.review_text}</p>}
                 </div>
