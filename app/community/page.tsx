@@ -139,6 +139,8 @@ export default function CommunityPage() {
   const [productions, setProductions] = useState<any[]>([])
   const [allCompanies, setAllCompanies] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [view, setView] = useState<'auditions' | 'productions'>('auditions')
+  const [viewOpen, setViewOpen] = useState(false)
 
   useEffect(() => {
     const timezoneToCity: Record<string, string> = {
@@ -280,6 +282,25 @@ export default function CommunityPage() {
               )}
             </div>
 
+            {/* View dropdown */}
+            <div style={dropdownBase}>
+              <button style={{ ...dropdownBtn, borderColor: '#a78bfa', color: '#a78bfa' }}
+                onClick={() => { setViewOpen(o => !o); setCityOpen(false); setCompanyOpen(false) }}>
+                {view === 'auditions' ? 'Auditions' : 'Productions'}
+                <span style={{ fontSize: '10px' }}>▾</span>
+              </button>
+              {viewOpen && (
+                <div style={{ ...dropdownMenu, minWidth: '140px' }}>
+                  {(['auditions', 'productions'] as const).map(v => (
+                    <button key={v} onClick={() => { setView(v); setViewOpen(false) }}
+                      style={{ display: 'block', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '13px', color: view === v ? '#a78bfa' : '#9ca3af', background: view === v ? '#1a1530' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
+                      {v === 'auditions' ? 'Auditions' : 'Productions'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <a href="/community/submit" style={{ marginLeft: 'auto', padding: '7px 14px', fontSize: '13px', fontWeight: '600', background: '#a78bfa', color: '#0f0f1a', borderRadius: '6px', textDecoration: 'none', whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
               + List your show
             </a>
@@ -301,59 +322,59 @@ export default function CommunityPage() {
 
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
 
-        <div style={{ marginBottom: '48px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa' }}>Auditions</span>
-            <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
+        {loading && <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>}
+
+        {!loading && view === 'auditions' && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa' }}>Auditions</span>
+              <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
+              {auditions.length > 0 && (
+                <span style={{ fontSize: '11px', color: '#4b5563' }}>{auditions.length} listing{auditions.length !== 1 ? 's' : ''}</span>
+              )}
+            </div>
+            {auditions.length === 0 && (
+              <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
+                <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} right now.</p>
+                <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
+                  Running auditions?{' '}
+                  <a href="/community/submit" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your audition free →</a>
+                </p>
+              </div>
+            )}
             {auditions.length > 0 && (
-              <span style={{ fontSize: '11px', color: '#4b5563' }}>{auditions.length} listing{auditions.length !== 1 ? 's' : ''}</span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))', gap: '12px' }}>
+                {auditions.map(a => <AuditionCard key={a.id} a={a} />)}
+              </div>
             )}
           </div>
+        )}
 
-          {loading && <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>}
-
-          {!loading && auditions.length === 0 && (
-            <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
-              <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} right now.</p>
-              <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
-                Running auditions?{' '}
-                <a href="/community/submit" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your audition free →</a>
-              </p>
+        {!loading && view === 'productions' && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563' }}>Productions</span>
+              <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
+              {productions.length > 0 && (
+                <span style={{ fontSize: '11px', color: '#4b5563' }}>{productions.length} show{productions.length !== 1 ? 's' : ''}</span>
+              )}
             </div>
-          )}
-
-          {!loading && auditions.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))', gap: '12px' }}>
-              {auditions.map(a => <AuditionCard key={a.id} a={a} />)}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563' }}>Productions</span>
-            <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
+            {productions.length === 0 && (
+              <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
+                <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No community productions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} yet.</p>
+                <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
+                  Got a show coming up?{' '}
+                  <a href="/community/submit" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your show free →</a>
+                </p>
+              </div>
+            )}
             {productions.length > 0 && (
-              <span style={{ fontSize: '11px', color: '#4b5563' }}>{productions.length} show{productions.length !== 1 ? 's' : ''}</span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(220px, 100%), 1fr))', gap: '12px' }}>
+                {productions.map(p => <ProductionCard key={p.production_id} p={p} />)}
+              </div>
             )}
           </div>
-
-          {!loading && productions.length === 0 && (
-            <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
-              <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No community productions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} yet.</p>
-              <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
-                Got a show coming up?{' '}
-                <a href="/community/submit" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your show free →</a>
-              </p>
-            </div>
-          )}
-
-          {!loading && productions.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(220px, 100%), 1fr))', gap: '12px' }}>
-              {productions.map(p => <ProductionCard key={p.production_id} p={p} />)}
-            </div>
-          )}
-        </div>
+        )}
 
       </div>
 
