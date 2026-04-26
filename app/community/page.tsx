@@ -236,6 +236,25 @@ export default function CommunityPage() {
           <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 20px 0' }}>Auditions and productions from community theatre companies across Australia and New Zealand</p>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' as const, paddingBottom: '1px' }}>
 
+            {/* View dropdown */}
+            <div style={dropdownBase}>
+              <button style={{ ...dropdownBtn, borderColor: '#a78bfa', color: '#a78bfa' }}
+                onClick={() => { setViewOpen(o => !o); setCityOpen(false); setCompanyOpen(false) }}>
+                {view === 'auditions' ? 'Auditions' : 'Productions'}
+                <span style={{ fontSize: '10px' }}>▾</span>
+              </button>
+              {viewOpen && (
+                <div style={{ ...dropdownMenu, minWidth: '140px' }}>
+                  {(['auditions', 'productions'] as const).map(v => (
+                    <button key={v} onClick={() => { setView(v); setViewOpen(false) }}
+                      style={{ display: 'block', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '13px', color: view === v ? '#a78bfa' : '#9ca3af', background: view === v ? '#1a1530' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
+                      {v === 'auditions' ? 'Auditions' : 'Productions'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* City dropdown */}
             <div style={dropdownBase}>
               <button style={{ ...dropdownBtn, borderColor: selectedCities.length > 0 ? '#a78bfa' : '#2a2a3e', color: selectedCities.length > 0 ? '#a78bfa' : '#9ca3af' }}
@@ -278,25 +297,6 @@ export default function CommunityPage() {
                   {selectedCompanies.length > 0 && (
                     <button onClick={() => setSelectedCompanies([])} style={{ width: '100%', marginTop: '6px', padding: '5px', fontSize: '11px', color: '#6b7280', background: 'none', border: '1px solid #2a2a3e', borderRadius: '4px', cursor: 'pointer' }}>Clear</button>
                   )}
-                </div>
-              )}
-            </div>
-
-            {/* View dropdown */}
-            <div style={dropdownBase}>
-              <button style={{ ...dropdownBtn, borderColor: '#a78bfa', color: '#a78bfa' }}
-                onClick={() => { setViewOpen(o => !o); setCityOpen(false); setCompanyOpen(false) }}>
-                {view === 'auditions' ? 'Auditions' : 'Productions'}
-                <span style={{ fontSize: '10px' }}>▾</span>
-              </button>
-              {viewOpen && (
-                <div style={{ ...dropdownMenu, minWidth: '140px' }}>
-                  {(['auditions', 'productions'] as const).map(v => (
-                    <button key={v} onClick={() => { setView(v); setViewOpen(false) }}
-                      style={{ display: 'block', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '13px', color: view === v ? '#a78bfa' : '#9ca3af', background: view === v ? '#1a1530' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
-                      {v === 'auditions' ? 'Auditions' : 'Productions'}
-                    </button>
-                  ))}
                 </div>
               )}
             </div>
