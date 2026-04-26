@@ -386,7 +386,7 @@ export default function CommunityPage() {
                 <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} right now.</p>
                 <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
                   Running auditions?{' '}
-                  <a href="/community/submit" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your audition free →</a>
+                  <a href="/community/submit?type=audition" style={{ color: '#a78bfa', textDecoration: 'none' }}>List your audition free →</a>
                 </p>
               </div>
             )}

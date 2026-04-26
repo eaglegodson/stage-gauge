@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../../lib/supabase'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
@@ -10,6 +10,11 @@ const TYPES = ['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert']
 
 export default function CommunitySubmitPage() {
   const [submissionType, setSubmissionType] = useState<'production' | 'audition'>('production')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('type') === 'audition') setSubmissionType('audition')
+  }, [])
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
