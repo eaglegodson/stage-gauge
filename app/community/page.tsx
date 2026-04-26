@@ -129,6 +129,29 @@ function ProductionCard({ p }: { p: any }) {
   )
 }
 
+function getProductionTiming(start: string, end: string, t: string) {
+  const now = new Date()
+  const startDate = start ? new Date(start) : null
+  const endDate = end ? new Date(end) : null
+  const threeMonths = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000)
+  if (t === 'now') return !!(startDate && startDate <= now && (!endDate || endDate >= now))
+  if (t === 'soon') return !!(startDate && startDate > now && startDate <= threeMonths)
+  if (t === 'later') return !!(startDate && startDate > threeMonths)
+  if (t === 'past') return !!(endDate && endDate < now)
+  return true
+}
+
+function getAuditionTiming(audDate: string, t: string) {
+  const now = new Date()
+  const threeMonths = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000)
+  const d = audDate ? new Date(audDate) : null
+  if (t === 'now') return !!(d && d >= now && d <= threeMonths)
+  if (t === 'soon') return !!(d && d > threeMonths)
+  if (t === 'past') return !!(d && d < now)
+  if (t === 'later') return !!(d && d > threeMonths)
+  return true
+}
+
 export default function CommunityPage() {
   const [selectedCities, setSelectedCities] = useState<string[]>([])
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([])
@@ -141,6 +164,8 @@ export default function CommunityPage() {
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState<'auditions' | 'productions'>('auditions')
   const [viewOpen, setViewOpen] = useState(false)
+  const [timing, setTiming] = useState('now')
+  const [timingOpen, setTimingOpen] = useState(false)
 
   useEffect(() => {
     const timezoneToCity: Record<string, string> = {
@@ -172,7 +197,6 @@ export default function CommunityPage() {
         .from('auditions')
         .select('*')
         .eq('status', 'active')
-        .or('audition_date.is.null,audition_date.gte.' + today)
         .order('audition_date', { ascending: true, nullsFirst: false })
 
       if (selectedCities.length > 0) audQ = audQ.in('city', selectedCities)
@@ -181,7 +205,6 @@ export default function CommunityPage() {
         .from('production_listing')
         .select('*')
         .eq('type', 'community')
-        .or('season_end.is.null,season_end.gte.' + today)
         .order('combined_score', { ascending: false, nullsFirst: false })
 
       if (selectedCities.length > 0) prodQ = prodQ.in('city', selectedCities)
@@ -189,20 +212,18 @@ export default function CommunityPage() {
 
       const [{ data: aud }, { data: prod }] = await Promise.all([audQ, prodQ])
       setAuditions(aud || [])
-      const prods = prod || []
-      setProductions(prods)
+      setProductions(prod || [])
       // Build company list from all productions (unfiltered by company)
       const allProdsQ = await supabase
         .from('production_listing')
         .select('company')
         .eq('type', 'community')
-        .or('season_end.is.null,season_end.gte.' + today)
       const companies = [...new Set((allProdsQ.data || []).map((r: any) => r.company).filter(Boolean))].sort()
       setAllCompanies(companies)
       setLoading(false)
     }
     fetchData()
-  }, [selectedCities, selectedCompanies, geoLoaded])
+  }, [selectedCities, selectedCompanies, geoLoaded, timing])
 
   const toggleCity = (c: string) => {
     setSelectedCities(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c])
@@ -249,6 +270,25 @@ export default function CommunityPage() {
                     <button key={v} onClick={() => { setView(v); setViewOpen(false) }}
                       style={{ display: 'block', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '13px', color: view === v ? '#a78bfa' : '#9ca3af', background: view === v ? '#1a1530' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
                       {v === 'auditions' ? 'Auditions' : 'Productions'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Timing dropdown */}
+            <div style={dropdownBase}>
+              <button style={{ ...dropdownBtn, borderColor: timing !== 'now' ? '#a78bfa' : '#2a2a3e', color: timing !== 'now' ? '#a78bfa' : '#9ca3af' }}
+                onClick={() => { setTimingOpen(o => !o); setViewOpen(false); setCityOpen(false); setCompanyOpen(false) }}>
+                {timing === 'now' ? 'Now' : timing === 'soon' ? 'Soon' : timing === 'later' ? 'Later' : 'Past'}
+                <span style={{ fontSize: '10px' }}>▾</span>
+              </button>
+              {timingOpen && (
+                <div style={{ ...dropdownMenu, minWidth: '120px' }}>
+                  {[['now', 'Now'], ['soon', 'Soon'], ['later', 'Later'], ['past', 'Past']].map(([v, label]) => (
+                    <button key={v} onClick={() => { setTiming(v); setTimingOpen(false) }}
+                      style={{ display: 'block', width: '100%', padding: '9px 14px', textAlign: 'left', fontSize: '13px', color: timing === v ? '#a78bfa' : '#9ca3af', background: timing === v ? '#1a1530' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px' }}>
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -329,11 +369,11 @@ export default function CommunityPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa' }}>Auditions</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
-              {auditions.length > 0 && (
-                <span style={{ fontSize: '11px', color: '#4b5563' }}>{auditions.length} listing{auditions.length !== 1 ? 's' : ''}</span>
+              {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length > 0 && (
+                <span style={{ fontSize: '11px', color: '#4b5563' }}>{auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length} listing{auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length !== 1 ? 's' : ''}</span>
               )}
             </div>
-            {auditions.length === 0 && (
+            {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length === 0 && (
               <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
                 <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No auditions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} right now.</p>
                 <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
@@ -342,9 +382,9 @@ export default function CommunityPage() {
                 </p>
               </div>
             )}
-            {auditions.length > 0 && (
+            {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))', gap: '12px' }}>
-                {auditions.map(a => <AuditionCard key={a.id} a={a} />)}
+                {auditions.filter(a => getAuditionTiming(a.audition_date, timing)).map(a => <AuditionCard key={a.id} a={a} />)}
               </div>
             )}
           </div>
@@ -355,11 +395,11 @@ export default function CommunityPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b5563' }}>Productions</span>
               <div style={{ flex: 1, height: '1px', backgroundColor: '#1e1e2e' }} />
-              {productions.length > 0 && (
-                <span style={{ fontSize: '11px', color: '#4b5563' }}>{productions.length} show{productions.length !== 1 ? 's' : ''}</span>
+              {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length > 0 && (
+                <span style={{ fontSize: '11px', color: '#4b5563' }}>{productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length} show{productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length !== 1 ? 's' : ''}</span>
               )}
             </div>
-            {productions.length === 0 && (
+            {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length === 0 && (
               <div style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '32px', textAlign: 'center' }}>
                 <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 8px 0' }}>No community productions listed{selectedCities.length === 1 ? ' in ' + selectedCities[0] : selectedCities.length > 1 ? ' in selected cities' : ''} yet.</p>
                 <p style={{ color: '#374151', fontSize: '13px', margin: 0 }}>
@@ -368,9 +408,9 @@ export default function CommunityPage() {
                 </p>
               </div>
             )}
-            {productions.length > 0 && (
+            {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(220px, 100%), 1fr))', gap: '12px' }}>
-                {productions.map(p => <ProductionCard key={p.production_id} p={p} />)}
+                {productions.filter(p => getProductionTiming(p.season_start, p.season_end, timing)).map(p => <ProductionCard key={p.production_id} p={p} />)}
               </div>
             )}
           </div>
