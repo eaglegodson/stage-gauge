@@ -11,9 +11,12 @@ const TYPES = ['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert']
 
 function CommunitySubmitPageInner() {
   const searchParams = useSearchParams()
-  const [submissionType, setSubmissionType] = useState<'production' | 'audition'>(
-    searchParams.get('type') === 'audition' ? 'audition' : 'production'
-  )
+  const [submissionType, setSubmissionType] = useState<'production' | 'audition'>('production')
+
+  useEffect(() => {
+    if (searchParams.get('type') === 'audition') setSubmissionType('audition')
+    else setSubmissionType('production')
+  }, [searchParams])
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
