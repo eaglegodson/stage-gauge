@@ -14,7 +14,7 @@ const typeConfig: Record<string, { gradient: string, accent: string, emoji: stri
   ballet:   { gradient: 'linear-gradient(160deg, #0f1a44 0%, #2050b5 100%)', accent: '#60A5FA', emoji: '🩰' },
   dance:    { gradient: 'linear-gradient(160deg, #0f2d1a 0%, #0f8f5a 100%)', accent: '#34D399', emoji: '💃' },
   concert:  { gradient: 'linear-gradient(160deg, #2d230f 0%, #b57d10 100%)', accent: '#FBBF24', emoji: '🎻' },
-  shakespeare: { gradient: 'linear-gradient(160deg, #2d1f0a 0%, #8b6914 100%)', accent: '#D4A017', emoji: '🪶' },
+  shakespeare: { gradient: 'linear-gradient(160deg, #2d1f0a 0%, #8b6914 100%)', accent: '#D4A017', emoji: '📜' },
 }
 
 function getTicketUrl(company: string, city: string, title: string, country: string): string {
