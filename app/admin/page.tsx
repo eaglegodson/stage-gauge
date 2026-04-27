@@ -334,7 +334,7 @@ export default function AdminPage() {
                   onChange={e => setForm({ ...form, type: e.target.value })}
                   style={{ width: '100%', background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9' }}
                 >
-                  {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert'].map(t => (
+                  {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert', 'shakespeare'].map(t => (
                     <option key={t} value={t}>{t}</option>
                   ))}
                 </select>
@@ -607,7 +607,7 @@ export default function AdminPage() {
                     <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>Type</label>
                     <select value={editForm.type || 'theatre'} onChange={e => setEditForm({ ...editForm, type: e.target.value })}
                       style={{ width: '100%', background: '#14141f', border: '1px solid #2a2a3e', borderRadius: '6px', padding: '7px 10px', fontSize: '13px', color: '#f1f5f9' }}>
-                      {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert', 'community'].map(t => <option key={t} value={t}>{t}</option>)}
+                      {['theatre', 'musical', 'opera', 'ballet', 'dance', 'concert', 'community', 'shakespeare'].map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
                   <div>

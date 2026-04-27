@@ -12,6 +12,7 @@ const TYPE_CONFIG: Record<string, { gradient: string; accent: string }> = {
   ballet:   { gradient: 'linear-gradient(135deg, #1a3347 0%, #2d6a8f 100%)', accent: '#38BDF8' },
   dance:    { gradient: 'linear-gradient(135deg, #1a4a3a 0%, #1D9E75 100%)', accent: '#34D399' },
   concert:  { gradient: 'linear-gradient(135deg, #4a3a1a 0%, #9f7c2d 100%)', accent: '#FBBF24' },
+  shakespeare: { gradient: 'linear-gradient(135deg, #2d1f0a 0%, #8b6914 100%)', accent: '#D4A017' },
 }
 
 function StarDisplay({ score }: { score: number }) {

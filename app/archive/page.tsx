@@ -47,7 +47,7 @@ export default function ArchivePage() {
     fetchProductions()
   }, [typeFilter, cityFilter])
 
-  const typeFilters = ['all', 'theatre', 'musical', 'opera', 'ballet', 'dance']
+  const typeFilters = ['all', 'theatre', 'musical', 'opera', 'ballet', 'dance', 'shakespeare']
   const cityFilters = ['all', 'Melbourne', 'Sydney', 'Brisbane', 'Perth', 'Adelaide', 'Auckland', 'Wellington', 'London']
 
   const fmt = (d: string) => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
