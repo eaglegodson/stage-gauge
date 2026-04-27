@@ -78,7 +78,7 @@ export default function ReviewsPage() {
   const [reviewType, setReviewType] = useState<'critic' | 'audience'>('critic')
   const [reviews, setReviews] = useState<any[]>([])
   const [audienceReviews, setAudienceReviews] = useState<any[]>([])
-  const [cityFilter, setCityFilter] = useState<string>('all')
+  const [cityFilter, setCityFilter] = useState<string[]>(['all'])
   const [outletFilter, setOutletFilter] = useState<string[]>(['all'])
   const [availableOutlets, setAvailableOutlets] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -94,7 +94,7 @@ export default function ReviewsPage() {
     }
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     const city = timezoneToCity[timezone]
-    if (city) setCityFilter(city)
+    if (city) setCityFilter([city])
   }, [])
 
   useEffect(() => {
@@ -125,8 +125,9 @@ export default function ReviewsPage() {
 
     let filtered = (data || []).filter(r => r.productions)
 
-    if (cityFilter !== 'all') {
-      filtered = filtered.filter(r => (r.productions as any)?.city === cityFilter)
+    const activeCities = cityFilter.filter(c => c !== 'all')
+    if (activeCities.length > 0) {
+      filtered = filtered.filter(r => activeCities.includes((r.productions as any)?.city))
     }
 
     const outlets = Array.from(new Set(filtered.map((r: any) => r.outlet).filter(Boolean))).sort() as string[]
@@ -159,8 +160,9 @@ export default function ReviewsPage() {
 
     let filtered = (data || []).filter(r => r.productions)
 
-    if (cityFilter !== 'all') {
-      filtered = filtered.filter(r => (r.productions as any)?.city === cityFilter)
+    const activeCitiesAud = cityFilter.filter(c => c !== 'all')
+    if (activeCitiesAud.length > 0) {
+      filtered = filtered.filter(r => activeCitiesAud.includes((r.productions as any)?.city))
     }
 
     setAudienceReviews(filtered)
@@ -172,31 +174,7 @@ export default function ReviewsPage() {
     <main style={{ minHeight: '100vh', backgroundColor: '#14141f', display: 'flex', flexDirection: 'column' }}>
       <Header />
 
-      {/* City filter bar */}
-      <div style={{ backgroundColor: '#0d0d1a', borderBottom: '1px solid #1e1e2e', position: 'sticky', top: '56px', zIndex: 90 }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', alignItems: 'center', overflowX: 'auto', padding: '0 24px' }}>
-          {['all', ...COVERED].map(c => (
-            <button
-              key={c}
-              onClick={() => { setCityFilter(c); setOutletFilter(['all']) }}
-              style={{
-                fontSize: '12px',
-                fontWeight: cityFilter === c ? '600' : '400',
-                padding: '12px 16px',
-                whiteSpace: 'nowrap',
-                border: 'none',
-                borderBottom: cityFilter === c ? '2px solid #1D9E75' : '2px solid transparent',
-                cursor: 'pointer',
-                backgroundColor: 'transparent',
-                color: cityFilter === c ? '#f1f5f9' : '#6b7280',
-                flexShrink: 0,
-              }}
-            >
-              {c === 'all' ? 'All cities' : c}
-            </button>
-          ))}
-        </div>
-      </div>
+
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px', flex: 1, width: '100%', boxSizing: 'border-box' }}>
 
@@ -228,17 +206,25 @@ export default function ReviewsPage() {
               Latest reviews
             </h1>
             <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
-              {cityFilter === 'all' ? 'All cities' : cityFilter} · {reviewType === 'critic' ? 'critic reviews' : 'audience reviews'}
+              {cityFilter.includes('all') ? 'All cities' : cityFilter.filter(x => x !== 'all').join(', ')} · {reviewType === 'critic' ? 'critic reviews' : 'audience reviews'}
             </p>
           </div>
-          {reviewType === 'critic' && availableOutlets.length > 0 && (
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <FilterDropdown
-              label="Publication"
-              options={['all', ...availableOutlets]}
-              values={outletFilter}
-              onChange={setOutletFilter}
+              label="City"
+              options={['all', ...COVERED]}
+              values={cityFilter}
+              onChange={setCityFilter}
             />
-          )}
+            {reviewType === 'critic' && availableOutlets.length > 0 && (
+              <FilterDropdown
+                label="Publication"
+                options={['all', ...availableOutlets]}
+                values={outletFilter}
+                onChange={setOutletFilter}
+              />
+            )}
+          </div>
         </div>
 
         {isLoadingCurrent && <p style={{ color: '#4b5563', fontSize: '14px' }}>Loading...</p>}
