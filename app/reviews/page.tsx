@@ -307,7 +307,7 @@ export default function ReviewsPage() {
           <>
             {audienceReviews.length === 0 && (
               <p style={{ color: '#4b5563', fontSize: '14px' }}>
-                No audience reviews yet{cityFilter !== 'all' ? ` for ${cityFilter}` : ''}.{' '}
+                No audience reviews yet{!cityFilter.includes('all') ? ` for ${cityFilter.filter(x => x !== 'all').join(', ')}` : ''}.{' '}
                 <a href="/browse" style={{ color: '#1D9E75', textDecoration: 'none' }}>Browse shows</a> and be the first.
               </p>
             )}
