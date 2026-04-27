@@ -26,7 +26,7 @@ function StarDisplay({ score }: { score: number }) {
 
 const COVERED = ['Melbourne','Sydney','Brisbane','Perth','Adelaide','Hobart','Canberra','Auckland','Wellington','London']
 
-function FilterDropdown({ label, options, values, onChange, allKey = 'all' }: { label: string, options: string[], values: string[], onChange: (v: string[]) => void, allKey?: string }) {
+function FilterDropdown({ label, options, values, onChange, allKey = 'all', allLabel = 'All' }: { label: string, options: string[], values: string[], onChange: (v: string[]) => void, allKey?: string, allLabel?: string }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -64,7 +64,7 @@ function FilterDropdown({ label, options, values, onChange, allKey = 'all' }: { 
                 onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
               >
                 <span style={{ width: '14px', height: '14px', border: '1px solid ' + (selected ? '#1D9E75' : '#4b5563'), borderRadius: '3px', background: selected ? '#1D9E75' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '9px', color: '#14141f' }}>{selected ? '✓' : ''}</span>
-                {opt === allKey ? 'All publications' : opt}
+                {opt === allKey ? allLabel : opt}
               </button>
             )
           })}
@@ -215,6 +215,7 @@ export default function ReviewsPage() {
               options={['all', ...COVERED]}
               values={cityFilter}
               onChange={setCityFilter}
+              allLabel="All cities"
             />
             {reviewType === 'critic' && availableOutlets.length > 0 && (
               <FilterDropdown
@@ -222,6 +223,7 @@ export default function ReviewsPage() {
                 options={['all', ...availableOutlets]}
                 values={outletFilter}
                 onChange={setOutletFilter}
+                allLabel="All publications"
               />
             )}
           </div>
