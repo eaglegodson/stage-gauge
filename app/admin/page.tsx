@@ -6,11 +6,12 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<'unmatched' | 'unknown' | 'community' | 'audience' | 'edit'>('unmatched')
+  const [tab, setTab] = useState<'unmatched' | 'unknown' | 'community' | 'audience' | 'edit' | 'dismissed'>('unmatched')
   const [communitySubmissions, setCommunitySubmissions] = useState<any[]>([])
   const [audienceReviews, setAudienceReviews] = useState<any[]>([])
   const [unmatched, setUnmatched] = useState<any[]>([])
   const [unknownTitles, setUnknownTitles] = useState<any[]>([])
+  const [dismissed, setDismissed] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   const [creating, setCreating] = useState<string | null>(null)
@@ -33,10 +34,12 @@ export default function AdminPage() {
       supabase.from('unmatched_reviews').select('*').eq('status', 'pending').order('created_at', { ascending: false }),
       supabase.from('community_submissions').select('*').eq('status', 'pending').order('created_at', { ascending: false })
     ])
+    const dis = await supabase.from('unmatched_reviews').select('*').eq('status', 'dismissed').eq('dismissed_by', 'algorithm').order('created_at', { ascending: false })
     const allUnmatched = unm.data || []
     setAudienceReviews(aud.data || [])
     setUnmatched(allUnmatched.filter(r => r.show_title && r.show_title !== 'Unknown'))
     setUnknownTitles(allUnmatched.filter(r => !r.show_title || r.show_title === 'Unknown'))
+    setDismissed(dis.data || [])
     setLoading(false)
   }
 
@@ -46,7 +49,7 @@ export default function AdminPage() {
   }
 
   async function dismissUnmatched(id: string) {
-    await supabase.from('unmatched_reviews').update({ status: 'dismissed' }).eq('id', id)
+    await supabase.from('unmatched_reviews').update({ status: 'dismissed', dismissed_by: 'human' }).eq('id', id)
     setUnmatched(unmatched.filter(r => r.id !== id))
     setUnknownTitles(unknownTitles.filter(r => r.id !== id))
     setCreating(null)
@@ -230,6 +233,18 @@ export default function AdminPage() {
     setEditSaving(false)
   }
 
+  async function confirmDismiss(id: string) {
+    await supabase.from('unmatched_reviews').update({ dismissed_by: 'confirmed' }).eq('id', id)
+    setDismissed(dismissed.filter(r => r.id !== id))
+  }
+
+  async function restoreToUnmatched(id: string) {
+    await supabase.from('unmatched_reviews').update({ status: 'pending', dismissed_by: null }).eq('id', id)
+    const item = dismissed.find(r => r.id === id)
+    if (item) setUnmatched(prev => [{ ...item, status: 'pending' }, ...prev])
+    setDismissed(dismissed.filter(r => r.id !== id))
+  }
+
   const tabStyle = (t: string) => ({
     fontSize: '13px',
     fontWeight: tab === t ? '600' : '400',
@@ -377,6 +392,9 @@ export default function AdminPage() {
           <button style={tabStyle('edit')} onClick={() => setTab('edit')}>
             Edit shows
           </button>
+          <button style={tabStyle('dismissed')} onClick={() => setTab('dismissed')}>
+            Dismissed <Badge count={dismissed.length} muted />
+          </button>
         </div>
 
         {loading && <p style={{ color: '#4b5563' }}>Loading...</p>}
@@ -455,6 +473,47 @@ export default function AdminPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {!loading && tab === 'dismissed' && (
+          <div>
+            <p style={{ fontSize: '13px', color: '#4b5563', margin: '0 0 16px 0' }}>
+              Reviews the algorithm automatically dismissed. Confirm to finalise, or restore to the Unmatched queue to add the show manually.
+            </p>
+            {dismissed.length === 0 && (
+              <p style={{ color: '#4b5563', fontSize: '14px' }}>No algorithm-dismissed reviews to review.</p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {dismissed.map(item => (
+                <div key={item.id} style={{ background: '#1e1e2e', border: '1px solid #2a2a3e', borderRadius: '10px', padding: '18px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '8px' }}>
+                    <div>
+                      <div style={{ fontFamily: 'Georgia, serif', fontSize: '16px', fontWeight: '600', color: '#f1f5f9', marginBottom: '3px' }}>
+                        {item.show_title || 'Unknown title'}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                        {item.outlet}{item.city && item.city !== 'Unknown' && ` · ${item.city}`}{item.published_date && ` · ${item.published_date}`}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                      <button onClick={() => restoreToUnmatched(item.id)} style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '6px', border: '1px solid #1D9E75', background: 'transparent', color: '#1D9E75', cursor: 'pointer' }}>
+                        + Add show
+                      </button>
+                      <button onClick={() => confirmDismiss(item.id)} style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '6px', border: '1px solid #2a2a3e', background: '#0f0f1a', color: '#6b7280', cursor: 'pointer' }}>
+                        Confirm dismiss
+                      </button>
+                    </div>
+                  </div>
+                  {item.pull_quote && (
+                    <p style={{ fontSize: '13px', color: '#9ca3af', margin: '8px 0', fontStyle: 'italic', lineHeight: '1.6', borderLeft: '2px solid #2a2a3e', paddingLeft: '10px' }}>"{item.pull_quote}"</p>
+                  )}
+                  {item.source_url && (
+                    <a href={item.source_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#4b5563', textDecoration: 'none' }}>Read original →</a>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

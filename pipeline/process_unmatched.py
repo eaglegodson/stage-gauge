@@ -186,14 +186,14 @@ def process_unmatched():
         # Dismiss out-of-scope cities immediately (but not Unknown city — let Claude decide)
         if city and city not in COVERED_CITIES and city != "Unknown":
             print(f"  -> Dismissed: city '{city}' not covered")
-            supabase.table("unmatched_reviews").update({"status": "dismissed"}).eq("id", item["id"]).execute()
+            supabase.table("unmatched_reviews").update({"status": "dismissed", "dismissed_by": "algorithm"}).eq("id", item["id"]).execute()
             dismissed += 1
             continue
 
         # Dismiss out-of-scope countries immediately (but not Unknown — let Claude decide)
         if country and country not in COVERED_COUNTRIES and country != "Unknown":
             print(f"  -> Dismissed: country '{country}' not covered")
-            supabase.table("unmatched_reviews").update({"status": "dismissed"}).eq("id", item["id"]).execute()
+            supabase.table("unmatched_reviews").update({"status": "dismissed", "dismissed_by": "algorithm"}).eq("id", item["id"]).execute()
             dismissed += 1
             continue
 
@@ -238,7 +238,7 @@ def process_unmatched():
 
         if not decision.get("include"):
             print(f"  -> Dismissed: {decision.get('reason', 'not suitable')}")
-            supabase.table("unmatched_reviews").update({"status": "dismissed"}).eq("id", item["id"]).execute()
+            supabase.table("unmatched_reviews").update({"status": "dismissed", "dismissed_by": "algorithm"}).eq("id", item["id"]).execute()
             dismissed += 1
             continue
 
