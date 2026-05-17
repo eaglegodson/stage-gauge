@@ -256,7 +256,7 @@ export default function Home() {
         const subtype = cs?.subtype || 'theatre'
         const ccfg = typeConfig[subtype] || typeConfig.theatre
         return (
-          <div style={{ textAlign: 'center', marginTop: '-24px', paddingBottom: '32px' }}>
+          <div style={{ textAlign: 'center', paddingTop: '8px', paddingBottom: '32px' }}>
             <a href={'/show/' + cs.production_id} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '8px', padding: '10px 16px', opacity: communityVisible ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}>
               <span style={{ fontSize: '20px' }}>{ccfg.emoji}</span>
               <div style={{ textAlign: 'left' }}>
