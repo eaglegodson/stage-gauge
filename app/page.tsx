@@ -102,12 +102,13 @@ export default function Home() {
     }
     detectAndFetch()
 
-    // Fetch community shows
+    // Fetch community shows filtered by detected city
     const today2 = new Date().toISOString().split('T')[0]
     supabase
       .from('production_listing')
       .select('*')
       .eq('type', 'community')
+      .eq('city', city)
       .or('season_end.is.null,season_end.gte.' + today2)
       .order('season_start', { ascending: true })
       .limit(8)
