@@ -256,24 +256,21 @@ export default function Home() {
         const subtype = cs?.subtype || 'theatre'
         const ccfg = typeConfig[subtype] || typeConfig.theatre
         return (
-          <div style={{ backgroundColor: '#0f0f1a', borderTop: '1px solid #1e1e2e', borderBottom: '1px solid #1e1e2e', padding: '16px 24px' }}>
-            <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', whiteSpace: 'nowrap' }}>Community theatre</span>
-              <a href={'/show/' + cs.production_id} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: '8px', padding: '8px 14px', opacity: communityVisible ? 1 : 0, transition: 'opacity 0.6s ease-in-out', flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: '18px', flexShrink: 0 }}>{ccfg.emoji}</span>
-                <div style={{ textAlign: 'left', minWidth: 0 }}>
-                  <div style={{ fontSize: '11px', color: '#6b7280', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '2px' }}>{cs.city} · {cs.company}</div>
-                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cs.title}</div>
-                </div>
-              </a>
-              {communityShows.length > 1 && (
-                <div style={{ display: 'flex', gap: '5px', flexShrink: 0 }}>
-                  {communityShows.map((_: any, i: number) => (
-                    <div key={i} onClick={() => setCurrentCommunityShow(i)} style={{ width: '5px', height: '5px', borderRadius: '50%', background: i === currentCommunityShow ? '#a78bfa' : 'rgba(255,255,255,0.15)', transition: 'background 0.3s', cursor: 'pointer' }} />
-                  ))}
-                </div>
-              )}
-            </div>
+          <div style={{ textAlign: 'center', marginTop: '-24px', paddingBottom: '32px' }}>
+            <a href={'/show/' + cs.production_id} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '8px', padding: '10px 16px', opacity: communityVisible ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}>
+              <span style={{ fontSize: '20px' }}>{ccfg.emoji}</span>
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: '11px', color: '#7c6fad', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '2px' }}>Community · {cs.city}</div>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600' }}>{cs.title}</div>
+              </div>
+            </a>
+            {communityShows.length > 1 && (
+              <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginTop: '12px' }}>
+                {communityShows.map((_: any, i: number) => (
+                  <div key={i} onClick={() => setCurrentCommunityShow(i)} style={{ width: '5px', height: '5px', borderRadius: '50%', background: i === currentCommunityShow ? '#a78bfa' : 'rgba(255,255,255,0.15)', transition: 'background 0.3s', cursor: 'pointer' }} />
+                ))}
+              </div>
+            )}
           </div>
         )
       })()}
