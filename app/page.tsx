@@ -99,20 +99,22 @@ export default function Home() {
         .order('combined_score', { ascending: false })
         .limit(8)
       if (productions && productions.length > 0) setShows(productions)
+
+      // Fetch community shows for same city
+      const today2 = new Date().toISOString().split('T')[0]
+      const { data: communityData } = await supabase
+        .from('production_listing')
+        .select('*')
+        .eq('type', 'community')
+        .eq('city', city)
+        .or('season_end.is.null,season_end.gte.' + today2)
+        .order('season_start', { ascending: true })
+        .limit(8)
+      if (communityData && communityData.length > 0) setCommunityShows(communityData)
     }
     detectAndFetch()
 
-    // Fetch community shows filtered by detected city
-    const today2 = new Date().toISOString().split('T')[0]
-    supabase
-      .from('production_listing')
-      .select('*')
-      .eq('type', 'community')
-      .eq('city', city)
-      .or('season_end.is.null,season_end.gte.' + today2)
-      .order('season_start', { ascending: true })
-      .limit(8)
-      .then(({ data }) => { if (data && data.length > 0) setCommunityShows(data) })
+
   }, [])
 
   useEffect(() => {
