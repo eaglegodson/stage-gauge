@@ -257,10 +257,10 @@ export default function Home() {
         const ccfg = typeConfig[subtype] || typeConfig.theatre
         return (
           <div style={{ textAlign: 'center', paddingTop: '8px', paddingBottom: '32px' }}>
-            <a href={'/show/' + cs.production_id} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '8px', padding: '10px 16px', opacity: communityVisible ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}>
+            <a href={'/show/' + cs.production_id} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px 16px', opacity: communityVisible ? 1 : 0, transition: 'opacity 0.6s ease-in-out' }}>
               <span style={{ fontSize: '20px' }}>{ccfg.emoji}</span>
               <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '11px', color: '#7c6fad', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '2px' }}>Community · {cs.city}</div>
+                <div style={{ fontSize: '11px', color: '#4b5563', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '2px' }}>Community · {cs.city}</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600' }}>{cs.title}</div>
               </div>
             </a>
