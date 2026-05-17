@@ -237,6 +237,7 @@ export default function Home() {
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: '11px', color: '#4b5563', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '2px' }}>Now playing in {userCity}</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600' }}>{show.title}</div>
+                {show.venue && <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>{show.venue}</div>}
               </div>
               {show.combined_score && <span style={{ color: '#1D9E75', fontSize: '12px', marginLeft: '8px' }}>{'★'.repeat(Math.round(show.combined_score))}</span>}
             </a>
@@ -262,6 +263,7 @@ export default function Home() {
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: '11px', color: '#4b5563', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '2px' }}>Community · {cs.city}</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600' }}>{cs.title}</div>
+                {cs.venue && <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>{cs.venue}</div>}
               </div>
             </a>
             {communityShows.length > 1 && (
