@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 import posthog from 'posthog-js'
 
-export default function ReviewForm({ productionId, user, onClose }: { productionId: string, user: any, onClose: () => void }) {
+export default function ReviewForm({ productionId, user, onClose, onSuccess }: { productionId: string, user: any, onClose: () => void, onSuccess?: () => void }) {
   const [rating, setRating] = useState(0)
   const [reviewText, setReviewText] = useState('')
   const [dateAttended, setDateAttended] = useState('')
@@ -23,7 +23,7 @@ export default function ReviewForm({ productionId, user, onClose }: { production
       reviewer_name: reviewerName || null,
       date_attended: dateAttended || null,
       city_attended: null,
-      status: 'pending'
+      status: 'approved'
     })
     if (error) {
       posthog.captureException(error)
@@ -35,7 +35,9 @@ export default function ReviewForm({ productionId, user, onClose }: { production
         has_review_text: reviewText.length > 0,
         has_date_attended: !!dateAttended,
       })
-      setMessage('Review submitted! It will appear after moderation.')
+      setMessage('Review submitted!')
+      onSuccess?.()
+      setTimeout(() => onClose(), 1200)
     }
     setLoading(false)
   }

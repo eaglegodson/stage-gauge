@@ -505,7 +505,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         </div>
       )}
       {showReviewForm && user && (
-        <ReviewForm productionId={id} user={user} onClose={() => setShowReviewForm(false)} />
+        <ReviewForm productionId={id} user={user} onClose={() => setShowReviewForm(false)} onSuccess={() => { supabase.from('audience_reviews').select('*').eq('production_id', id).eq('status', 'approved').order('created_at', { ascending: false }).then(({ data }) => setAudienceReviews(data || [])) }} />
       )}
 
       <Footer />
