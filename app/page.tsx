@@ -27,6 +27,9 @@ export default function Home() {
   const [shows, setShows] = useState<any[]>([])
   const [currentShow, setCurrentShow] = useState(0)
   const [visible, setVisible] = useState(true)
+  const [communityShows, setCommunityShows] = useState<any[]>([])
+  const [currentCommunityShow, setCurrentCommunityShow] = useState(0)
+  const [communityVisible, setCommunityVisible] = useState(true)
   const [userCity, setUserCity] = useState('')
   const [stats, setStats] = useState({ productions: 0, reviews: 0, cities: 0 })
   const [user, setUser] = useState<any>(null)
@@ -98,6 +101,17 @@ export default function Home() {
       if (productions && productions.length > 0) setShows(productions)
     }
     detectAndFetch()
+
+    // Fetch community shows
+    const today2 = new Date().toISOString().split('T')[0]
+    supabase
+      .from('production_listing')
+      .select('*')
+      .eq('type', 'community')
+      .or('season_end.is.null,season_end.gte.' + today2)
+      .order('season_start', { ascending: true })
+      .limit(8)
+      .then(({ data }) => { if (data && data.length > 0) setCommunityShows(data) })
   }, [])
 
   useEffect(() => {
@@ -111,6 +125,18 @@ export default function Home() {
     }, 3500)
     return () => clearInterval(interval)
   }, [shows])
+
+  useEffect(() => {
+    if (communityShows.length < 2) return
+    const interval = setInterval(() => {
+      setCommunityVisible(false)
+      setTimeout(() => {
+        setCurrentCommunityShow(prev => (prev + 1) % communityShows.length)
+        setCommunityVisible(true)
+      }, 600)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [communityShows])
 
   useEffect(() => {
     if (searchOpen && searchRef.current) {
@@ -224,6 +250,33 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {communityShows.length > 0 && (() => {
+        const cs = communityShows[currentCommunityShow]
+        const subtype = cs?.subtype || 'theatre'
+        const ccfg = typeConfig[subtype] || typeConfig.theatre
+        return (
+          <div style={{ backgroundColor: '#0f0f1a', borderTop: '1px solid #1e1e2e', borderBottom: '1px solid #1e1e2e', padding: '16px 24px' }}>
+            <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', whiteSpace: 'nowrap' }}>Community theatre</span>
+              <a href={'/show/' + cs.production_id} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: '8px', padding: '8px 14px', opacity: communityVisible ? 1 : 0, transition: 'opacity 0.6s ease-in-out', flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: '18px', flexShrink: 0 }}>{ccfg.emoji}</span>
+                <div style={{ textAlign: 'left', minWidth: 0 }}>
+                  <div style={{ fontSize: '11px', color: '#6b7280', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '2px' }}>{cs.city} · {cs.company}</div>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#f1f5f9', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cs.title}</div>
+                </div>
+              </a>
+              {communityShows.length > 1 && (
+                <div style={{ display: 'flex', gap: '5px', flexShrink: 0 }}>
+                  {communityShows.map((_: any, i: number) => (
+                    <div key={i} onClick={() => setCurrentCommunityShow(i)} style={{ width: '5px', height: '5px', borderRadius: '50%', background: i === currentCommunityShow ? '#a78bfa' : 'rgba(255,255,255,0.15)', transition: 'background 0.3s', cursor: 'pointer' }} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })()}
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px 80px', width: '100%', boxSizing: 'border-box' }}>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '12px' }}>
