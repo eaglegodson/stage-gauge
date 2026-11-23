@@ -77,6 +77,14 @@ rows = (supabase.table("unmatched_reviews")
         .or_("show_title.is.null,show_title.ilike.unknown")
         .execute().data)
 
+from collections import Counter
+url_counts = Counter(r.get("source_url") for r in rows)
+existing = set()
+for r in rows:
+    u = r.get("source_url")
+    if u and supabase.table("critic_reviews").select("id").eq("source_url", u).limit(1).execute().data:
+        existing.add(u)
+
 print(f"Model: {MODEL}")
 print(f"Found {len(rows)} pending reviews with no title\n")
 identified = left = 0
@@ -84,6 +92,10 @@ identified = left = 0
 for i, row in enumerate(rows, 1):
     url = row.get("source_url") or ""
     print(f"[{i}/{len(rows)}] {row.get('outlet')} — {url[:90]}")
+    if not url or url_counts[url] > 1 or url in existing:
+        print("  -> Skipped: link missing, shared by several reviews, or already on site")
+        left += 1
+        continue
     page_title, text = fetch(url) if url else ("", "(no URL)")
     try:
         resp = claude.messages.create(
